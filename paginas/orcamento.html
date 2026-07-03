@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Solicitar Orçamento - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=3.2.0">
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="marca-header">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+            <h1>Solicitar Orçamento</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Início</a></li>
+                <li><a href="servicos.html">Serviços</a></li>
+                <li><a href="produtos.html">Produtos</a></li>
+                <li><a href="contato.html">Contato</a></li>
+                <li><a href="orcamento.html">Orçamento</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<section class="orcamento">
+    <div class="container">
+        <h2>Monte seu pedido de orçamento</h2>
+        <p>Informe os produtos desejados. Nossa equipe receberá seu pedido no painel e retornará com o orçamento final.</p>
+
+        <form id="formSolicitacaoOrcamento" class="formulario formulario-cliente" novalidate>
+            <div class="card-form">
+                <h2>Dados do Cliente</h2>
+
+                <label>Nome completo</label>
+                <input type="text" id="cliente" placeholder="Digite seu nome" required>
+
+                <label>Telefone / WhatsApp</label>
+                <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+
+                <label>E-mail</label>
+                <input type="email" id="email" placeholder="Seu e-mail">
+
+                <label>Endereço do serviço</label>
+                <input type="text" id="endereco" placeholder="Rua, número, bairro e cidade">
+            </div>
+
+            <div class="card-form">
+                <h2>Dados da peça</h2>
+
+                <div class="linha3">
+                    <div>
+                        <label>Tipo</label>
+                        <select id="tipoVidro" required>
+                            <option value="">Escolha uma opção</option>
+                            <option value="Porta">Porta</option>
+                            <option value="Janela">Janela</option>
+                            <option value="Vidro Fixo">Vidro Fixo</option>
+                            <option value="Box de Banheiro">Box de Banheiro</option>
+                            <option value="Guarda-Corpo">Guarda-Corpo</option>
+                            <option value="Espelho">Espelho</option>
+                            <option value="Prateleira">Prateleira</option>
+                            <option value="Fachada de vidro">Fachada de vidro</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Espessura</label>
+                        <select id="espessura">
+                            <option value="4">4 mm</option>
+                            <option value="6">6 mm</option>
+                            <option value="8">8 mm</option>
+                            <option value="10">10 mm</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Cor</label>
+                        <select id="cor">
+                            <option value="incolor">Incolor</option>
+                            <option value="fume">Fumê</option>
+                            <option value="verde">Verde</option>
+                            <option value="bronze">Bronze</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-form">
+                <h2>Medidas</h2>
+
+                <div class="linha4">
+                    <div>
+                        <label>Largura (cm)</label>
+                        <input id="largura" type="number" placeholder="Ex.: 100" min="0" step="1">
+                    </div>
+
+                    <div>
+                        <label>Altura (cm)</label>
+                        <input id="altura" type="number" placeholder="Ex.: 150" min="0" step="1">
+                    </div>
+
+                    <div>
+                        <label>Quantidade</label>
+                        <input id="quantidade" type="number" value="1" min="1" step="1">
+                    </div>
+
+                    <div>
+                        <label>Área</label>
+                        <input id="area" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-form card-adicionar-produto">
+                <h2>Adicionar produto</h2>
+                <p class="ajuda-form">Confira os dados do produto e clique em adicionar. Os valores serão calculados pela equipe da RK.</p>
+                <button type="button" id="btnAdicionarItemCliente" class="btn-adicionar-cliente">+ Adicionar produto à lista</button>
+            </div>
+
+            <div class="secao-inteira">
+                <h2>Itens adicionados</h2>
+                <table id="tabelaItensCliente">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Produto</th>
+                            <th>Medidas</th>
+                            <th>Espessura</th>
+                            <th>Cor</th>
+                            <th>Qtd.</th>
+                            <th>Área aproximada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card-form">
+                <h2>Observações</h2>
+                <textarea id="observacoes" rows="5" placeholder="Ex.: local de instalação, detalhes do acabamento, urgência, melhor horário para contato..."></textarea>
+            </div>
+
+            <div class="card-form resumo-orcamento resumo-cliente-sem-valores">
+                <div class="linha-total">
+                    <span>Produtos adicionados</span>
+                    <strong id="totalItensCliente">0</strong>
+                </div>
+                <small class="ajuda-form">Após o envio, a equipe da RK revisará medidas, alumínio, acessórios e instalação para retornar com o valor final.</small>
+            </div>
+
+            <button type="submit">Enviar pedido para RK Vidraçaria</button>
+            <p id="mensagemSolicitacao" class="mensagem-sucesso"></p>
+            <div id="popupSolicitacao" class="rk-popup" aria-live="polite">
+                <div class="rk-popup-card">
+                    <button type="button" id="fecharPopupSolicitacao" class="rk-popup-fechar">×</button>
+                    <div class="rk-popup-icone">✓</div>
+                    <h3>Pedido enviado!</h3>
+                    <p>A RK Vidraçaria recebeu sua solicitação. Em breve nossa equipe entrará em contato.</p>
+                    <small>Você também pode falar pelo WhatsApp: (73) 9981-9768</small>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p>
+    <p>📞 (73) 9981-9768 | 📍 Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=2.2.0"></script>
+<script src="../js/config.js?v=2.2.0"></script>
+<script src="../js/storage.js?v=2.2.0"></script>
+<script src="../js/util.js?v=2.2.0"></script>
+<script src="../js/calculos.js?v=2.2.0"></script>
+<script src="../js/orcamento-cliente.js?v=2.3.0"></script>
+
+    <script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>

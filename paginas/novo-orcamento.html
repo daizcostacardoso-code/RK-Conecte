@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Novo Orçamento</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=3.2.0">
+
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+
+<body>
+
+    <header>
+
+        <div class="container">
+
+            <div class="marca-header">
+                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+                <h1>Novo Orçamento</h1>
+            </div>
+
+            <a href="funcionario.html" class="voltar">
+                Voltar
+            </a>
+
+        </div>
+
+    </header>
+
+    <section class="orcamento">
+
+        <div class="container">
+
+            <form id="formOrcamento" class="formulario">
+
+                <!-- CLIENTE -->
+                <div class="card-form">
+
+                    <h2>Dados do Cliente</h2>
+
+                    <label>Nome do Cliente</label>
+                    <input type="text" id="cliente">
+
+                    <label>Telefone / WhatsApp</label>
+                    <input type="tel" id="telefone">
+
+                    <label>Endereço</label>
+                    <input type="text" id="endereco">
+
+                </div>
+
+                <!-- VIDRO -->
+                <div class="card-form">
+
+                    <h2 id="dadosVidro">Dados do Vidro</h2>
+
+                    <div class="linha3">
+
+                        <div>
+                            <label>Espessura</label>
+
+                            <select id="espessura">
+                                <option value="4">4 mm</option>
+                                <option value="6">6 mm</option>
+                                <option value="8">8 mm</option>
+                                <option value="10">10 mm</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Cor</label>
+
+                            <select id="cor">
+                                <option value="incolor">Incolor</option>
+                                <option value="fume">Fumê</option>
+                                <option value="verde">Verde</option>
+                                <option value="bronze">Bronze</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Tipo</label>
+
+                            <select id="tipoVidro">
+                                <option value="Porta">Porta</option>
+                                <option value="Janela">Janela</option>
+                                <option value="Vidro Fixo">Vidro Fixo</option>
+                                <option value="Box de Banheiro">Box de Banheiro</option>
+                                <option value="Guarda-Corpo">Guarda-Corpo</option>
+                                <option value="Espelho">Espelho</option>
+                                <option value="Prateleira">Prateleira</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- MEDIDAS -->
+                <div class="card-form">
+
+                    <h2>Medidas</h2>
+
+                    <div class="linha4">
+
+                        <div>
+                            <label>Largura (cm)</label>
+                            <input id="largura" type="number" placeholder="Ex.: 125 (cm)" min="0" step="1">
+                        </div>
+
+                        <div>
+                            <label>Altura (cm)</label>
+                            <input id="altura" type="number" placeholder="Ex.: 125 (cm)" min="0" step="1">
+                        </div>
+
+                        <div>
+                            <label>Quantidade</label>
+                            <input id="quantidade" type="number" value="1" min="1">
+                        </div>
+
+                        <div>
+                            <label>Área</label>
+                            <input id="area" readonly>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <!-- VALORES -->
+                <div class="card-form">
+
+                    <h2>Valores</h2>
+
+                    <div class="linha4">
+
+                        <div>
+                            <label>Vidro</label>
+                            <input id="valorVidro" readonly>
+                        </div>
+
+                        <div>
+                            <label>Cor</label>
+                            <input id="valorCor" readonly>
+                        </div>
+
+                        <div>
+                            <label>Alumínio (R$/metro)</label>
+                            <input id="aluminio" readonly>
+                        </div>
+
+                        <div>
+                            <label>Acessórios (R$)</label>
+                            <input id="acessorios" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 50">
+                        </div>
+
+                    </div>
+
+                    <div class="resultado-card">
+
+                        <span>Total</span>
+
+                        <strong id="resultado">
+                            R$ 0,00
+                        </strong>
+
+                    </div>
+
+                    <button type="button" id="btnAdicionarItem">
+                        Adicionar Item
+                    </button>
+
+                </div>
+
+                <!-- TABELA -->
+                <div class="secao-inteira">
+
+                    <h2>Itens do Orçamento</h2>
+
+                    <table id="tabelaItens">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>#</th>
+                                <th>Tipo</th>
+                                <th>Esp.</th>
+                                <th>Cor</th>
+                                <th>Qtd</th>
+                                <th>Área</th>
+                                <th>Vidro</th>
+                                <th>Alumínio</th>
+                                <th>Acessórios</th>
+                                <th>Total</th>
+                                <th>Ações</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody></tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- OBSERVAÇÕES -->
+                <div class="card-form">
+
+                    <h2>Observações</h2>
+
+                    <textarea id="observacoes" rows="5"></textarea>
+
+                </div>
+
+                <!-- RESUMO -->
+                <div class="card-form resumo-orcamento">
+
+                    <div class="linha-total">
+
+                        <span>Subtotal</span>
+
+                        <strong id="subtotal">
+                            R$ 0,00
+                        </strong>
+
+                    </div>
+
+                    <div class="desconto-grid">
+
+                        <div>
+                            <label>Tipo de desconto</label>
+                            <select id="tipoDesconto">
+                                <option value="valor">Valor (R$)</option>
+                                <option value="percentual">Percentual (%)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Desconto</label>
+                            <input type="number" id="desconto" value="0" step="0.01" min="0">
+                        </div>
+
+                    </div>
+
+                    <div class="linha-total">
+
+                        <span>Total Geral</span>
+
+                        <strong id="totalGeral">
+                            R$ 0,00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <!-- BOTÕES -->
+
+                <div class="secao-inteira acoes-orcamento">
+
+                    <button type="button" id="btnGerarPDF" class="btn-pdf">
+                        📄 Baixar PDF
+                    </button>
+
+                    <button type="button" id="btnNovoOrcamento" class="btn-secundario">
+                        Novo Orçamento
+                    </button>
+
+                </div>
+
+                <!-- CAMPOS OCULTOS -->
+
+                <input type="hidden" id="empresa" value="RK VIDRAÇARIA">
+                <input type="hidden" id="cnpj" value="00.000.000/0001-00">
+                <input type="hidden" id="endEmpresa" value="Rua Guimarães, 336 - Nilo Fraga, Porto Seguro">
+                <input type="hidden" id="foneEmpresa" value="(73) 9981-9768">
+                <input type="hidden" id="emailEmpresa" value="">
+                <input type="hidden" id="logo" value="../imagens/logo.jpeg">
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <footer>
+
+        <p>RK Vidraçaria</p>
+
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js?v=2.1.0"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js?v=2.1.0"></script>
+
+    <script src="../js/config.js?v=2.1.0"></script>
+    <script src="../js/storage.js?v=2.1.0"></script>
+    <script src="../js/util.js?v=2.1.0"></script>
+    <script src="../js/formulario.js?v=2.1.0"></script>
+    <script src="../js/calculos.js?v=2.1.0"></script>
+    <script src="../js/itens.js?v=2.1.0"></script>
+    <script src="../js/tabela.js?v=2.1.0"></script>
+    <script src="../js/orcamento.js?v=2.1.0"></script>
+    <script src="../js/eventos.js?v=2.1.0"></script>
+    <script src="../js/pdf.js?v=2.1.0"></script>
+    <script src="../js/app-orcamento.js?v=2.1.0"></script>
+
+    <script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+
+</html>

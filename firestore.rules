@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /configuracoes/{documento} {
+      allow read, write: if true;
+    }
+
+    match /orcamentos/{documento} {
+      allow read, write: if true;
+    }
+
+    match /orcamentos_emitidos/{documento} {
+      allow read, write: if true;
+    }
+
+    match /solicitacoes_site/{documento} {
+      allow read, write: if true;
+    }
+
+    // TODO: as regras atuais estão abertas para facilitar a operação.
+    // Futuramente, exigir autenticação antes de liberar o caixa da empresa.
+    match /caixa_empresa/{documento} {
+      allow read, write: if true;
+    }
+  }
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Entrar - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=3.2.0">
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="login-pro-body">
+    <main class="login-pro-page">
+        <section class="login-pro-showcase">
+            <div class="login-pro-glass">
+                <div class="login-pro-logo-line">
+                    <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+                    <div>
+                        <strong>RK Vidraçaria</strong>
+                        <small>Sistema interno de gestão</small>
+                    </div>
+                </div>
+
+                <h1>Controle sua vidraçaria com mais clareza.</h1>
+                <p>Orçamentos, solicitações, caixa, lembretes e ferramentas em uma área exclusiva da equipe.</p>
+
+                <div class="login-pro-mini-cards">
+                    <span>📋 Orçamentos</span>
+                    <span>💰 Caixa</span>
+                    <span>🔔 Lembretes</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-pro-panel" aria-label="Login do funcionário">
+            <a href="../index.html" class="login-pro-voltar">← Voltar ao site</a>
+
+            <div class="login-pro-card">
+                <div class="login-pro-card-top">
+                    <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+                    <span>Área da equipe</span>
+                </div>
+
+                <h2>Entrar no painel</h2>
+                <p class="login-pro-subtitle">Informe suas credenciais para acessar o ambiente administrativo.</p>
+
+                <form class="login-pro-form" onsubmit="Login.entrar(event)">
+                    <label for="usuario">Login do usuário</label>
+                    <div class="login-pro-input">
+                        <span>👤</span>
+                        <input type="text" id="usuario" placeholder="admin" autocomplete="username" required>
+                    </div>
+
+                    <label for="senha">Senha de acesso</label>
+                    <div class="login-pro-input">
+                        <span>🔐</span>
+                        <input type="password" id="senha" placeholder="1234" autocomplete="current-password" required>
+                    </div>
+
+                    <button type="submit" class="login-pro-button">Acessar painel</button>
+                </form>
+
+                <p id="mensagem" class="login-pro-message" role="alert"></p>
+                <small class="login-pro-note">Após o login, o sistema exibirá uma tela de carregamento com os dados da empresa.</small>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/login.js?v=2.7.0"></script>
+    <script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>

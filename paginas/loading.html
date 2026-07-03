@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Carregando - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=3.2.0">
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="splash-body">
+    <main class="splash-page">
+        <section class="splash-card">
+            <div class="splash-logo-wrap">
+                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria" class="splash-logo">
+            </div>
+
+            <span class="splash-kicker">Acesso autorizado</span>
+            <h1 id="splashEmpresa">RK Vidraçaria</h1>
+            <p id="splashSubtitulo">Preparando ambiente do funcionário...</p>
+
+            <div class="splash-user">
+                <div class="splash-avatar" id="splashAvatar">RK</div>
+                <div>
+                    <strong id="splashUsuario">Funcionário RK</strong>
+                    <small id="splashLogin">admin</small>
+                </div>
+            </div>
+
+            <div class="splash-info-grid">
+                <div>
+                    <span>Versão</span>
+                    <strong>RK Vidraçaria v2.7</strong>
+                </div>
+                <div>
+                    <span>CNPJ</span>
+                    <strong id="splashCnpj">Não informado</strong>
+                </div>
+                <div>
+                    <span>Sistema</span>
+                    <strong>Connect Suite</strong>
+                </div>
+            </div>
+
+            <div class="splash-progress" aria-label="Carregando painel">
+                <span></span>
+            </div>
+
+            <p class="splash-footer">Carregando painel. Aguarde alguns segundos...</p>
+        </section>
+    </main>
+
+    <script>
+        (function(){
+            const chaveSessao = "vidracaria_sessao_funcionario";
+            const chaveConfig = "vidracaria_configuracoes_sistema";
+            const sessao = JSON.parse(localStorage.getItem(chaveSessao) || "null");
+            const config = JSON.parse(localStorage.getItem(chaveConfig) || "{}");
+
+            if (!sessao || !sessao.logado) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const nomeEmpresa = config.nomeEmpresa || "RK Vidraçaria";
+            const nomeUsuario = sessao.nomeUsuario || config.nomeUsuario || "Funcionário RK";
+            const loginUsuario = sessao.usuario || config.usuario || "admin";
+            const foto = sessao.fotoUsuario || config.fotoUsuario || "";
+            const cnpj = config.cnpjEmpresa || config.cnpj || "Não informado";
+
+            document.getElementById("splashEmpresa").textContent = nomeEmpresa;
+            document.getElementById("splashUsuario").textContent = nomeUsuario;
+            document.getElementById("splashLogin").textContent = "Usuário: " + loginUsuario;
+            document.getElementById("splashCnpj").textContent = cnpj;
+
+            const avatar = document.getElementById("splashAvatar");
+            if (foto) {
+                avatar.innerHTML = '<img src="' + foto + '" alt="Foto do usuário">';
+                avatar.classList.add("com-imagem");
+            } else {
+                const partes = nomeUsuario.trim().split(/\s+/).filter(Boolean);
+                avatar.textContent = (partes[0]?.[0] || "R") + (partes[1]?.[0] || "K");
+            }
+
+            setTimeout(() => {
+                window.location.href = "funcionario.html";
+            }, 2600);
+        })();
+    </script>
+    <script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>
