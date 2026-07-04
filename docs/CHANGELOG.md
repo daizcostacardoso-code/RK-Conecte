@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.3: Clientes evoluido para Centro Comercial.
+- Adicionado resumo do cliente com dados principais de atendimento.
+- Criadas abas de Dados, Projetos, Orcamentos, Historico, Timeline e Observacoes.
+- Adicionado painel lateral de indicadores comerciais sem novas regras de negocio.
 - Sprint 3.2: Criada primeira interface do modulo Clientes.
 - Adicionada pagina `paginas/clientes.html` com cabecalho, busca, lista, cadastro rapido e detalhe inicial.
 - Interface de Clientes passa a consumir Use Cases/ClienteService sem acesso direto a persistencia.

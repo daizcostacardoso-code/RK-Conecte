@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Clientes - RK Vidraçaria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=3.2.1">
+    <link rel="stylesheet" href="../css/style.css?v=3.3.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -54,7 +54,7 @@
             </div>
         </section>
 
-        <section class="clientes-grid">
+        <section class="clientes-grid clientes-grid-operacional">
             <div class="clientes-painel clientes-lista-painel">
                 <div class="clientes-painel-topo">
                     <div>
@@ -87,7 +87,7 @@
                 </div>
             </div>
 
-            <aside class="clientes-lateral">
+            <aside class="clientes-lateral clientes-lateral-cadastro">
                 <section class="clientes-painel" aria-labelledby="cadastroRapidoTitulo">
                     <div class="clientes-painel-topo">
                         <div>
@@ -146,47 +146,36 @@
                         </div>
                     </form>
                 </section>
-
-                <section class="clientes-painel cliente-detalhe" aria-labelledby="clienteDetalheTitulo">
-                    <div class="clientes-painel-topo">
-                        <div>
-                            <h2 id="clienteDetalheTitulo">Detalhe do cliente</h2>
-                            <p id="clienteDetalheResumo">Selecione um cliente para visualizar.</p>
-                        </div>
-                    </div>
-
-                    <div id="clienteDetalheConteudo" class="cliente-detalhe-conteudo">
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Dados principais</h3>
-                            <p>Nenhum cliente selecionado.</p>
-                        </div>
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Endereços</h3>
-                            <p>Aguardando cadastro.</p>
-                        </div>
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Contatos</h3>
-                            <p>Aguardando cadastro.</p>
-                        </div>
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Projetos vinculados</h3>
-                            <p>Aguardando integração.</p>
-                        </div>
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Orçamentos</h3>
-                            <p>Aguardando integração.</p>
-                        </div>
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Timeline</h3>
-                            <p>Aguardando eventos.</p>
-                        </div>
-                        <div class="cliente-detalhe-bloco">
-                            <h3>Observações</h3>
-                            <p>Nenhuma observação cadastrada.</p>
-                        </div>
-                    </div>
-                </section>
             </aside>
+        </section>
+
+        <section class="clientes-painel clientes-centro-painel" aria-labelledby="clienteDetalheTitulo">
+            <div class="clientes-painel-topo clientes-centro-topo">
+                <div>
+                    <span class="clientes-modulo-label">Centro Comercial</span>
+                    <h2 id="clienteDetalheTitulo">Resumo do cliente</h2>
+                    <p id="clienteDetalheResumo">Selecione um cliente para visualizar.</p>
+                </div>
+            </div>
+
+            <div id="clienteResumoConteudo" class="cliente-resumo-grid" aria-live="polite"></div>
+
+            <div class="cliente-centro-layout">
+                <div class="cliente-centro-principal">
+                    <div class="cliente-abas" role="tablist" aria-label="Seções do cliente">
+                        <button type="button" class="cliente-aba-ativa" data-cliente-aba="dados">Dados</button>
+                        <button type="button" data-cliente-aba="projetos">Projetos</button>
+                        <button type="button" data-cliente-aba="orcamentos">Orçamentos</button>
+                        <button type="button" data-cliente-aba="historico">Histórico</button>
+                        <button type="button" data-cliente-aba="timeline">Timeline</button>
+                        <button type="button" data-cliente-aba="observacoes">Observações</button>
+                    </div>
+
+                    <div id="clienteDetalheConteudo" class="cliente-detalhe-conteudo"></div>
+                </div>
+
+                <aside id="clienteIndicadoresConteudo" class="cliente-indicadores" aria-label="Indicadores do cliente"></aside>
+            </div>
         </section>
     </div>
 </main>
@@ -196,18 +185,18 @@
     <p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
-<script src="../js/storage/storage-adapter.js?v=3.2.1"></script>
-<script src="../js/storage/memory-adapter.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-model.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-validator.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-factory.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-repository.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-service.js?v=3.2.1"></script>
-<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=3.2.1"></script>
-<script src="../js/usecases/clientes/buscar-cliente-usecase.js?v=3.2.1"></script>
-<script src="../js/usecases/clientes/listar-clientes-usecase.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-ui.js?v=3.2.1"></script>
-<script src="../js/clientes/cliente-controller.js?v=3.2.1"></script>
+<script src="../js/storage/storage-adapter.js?v=3.3.0"></script>
+<script src="../js/storage/memory-adapter.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-model.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-validator.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-factory.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-repository.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-service.js?v=3.3.0"></script>
+<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=3.3.0"></script>
+<script src="../js/usecases/clientes/buscar-cliente-usecase.js?v=3.3.0"></script>
+<script src="../js/usecases/clientes/listar-clientes-usecase.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-ui.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-controller.js?v=3.3.0"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>
 </html>

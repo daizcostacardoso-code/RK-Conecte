@@ -16,6 +16,10 @@ Adapter.
   a Firestore.
 - `cliente-service.js`: fachada de aplicacao para criar, buscar, listar,
   atualizar e desativar Clientes.
+- `cliente-ui.js`: renderizacao da tela de Clientes, resumo, abas,
+  placeholders e indicadores comerciais.
+- `cliente-controller.js`: orquestracao da interface com Use Cases e
+  `ClienteService`.
 
 ## Estrutura do Cliente
 
@@ -51,7 +55,34 @@ timeline
 <script src="../js/clientes/cliente-factory.js"></script>
 <script src="../js/clientes/cliente-repository.js"></script>
 <script src="../js/clientes/cliente-service.js"></script>
+<script src="../js/usecases/clientes/criar-cliente-usecase.js"></script>
+<script src="../js/usecases/clientes/buscar-cliente-usecase.js"></script>
+<script src="../js/usecases/clientes/listar-clientes-usecase.js"></script>
+<script src="../js/clientes/cliente-ui.js"></script>
+<script src="../js/clientes/cliente-controller.js"></script>
 ```
+
+## Interface - Sprint 3.3
+
+A pagina `paginas/clientes.html` usa `ClienteController` e `ClienteUI` para
+compor o Centro Comercial de Clientes.
+
+Areas da tela:
+
+- cabecalho com titulo, busca e acao Novo Cliente;
+- lista de clientes com Nome, Tipo, Telefone, Cidade, Status, Ultima
+  atualizacao e Acoes;
+- cadastro rapido para o primeiro contato comercial;
+- resumo do cliente selecionado;
+- abas de Dados, Projetos, Orcamentos, Historico, Timeline e Observacoes;
+- painel lateral de indicadores.
+
+Regras da interface:
+
+- criar, buscar e listar devem passar por Use Cases ou `ClienteService`;
+- Projetos e Orcamentos sao apenas listas preparadas nesta sprint;
+- Timeline permanece como placeholder;
+- a interface nao acessa Firestore diretamente.
 
 ## Workflow
 

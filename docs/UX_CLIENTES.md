@@ -137,3 +137,28 @@ Diretriz tecnica de UX:
   `ClienteService`;
 - campos ainda nao cobertos pelo cadastro rapido devem aparecer como areas
   preparadas para evolucao posterior.
+
+## Sprint 3.3 - Centro Comercial
+
+A tela de Clientes passa a funcionar como um centro comercial de consulta. Ao
+selecionar um cliente, a interface deve apresentar:
+
+- resumo com Nome, Telefone, Cidade, Status, Cliente desde e Ultima
+  atualizacao;
+- abas de Dados, Projetos, Orcamentos, Historico, Timeline e Observacoes;
+- painel lateral com Quantidade de Projetos, Quantidade de Orcamentos, Ultimo
+  orcamento, Ultimo contato e Status comercial.
+
+Comportamentos preparados:
+
+- Projetos exibe "Nenhum projeto cadastrado." quando nao houver vinculos;
+- Orcamentos exibe "Nenhum orcamento encontrado." quando nao houver vinculos;
+- Timeline deve permanecer apenas como placeholder nesta sprint;
+- pesquisa comercial deve localizar por Nome, Telefone, CPF/CNPJ e E-mail,
+  usando a camada de aplicacao existente.
+
+Limites da sprint:
+
+- nao implementar Producao, Financeiro, Instalacao ou Timeline funcional;
+- nao acessar Firestore diretamente;
+- nao criar novas regras de negocio na interface.
