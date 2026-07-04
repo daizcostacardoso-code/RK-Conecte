@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.0 - Em desenvolvimento
+- Iniciada a fundacao do Bloco Comercial.
+- Criado conceito central de Projeto.
+- Criada documentacao base da arquitetura da v0.2.0.
+- Criada estrutura inicial de pastas para modulos comerciais.
+- Criado modelo inicial de Projeto.
+
 ## v2.5.0
 - Criada base profissional do módulo de orçamento interno.
 - Adicionados cabeçalho comercial, dados da obra, status, vendedor e validade.

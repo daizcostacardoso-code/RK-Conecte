@@ -18,6 +18,10 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    match /projetos/{documento} {
+      allow read, write: if true;
+    }
+
     // TODO: as regras atuais estão abertas para facilitar a operação.
     // Futuramente, exigir autenticação antes de liberar o caixa da empresa.
     match /caixa_empresa/{documento} {

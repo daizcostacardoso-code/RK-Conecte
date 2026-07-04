@@ -10,6 +10,8 @@ const Config = {
         historicoOrcamentos: "vidracaria_historico_orcamentos",
         numeroOrcamento: "vidracaria_numero_orcamento",
         solicitacoesSite: "vidracaria_solicitacoes_site",
+        projetos: "vidracaria_projetos",
+        projetoAtual: "vidracaria_projeto_atual",
         caixaEmpresa: "vidracaria_caixa_empresa",
         configuracoesSistema: "vidracaria_configuracoes_sistema",
         lembretes: "vidracaria_lembretes"
