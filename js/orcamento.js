@@ -1,7 +1,16 @@
 const Orcamento = {
     resetando: false,
+    dadosAtuais: null,
 
     estadoVazio() {
+        if (typeof OrcamentoModel !== "undefined") {
+            return OrcamentoModel.normalizar({
+                itens: [],
+                totais: Calculos.calcularTotais([], {}),
+                historico: []
+            });
+        }
+
         return {
             cliente: {
                 nome: "",
@@ -74,21 +83,38 @@ const Orcamento = {
     salvar() {
         if (this.resetando) return;
 
-        const dados = {
-            cliente: Formulario.lerCliente(),
-            itens: Itens.todos(),
-            desconto: Formulario.lerDesconto(),
-            observacoes: Formulario.lerObservacoes(),
-            rascunhoItem: null,
-            atualizadoEm: Util.agora(),
-            atualizadoEmISO: new Date().toISOString()
-        };
+        const dados = typeof OrcamentoModel !== "undefined"
+            ? OrcamentoModel.montar(this.dadosAtuais || {})
+            : {
+                cliente: Formulario.lerCliente(),
+                itens: Itens.todos(),
+                desconto: Formulario.lerDesconto(),
+                observacoes: Formulario.lerObservacoes(),
+                rascunhoItem: null,
+                atualizadoEm: Util.agora(),
+                atualizadoEmISO: new Date().toISOString()
+            };
+
+        this.dadosAtuais = dados;
+        if (typeof OrcamentoUI !== "undefined") {
+            OrcamentoUI.valor("dataAtualizacao", OrcamentoUI.formatarDataHora(dados.datas?.atualizacao));
+        }
 
         Storage.salvar(Config.storage.orcamentoAtual, dados);
         this.salvarNaNuvem(dados, false);
     },
 
     async salvarNaNuvem(dados, mostrarAviso = false) {
+        if (typeof OrcamentoStorage !== "undefined") {
+            const salvo = await OrcamentoStorage.salvarAtual(dados);
+
+            if (!salvo && mostrarAviso) {
+                alert("Não foi possível salvar o orçamento na nuvem. Ele ficou salvo neste dispositivo.");
+            }
+
+            return salvo;
+        }
+
         try {
             if (typeof db === "undefined" || !db) {
                 throw new Error("Firebase não carregado. Verifique firebase-config.js.");
@@ -111,6 +137,10 @@ const Orcamento = {
     },
 
     async carregarDaNuvem() {
+        if (typeof OrcamentoStorage !== "undefined") {
+            return OrcamentoStorage.carregarAtual();
+        }
+
         try {
             if (typeof db === "undefined" || !db) {
                 throw new Error("Firebase não carregado. Verifique firebase-config.js.");
@@ -140,33 +170,56 @@ const Orcamento = {
 
         if (!dados) {
             Itens.carregar([]);
+            this.dadosAtuais = this.estadoVazio();
+            if (typeof OrcamentoUI !== "undefined") {
+                OrcamentoUI.preencherFormulario(this.dadosAtuais);
+            }
             return;
         }
 
-        Itens.carregar(Array.isArray(dados.itens) ? dados.itens : []);
+        const normalizado = typeof OrcamentoModel !== "undefined" ? OrcamentoModel.normalizar(dados) : dados;
+        this.dadosAtuais = normalizado;
 
-        if (dados.cliente) {
-            if (Util.$("cliente")) Util.$("cliente").value = dados.cliente.nome || "";
-            if (Util.$("telefone")) Util.$("telefone").value = dados.cliente.telefone || "";
-            if (Util.$("endereco")) Util.$("endereco").value = dados.cliente.endereco || "";
+        Itens.carregar(Array.isArray(normalizado.itens) ? normalizado.itens : []);
+
+        if (typeof OrcamentoUI !== "undefined") {
+            OrcamentoUI.preencherFormulario(normalizado);
+            if (normalizado.rascunhoItem) {
+                this.preencherRascunhoItem(normalizado.rascunhoItem);
+            }
+            return;
         }
 
-        if (dados.desconto) {
-            if (Util.$("tipoDesconto")) Util.$("tipoDesconto").value = dados.desconto.tipo || "valor";
-            if (Util.$("desconto")) Util.$("desconto").value = dados.desconto.valor || 0;
+        if (normalizado.cliente) {
+            if (Util.$("cliente")) Util.$("cliente").value = normalizado.cliente.nome || "";
+            if (Util.$("telefone")) Util.$("telefone").value = normalizado.cliente.telefone || "";
+            if (Util.$("endereco")) Util.$("endereco").value = normalizado.cliente.endereco || "";
+        }
+
+        if (normalizado.desconto) {
+            if (Util.$("tipoDesconto")) Util.$("tipoDesconto").value = normalizado.desconto.tipo || "valor";
+            if (Util.$("desconto")) Util.$("desconto").value = normalizado.desconto.valor || 0;
         }
 
         if (Util.$("observacoes")) {
-            Util.$("observacoes").value = dados.observacoes || "";
+            Util.$("observacoes").value = normalizado.observacoes || "";
         }
 
-        if (dados.rascunhoItem) {
-            this.preencherRascunhoItem(dados.rascunhoItem);
+        if (normalizado.rascunhoItem) {
+            this.preencherRascunhoItem(normalizado.rascunhoItem);
         }
     },
 
     preencherRascunhoItem(rascunho) {
         if (!rascunho) return;
+
+        if (Util.$("categoria") && rascunho.categoria) {
+            Util.$("categoria").value = rascunho.categoria;
+        }
+
+        if (Util.$("descricaoItem") && rascunho.descricao) {
+            Util.$("descricaoItem").value = rascunho.descricao;
+        }
 
         const tipo = Util.$("tipoVidro");
         if (tipo && rascunho.tipoVidro) {
@@ -188,6 +241,22 @@ const Orcamento = {
 
         if (Util.$("acessorios") && rascunho.acessorios) {
             Util.$("acessorios").value = rascunho.acessorios;
+        }
+
+        if (Util.$("valorM2") && rascunho.valorM2) {
+            Util.$("valorM2").value = rascunho.valorM2;
+        }
+
+        if (Util.$("valorFerragens") && (rascunho.valorFerragens || rascunho.acessorios)) {
+            Util.$("valorFerragens").value = rascunho.valorFerragens || rascunho.acessorios;
+        }
+
+        if (Util.$("valorServico") && rascunho.valorServico) {
+            Util.$("valorServico").value = rascunho.valorServico;
+        }
+
+        if (Util.$("observacoesItem") && rascunho.observacoes) {
+            Util.$("observacoesItem").value = rascunho.observacoes;
         }
 
         if (typeof Eventos !== "undefined" && Eventos.atualizarPrevia) {
@@ -222,13 +291,22 @@ const Orcamento = {
         this.limparFormulario();
         Tabela.atualizar();
         Formulario.preencherTotais({
+            quantidadeItens: 0,
+            areaTotalM2: 0,
             subtotal: 0,
             desconto: 0,
-            total: 0
+            descontoTotal: 0,
+            total: 0,
+            totalFinal: 0
         });
 
         // Salva um estado vazio para impedir que um orçamento antigo volte ao recarregar a página.
-        Storage.salvar(Config.storage.orcamentoAtual, this.estadoVazio());
+        this.dadosAtuais = this.estadoVazio();
+        Storage.salvar(Config.storage.orcamentoAtual, this.dadosAtuais);
+
+        if (typeof OrcamentoUI !== "undefined") {
+            OrcamentoUI.preencherFormulario(this.dadosAtuais);
+        }
 
         this.resetando = false;
 
@@ -243,7 +321,7 @@ const Orcamento = {
     limparFormulario() {
         const form = Util.$("formOrcamento") || document;
 
-        ["cliente", "telefone", "endereco", "largura", "altura", "area", "valorVidro", "valorCor", "aluminio", "despesa", "acessorios", "desconto"].forEach(id => {
+        ["numeroOrcamento", "dataCriacao", "dataValidade", "vendedor", "cliente", "telefone", "email", "endereco", "enderecoObra", "largura", "altura", "area", "descricaoItem", "valorM2", "valorFerragens", "valorServico", "totalItem", "valorVidro", "valorCor", "aluminio", "despesa", "acessorios", "desconto", "descontoValor", "descontoPercentual", "acrescimo", "instalacao", "frete", "entradaPagamento", "parcelasPagamento", "custoVidro", "custoFerragens", "custoMaoObra", "custoTransporte", "comissao", "lucroBruto", "margemLucro"].forEach(id => {
             const campo = Util.$(id);
             if (campo) campo.value = "";
         });
@@ -254,11 +332,26 @@ const Orcamento = {
 
         if (Util.$("espessura")) Util.$("espessura").selectedIndex = 0;
         if (Util.$("cor")) Util.$("cor").selectedIndex = 0;
+        if (Util.$("categoria")) Util.$("categoria").selectedIndex = 0;
         if (Util.$("tipoVidro")) Util.$("tipoVidro").selectedIndex = 0;
         if (Util.$("tipoDesconto")) Util.$("tipoDesconto").value = "valor";
+        if (Util.$("statusOrcamento")) Util.$("statusOrcamento").value = "rascunho";
+        if (Util.$("formaPagamento")) Util.$("formaPagamento").value = "";
 
         if (Util.$("quantidade")) Util.$("quantidade").value = "1";
         if (Util.$("desconto")) Util.$("desconto").value = "0";
+        if (Util.$("descontoValor")) Util.$("descontoValor").value = "0";
+        if (Util.$("descontoPercentual")) Util.$("descontoPercentual").value = "0";
+        if (Util.$("acrescimo")) Util.$("acrescimo").value = "0";
+        if (Util.$("instalacao")) Util.$("instalacao").value = "0";
+        if (Util.$("frete")) Util.$("frete").value = "0";
+        if (Util.$("entradaPagamento")) Util.$("entradaPagamento").value = "0";
+        if (Util.$("parcelasPagamento")) Util.$("parcelasPagamento").value = "1";
+        if (Util.$("custoVidro")) Util.$("custoVidro").value = "0";
+        if (Util.$("custoFerragens")) Util.$("custoFerragens").value = "0";
+        if (Util.$("custoMaoObra")) Util.$("custoMaoObra").value = "0";
+        if (Util.$("custoTransporte")) Util.$("custoTransporte").value = "0";
+        if (Util.$("comissao")) Util.$("comissao").value = "0";
         if (Util.$("resultado")) Util.$("resultado").textContent = Util.moeda(0);
     }
 };

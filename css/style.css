@@ -4810,6 +4810,121 @@ button:disabled, .btn-adicionar-cliente:disabled {
     }
 }
 
+/* =========================
+   ORÇAMENTO PROFISSIONAL
+========================= */
+
+.formulario .card-form.secao-inteira {
+    grid-column: 1 / -1;
+}
+
+.resumo-orcamento .resumo-ajustes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-interno {
+    border-left: 4px solid #0d6efd;
+    background: #f8fbff;
+}
+
+.card-interno .ajuda-form {
+    margin: -2px 0 14px;
+}
+
+.card-interno input[readonly] {
+    background: #eef5ff;
+}
+
+#tabelaItens {
+    min-width: 1180px;
+}
+
+#tabelaItens th,
+#tabelaItens td {
+    padding: 9px 8px;
+    font-size: 13px;
+}
+
+#tabelaItens td:nth-child(3) {
+    text-align: left;
+    min-width: 160px;
+}
+
+.status-orcamento {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #eef5ff;
+    color: #083d67;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+@media(max-width:768px) {
+    .resumo-orcamento .resumo-ajustes {
+        grid-template-columns: 1fr;
+    }
+
+    #tabelaItens td:nth-child(1)::before {
+        content: "Item";
+    }
+
+    #tabelaItens td:nth-child(2)::before {
+        content: "Categoria";
+    }
+
+    #tabelaItens td:nth-child(3)::before {
+        content: "Descrição";
+    }
+
+    #tabelaItens td:nth-child(4)::before {
+        content: "Vidro";
+    }
+
+    #tabelaItens td:nth-child(5)::before {
+        content: "Esp.";
+    }
+
+    #tabelaItens td:nth-child(6)::before {
+        content: "Cor";
+    }
+
+    #tabelaItens td:nth-child(7)::before {
+        content: "Medidas";
+    }
+
+    #tabelaItens td:nth-child(8)::before {
+        content: "Qtd";
+    }
+
+    #tabelaItens td:nth-child(9)::before {
+        content: "Área";
+    }
+
+    #tabelaItens td:nth-child(10)::before {
+        content: "Valor m²";
+    }
+
+    #tabelaItens td:nth-child(11)::before {
+        content: "Ferragens";
+    }
+
+    #tabelaItens td:nth-child(12)::before {
+        content: "Serviço";
+    }
+
+    #tabelaItens td:nth-child(13)::before {
+        content: "Total";
+    }
+
+    #tabelaItens td:nth-child(14)::before {
+        content: "Ações";
+    }
+}
+
 @media (max-width: 390px) {
     body:has(.painel-dashboard) .marca-header-compacta strong {
         max-width: 108px !important;

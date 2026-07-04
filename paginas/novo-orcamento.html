@@ -44,6 +44,63 @@
 
             <form id="formOrcamento" class="formulario">
 
+                <!-- CABEÇALHO DO ORÇAMENTO -->
+                <div class="card-form secao-inteira">
+
+                    <h2>Dados do Orçamento</h2>
+
+                    <div class="linha4">
+
+                        <div>
+                            <label>Número do orçamento</label>
+                            <input type="text" id="numeroOrcamento" placeholder="Gerado ao emitir">
+                        </div>
+
+                        <div>
+                            <label>Data de criação</label>
+                            <input type="date" id="dataCriacao">
+                        </div>
+
+                        <div>
+                            <label>Validade</label>
+                            <input type="date" id="dataValidade">
+                        </div>
+
+                        <div>
+                            <label>Status</label>
+                            <select id="statusOrcamento">
+                                <option value="rascunho">Rascunho</option>
+                                <option value="enviado">Enviado</option>
+                                <option value="aprovado">Aprovado</option>
+                                <option value="em_producao">Em produção</option>
+                                <option value="instalado">Instalado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="linha3">
+
+                        <div>
+                            <label>Vendedor / responsável</label>
+                            <input type="text" id="vendedor" placeholder="Nome do responsável">
+                        </div>
+
+                        <div>
+                            <label>Usuário que criou</label>
+                            <input type="text" id="usuarioCriacao" readonly>
+                        </div>
+
+                        <div>
+                            <label>Última alteração</label>
+                            <input type="text" id="dataAtualizacao" readonly>
+                        </div>
+
+                    </div>
+
+                </div>
+
                 <!-- CLIENTE -->
                 <div class="card-form">
 
@@ -55,17 +112,63 @@
                     <label>Telefone / WhatsApp</label>
                     <input type="tel" id="telefone">
 
-                    <label>Endereço</label>
+                    <label>E-mail</label>
+                    <input type="email" id="email">
+
+                    <label>Endereço do cliente</label>
                     <input type="text" id="endereco">
+
+                </div>
+
+                <!-- OBRA -->
+                <div class="card-form">
+
+                    <h2>Obra / Instalação</h2>
+
+                    <label>Endereço da obra</label>
+                    <input type="text" id="enderecoObra" placeholder="Local onde será instalado">
+
+                    <label>Observações da obra</label>
+                    <textarea id="observacoesObra" rows="5" placeholder="Acesso, pavimento, horários, restrições e detalhes do local"></textarea>
 
                 </div>
 
                 <!-- VIDRO -->
                 <div class="card-form">
 
-                    <h2 id="dadosVidro">Dados do Vidro</h2>
+                    <h2 id="dadosVidro">Dados do Item</h2>
 
                     <div class="linha3">
+
+                        <div>
+                            <label>Categoria</label>
+
+                            <select id="categoria">
+                                <option value="box">Box</option>
+                                <option value="espelho">Espelho</option>
+                                <option value="porta">Porta</option>
+                                <option value="janela">Janela</option>
+                                <option value="guarda_corpo">Guarda-corpo</option>
+                                <option value="cobertura">Cobertura</option>
+                                <option value="fachada">Fachada</option>
+                                <option value="vidro_avulso">Vidro avulso</option>
+                                <option value="servico_avulso">Serviço avulso</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Tipo de vidro</label>
+
+                            <select id="tipoVidro">
+                                <option value="Temperado">Temperado</option>
+                                <option value="Laminado">Laminado</option>
+                                <option value="Comum">Comum</option>
+                                <option value="Refletivo">Refletivo</option>
+                                <option value="Jateado">Jateado</option>
+                                <option value="Espelho">Espelho</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
 
                         <div>
                             <label>Espessura</label>
@@ -77,6 +180,13 @@
                                 <option value="10">10 mm</option>
                             </select>
                         </div>
+
+                    </div>
+
+                    <label>Descrição</label>
+                    <input type="text" id="descricaoItem" placeholder="Ex.: Box frontal com roldanas aparentes">
+
+                    <div class="linha3">
 
                         <div>
                             <label>Cor</label>
@@ -90,18 +200,8 @@
                         </div>
 
                         <div>
-                            <label>Tipo</label>
-
-                            <select id="tipoVidro">
-                                <option value="Porta">Porta</option>
-                                <option value="Janela">Janela</option>
-                                <option value="Vidro Fixo">Vidro Fixo</option>
-                                <option value="Box de Banheiro">Box de Banheiro</option>
-                                <option value="Guarda-Corpo">Guarda-Corpo</option>
-                                <option value="Espelho">Espelho</option>
-                                <option value="Prateleira">Prateleira</option>
-                                <option value="Outro">Outro</option>
-                            </select>
+                            <label>Observações técnicas</label>
+                            <input type="text" id="observacoesItem" placeholder="Recortes, furos, ferragens, acabamento">
                         </div>
 
                     </div>
@@ -148,23 +248,23 @@
                     <div class="linha4">
 
                         <div>
-                            <label>Vidro</label>
-                            <input id="valorVidro" readonly>
+                            <label>Valor por m² (R$)</label>
+                            <input id="valorM2" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 450">
                         </div>
 
                         <div>
-                            <label>Cor</label>
-                            <input id="valorCor" readonly>
+                            <label>Ferragens (R$)</label>
+                            <input id="valorFerragens" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 180">
                         </div>
 
                         <div>
-                            <label>Alumínio (R$/metro)</label>
-                            <input id="aluminio" readonly>
+                            <label>Serviço / mão de obra (R$)</label>
+                            <input id="valorServico" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 250">
                         </div>
 
                         <div>
-                            <label>Acessórios (R$)</label>
-                            <input id="acessorios" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 50">
+                            <label>Total do item</label>
+                            <input id="totalItem" readonly>
                         </div>
 
                     </div>
@@ -197,14 +297,17 @@
                             <tr>
 
                                 <th>#</th>
-                                <th>Tipo</th>
+                                <th>Categoria</th>
+                                <th>Descrição</th>
+                                <th>Vidro</th>
                                 <th>Esp.</th>
                                 <th>Cor</th>
+                                <th>Medidas</th>
                                 <th>Qtd</th>
                                 <th>Área</th>
-                                <th>Vidro</th>
-                                <th>Alumínio</th>
-                                <th>Acessórios</th>
+                                <th>Valor m²</th>
+                                <th>Ferragens</th>
+                                <th>Serviço</th>
                                 <th>Total</th>
                                 <th>Ações</th>
 
@@ -232,6 +335,26 @@
 
                     <div class="linha-total">
 
+                        <span>Itens</span>
+
+                        <strong id="quantidadeItensResumo">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="linha-total">
+
+                        <span>Área total</span>
+
+                        <strong id="areaTotalResumo">
+                            0,000 m²
+                        </strong>
+
+                    </div>
+
+                    <div class="linha-total">
+
                         <span>Subtotal</span>
 
                         <strong id="subtotal">
@@ -240,30 +363,142 @@
 
                     </div>
 
-                    <div class="desconto-grid">
+                    <div class="desconto-grid resumo-ajustes">
 
                         <div>
-                            <label>Tipo de desconto</label>
-                            <select id="tipoDesconto">
-                                <option value="valor">Valor (R$)</option>
-                                <option value="percentual">Percentual (%)</option>
-                            </select>
+                            <label>Desconto (R$)</label>
+                            <input type="number" id="descontoValor" value="0" step="0.01" min="0">
                         </div>
 
                         <div>
-                            <label>Desconto</label>
-                            <input type="number" id="desconto" value="0" step="0.01" min="0">
+                            <label>Desconto (%)</label>
+                            <input type="number" id="descontoPercentual" value="0" step="0.01" min="0" max="100">
                         </div>
+
+                        <div>
+                            <label>Acréscimo (R$)</label>
+                            <input type="number" id="acrescimo" value="0" step="0.01" min="0">
+                        </div>
+
+                        <div>
+                            <label>Instalação (R$)</label>
+                            <input type="number" id="instalacao" value="0" step="0.01" min="0">
+                        </div>
+
+                        <div>
+                            <label>Frete / transporte (R$)</label>
+                            <input type="number" id="frete" value="0" step="0.01" min="0">
+                        </div>
+
+                    </div>
+
+                    <input type="hidden" id="tipoDesconto" value="valor">
+                    <input type="hidden" id="desconto" value="0">
+
+                    <div class="linha-total">
+
+                        <span>Desconto calculado</span>
+
+                        <strong id="valorDesconto">
+                            R$ 0,00
+                        </strong>
 
                     </div>
 
                     <div class="linha-total">
 
-                        <span>Total Geral</span>
+                        <span>Total final</span>
 
                         <strong id="totalGeral">
                             R$ 0,00
                         </strong>
+
+                    </div>
+
+                </div>
+
+                <!-- PAGAMENTO -->
+                <div class="card-form">
+
+                    <h2>Forma de Pagamento</h2>
+
+                    <div class="linha3">
+
+                        <div>
+                            <label>Forma</label>
+                            <select id="formaPagamento">
+                                <option value="">A definir</option>
+                                <option value="dinheiro">Dinheiro</option>
+                                <option value="pix">PIX</option>
+                                <option value="cartao">Cartão</option>
+                                <option value="boleto">Boleto</option>
+                                <option value="parcelado">Parcelado</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Entrada (R$)</label>
+                            <input type="number" id="entradaPagamento" value="0" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                        <div>
+                            <label>Parcelas</label>
+                            <input type="number" id="parcelasPagamento" value="1" min="1" step="1">
+                        </div>
+
+                    </div>
+
+                    <label>Observação de pagamento</label>
+                    <textarea id="observacaoPagamento" rows="4" placeholder="Condições, vencimentos, sinal e observações combinadas"></textarea>
+
+                </div>
+
+                <!-- CUSTOS INTERNOS -->
+                <div class="card-form card-interno">
+
+                    <h2>Custos Internos</h2>
+                    <p class="ajuda-form">Campos de controle interno. Não aparecem no PDF enviado ao cliente.</p>
+
+                    <div class="linha4">
+
+                        <div>
+                            <label>Custo do vidro (R$)</label>
+                            <input type="number" id="custoVidro" value="0" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                        <div>
+                            <label>Custo de ferragens (R$)</label>
+                            <input type="number" id="custoFerragens" value="0" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                        <div>
+                            <label>Custo de mão de obra (R$)</label>
+                            <input type="number" id="custoMaoObra" value="0" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                        <div>
+                            <label>Custo de transporte (R$)</label>
+                            <input type="number" id="custoTransporte" value="0" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                    </div>
+
+                    <div class="linha3">
+
+                        <div>
+                            <label>Comissão (R$)</label>
+                            <input type="number" id="comissao" value="0" min="0" step="0.01" inputmode="decimal">
+                        </div>
+
+                        <div>
+                            <label>Lucro bruto</label>
+                            <input type="text" id="lucroBruto" readonly>
+                        </div>
+
+                        <div>
+                            <label>Margem de lucro</label>
+                            <input type="text" id="margemLucro" readonly>
+                        </div>
 
                     </div>
 
@@ -311,10 +546,15 @@
     <script src="../js/config.js?v=2.1.0"></script>
     <script src="../js/storage.js?v=2.1.0"></script>
     <script src="../js/util.js?v=2.1.0"></script>
+    <script src="../js/orcamentos/orcamento-calculos.js?v=2.5.0"></script>
     <script src="../js/formulario.js?v=2.1.0"></script>
     <script src="../js/calculos.js?v=2.1.0"></script>
     <script src="../js/itens.js?v=2.1.0"></script>
     <script src="../js/tabela.js?v=2.1.0"></script>
+    <script src="../js/orcamentos/orcamento-model.js?v=2.5.0"></script>
+    <script src="../js/orcamentos/orcamento-storage.js?v=2.5.0"></script>
+    <script src="../js/orcamentos/orcamento-ui.js?v=2.5.0"></script>
+    <script src="../js/orcamentos/orcamento-pdf.js?v=2.5.0"></script>
     <script src="../js/orcamento.js?v=2.1.0"></script>
     <script src="../js/eventos.js?v=2.1.0"></script>
     <script src="../js/pdf.js?v=2.1.0"></script>

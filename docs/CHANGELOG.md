@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.5.0
+- Criada base profissional do módulo de orçamento interno.
+- Adicionados cabeçalho comercial, dados da obra, status, vendedor e validade.
+- Itens agora suportam categoria, descrição, tipo de vidro, valor por m², ferragens, serviço e observações técnicas.
+- Totais passam a calcular quantidade de itens, área total, descontos, acréscimo, instalação, frete e total final.
+- Preparada estrutura de pagamento e custos internos com lucro bruto e margem.
+- Orçamento salvo em objeto compatível com Firebase, incluindo datas, usuários e histórico.
+- PDF atualizado para exibir dados públicos do cliente, obra, itens, totais, pagamento, validade e aceite.
+- Custos internos, histórico e usuários não são enviados para o PDF do cliente.
+- Documentação atualizada em arquitetura, regras de negócio, database e roadmap.
+
 ## v2.0.0
 - Reorganização do projeto para publicação direta pela pasta principal.
 - `firebase.json` ajustado para publicar a raiz do projeto.

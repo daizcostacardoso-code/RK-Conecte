@@ -32,37 +32,55 @@ const PDF = {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        const cliente = Formulario.lerCliente();
-        const itens = Itens.todos();
-        const desconto = Formulario.lerDesconto();
-        const totais = Calculos.calcularTotais(itens, desconto);
-        const observacoes = Formulario.lerObservacoes();
+        const dadosOrcamento = typeof OrcamentoModel !== "undefined"
+            ? OrcamentoModel.montar(Orcamento.dadosAtuais || {})
+            : {
+                cliente: Formulario.lerCliente(),
+                obra: Formulario.lerObra ? Formulario.lerObra() : {},
+                itens: Itens.todos(),
+                desconto: Formulario.lerDesconto(),
+                totais: Calculos.calcularTotais(Itens.todos(), Formulario.lerDesconto()),
+                pagamento: Formulario.lerPagamento ? Formulario.lerPagamento() : {},
+                datas: {},
+                observacoes: Formulario.lerObservacoes()
+            };
+        const dadosPublicos = typeof OrcamentoPDF !== "undefined"
+            ? OrcamentoPDF.dadosPublicos(dadosOrcamento)
+            : dadosOrcamento;
+        const cliente = dadosPublicos.cliente || {};
+        const obra = dadosPublicos.obra || {};
+        const itens = dadosPublicos.itens || [];
+        const totais = dadosPublicos.totais || Calculos.calcularTotais(itens, dadosPublicos.desconto || {});
+        const observacoes = dadosPublicos.observacoes || "";
         const empresa = this.obterEmpresa();
 
-        const numero = this.obterNumeroOrcamento();
+        const numero = this.obterNumeroOrcamento(dadosPublicos.numero);
+        dadosPublicos.numero = numero;
 
         let y = 15;
 
-        y = this.desenharCabecalho(doc, logo, numero, y, empresa);
-        y = this.desenharCliente(doc, cliente, y);
+        y = this.desenharCabecalho(doc, logo, numero, y, empresa, dadosPublicos);
+        y = this.desenharCliente(doc, cliente, obra, y);
         y = this.desenharTabela(doc, itens, y);
         y = this.desenharTotais(doc, totais, y);
+        if (typeof OrcamentoPDF !== "undefined") {
+            y = OrcamentoPDF.desenharPagamento(doc, dadosPublicos.pagamento || {}, y);
+        }
         y = this.desenharObservacoes(doc, observacoes, y);
-        this.desenharRodape(doc);
+        if (typeof OrcamentoPDF !== "undefined") {
+            y = OrcamentoPDF.desenharAceite(doc, y);
+        }
+        this.desenharRodape(doc, dadosPublicos);
 
-        this.salvarOrcamentoEmitido(numero, cliente, itens, desconto, totais, observacoes, empresa);
+        this.salvarOrcamentoEmitido(numero, dadosPublicos, empresa);
 
         doc.save(`orcamento_${numero}.pdf`);
     },
 
-    salvarOrcamentoEmitido(numero, cliente, itens, desconto, totais, observacoes, empresa) {
+    salvarOrcamentoEmitido(numero, dadosOrcamento, empresa) {
         const dados = {
+            ...dadosOrcamento,
             numero,
-            cliente,
-            itens,
-            desconto,
-            totais,
-            observacoes,
             empresa,
             criadoEm: Util.agora(),
             criadoEmISO: new Date().toISOString()
@@ -81,7 +99,18 @@ const PDF = {
         }
     },
 
-    obterNumeroOrcamento() {
+    obterNumeroOrcamento(numeroInformado = "") {
+        const numeroExistente = String(numeroInformado || "").trim();
+        const proximoNumero = Storage.carregar(Config.storage.numeroOrcamento, 1) || 1;
+
+        if (numeroExistente) {
+            const numeroLimpo = Number(numeroExistente.replace(/\D/g, ""));
+            if (numeroLimpo && numeroLimpo >= proximoNumero) {
+                Storage.salvar(Config.storage.numeroOrcamento, numeroLimpo + 1);
+            }
+            return numeroExistente;
+        }
+
         let numero = Storage.carregar(Config.storage.numeroOrcamento, 1);
 
         if (!numero || isNaN(numero)) {
@@ -103,7 +132,7 @@ const PDF = {
         };
     },
 
-    desenharCabecalho(doc, logo, numero, y, empresa) {
+    desenharCabecalho(doc, logo, numero, y, empresa, dadosOrcamento = {}) {
         doc.setDrawColor(80);
         doc.setLineWidth(0.3);
         doc.rect(15, 10, 180, 38);
@@ -143,16 +172,17 @@ const PDF = {
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.text(`Data: ${Util.hoje()}`, 15, y);
+        doc.text(`Data: ${this.formatarData(dadosOrcamento.datas?.criacao) || Util.hoje()}`, 15, y);
+        doc.text(`Validade: ${this.formatarData(dadosOrcamento.datas?.validade) || "15 dias"}`, 75, y);
         doc.text(`Hora: ${new Date().toLocaleTimeString("pt-BR")}`, 165, y);
 
         return y + 10;
     },
 
-    desenharCliente(doc, cliente, y) {
+    desenharCliente(doc, cliente, obra, y) {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
-        doc.text("Dados do Cliente", 15, y);
+        doc.text("Dados do Cliente e Obra", 15, y);
 
         y += 6;
 
@@ -161,8 +191,13 @@ const PDF = {
         doc.text(`Cliente: ${cliente.nome || ""}`, 15, y);
         y += 6;
         doc.text(`Telefone: ${cliente.telefone || ""}`, 15, y);
+        if (cliente.email) {
+            doc.text(`E-mail: ${cliente.email}`, 95, y);
+        }
         y += 6;
-        doc.text(`Endereço: ${cliente.endereco || ""}`, 15, y);
+        doc.text(`Endereço do cliente: ${cliente.endereco || ""}`, 15, y);
+        y += 6;
+        doc.text(`Endereço da obra: ${obra.endereco || cliente.endereco || ""}`, 15, y);
 
         y += 8;
         doc.line(15, y, 195, y);
@@ -192,16 +227,19 @@ const PDF = {
             doc.rect(15, y - 5, 180, 8);
 
             const medidas = `${item.largura || ""}x${item.altura || ""}`;
-            const produto = `${item.tipoVidro || ""} ${item.espessura || ""}mm ${item.cor || ""}`.trim();
+            const categoria = typeof OrcamentoModel !== "undefined"
+                ? OrcamentoModel.rotuloCategoria(item.categoria)
+                : item.categoria;
+            const produto = `${item.descricao || categoria || item.tipoVidro || ""}`.trim();
+            const vidro = `${item.tipoVidro || ""} ${item.espessura || ""}mm ${item.cor || ""}`.trim();
+            const area = item.areaM2 ?? item.area ?? 0;
 
             doc.text(String(index + 1), 18, y);
-            doc.text(doc.splitTextToSize(produto, 42)[0] || "", 26, y);
-            doc.text(medidas, 72, y);
-            doc.text(String(item.quantidade || ""), 95, y);
-            doc.text(Util.decimal(item.area || 0), 106, y);
-            doc.text(Util.moeda(item.totalVidro ?? Math.max(0, Util.numero(item.total) - Util.numero(item.totalAluminio) - Util.numero(item.totalAcessorios ?? item.acessorios))), 142, y, { align: "right" });
-            doc.text(Util.moeda(item.totalAluminio ?? 0), 163, y, { align: "right" });
-            doc.text(Util.moeda(item.totalAcessorios ?? item.acessorios ?? 0), 181, y, { align: "right" });
+            doc.text(doc.splitTextToSize(produto, 45)[0] || "", 26, y);
+            doc.text(doc.splitTextToSize(vidro, 34)[0] || "", 74, y);
+            doc.text(medidas, 112, y);
+            doc.text(String(item.quantidade || ""), 136, y);
+            doc.text(`${Util.decimal(area || 0)} m²`, 148, y);
             doc.text(Util.moeda(item.total || 0), 194, y, { align: "right" });
 
             y += 8;
@@ -219,12 +257,10 @@ const PDF = {
 
         doc.text("#", 18, y);
         doc.text("Produto", 26, y);
-        doc.text("Medidas", 72, y);
-        doc.text("Qtd", 95, y);
-        doc.text("Área", 106, y);
-        doc.text("Vidro", 142, y, { align: "right" });
-        doc.text("Alum.", 163, y, { align: "right" });
-        doc.text("Acess.", 181, y, { align: "right" });
+        doc.text("Vidro", 74, y);
+        doc.text("Medidas", 112, y);
+        doc.text("Qtd", 136, y);
+        doc.text("Área", 148, y);
         doc.text("Total", 194, y, { align: "right" });
 
         return y + 8;
@@ -246,13 +282,31 @@ const PDF = {
 
         y += 7;
         doc.text("Desconto:", 135, y);
-        doc.text(Util.moeda(totais.desconto), 195, y, { align: "right" });
+        doc.text(Util.moeda(totais.descontoTotal ?? totais.desconto), 195, y, { align: "right" });
+
+        if (Util.numero(totais.acrescimo) > 0) {
+            y += 7;
+            doc.text("Acréscimo:", 135, y);
+            doc.text(Util.moeda(totais.acrescimo), 195, y, { align: "right" });
+        }
+
+        if (Util.numero(totais.instalacao) > 0) {
+            y += 7;
+            doc.text("Instalação:", 135, y);
+            doc.text(Util.moeda(totais.instalacao), 195, y, { align: "right" });
+        }
+
+        if (Util.numero(totais.frete) > 0) {
+            y += 7;
+            doc.text("Frete:", 135, y);
+            doc.text(Util.moeda(totais.frete), 195, y, { align: "right" });
+        }
 
         y += 8;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
-        doc.text("TOTAL GERAL:", 135, y);
-        doc.text(Util.moeda(totais.total), 195, y, { align: "right" });
+        doc.text("TOTAL FINAL:", 135, y);
+        doc.text(Util.moeda(totais.totalFinal ?? totais.total), 195, y, { align: "right" });
 
         return y + 12;
     },
@@ -282,8 +336,9 @@ const PDF = {
         return y + linhas.length * 5 + 10;
     },
 
-    desenharRodape(doc) {
+    desenharRodape(doc, dadosOrcamento = {}) {
         const totalPaginas = doc.getNumberOfPages();
+        const validade = this.formatarData(dadosOrcamento.datas?.validade) || "15 dias";
 
         for (let i = 1; i <= totalPaginas; i++) {
             doc.setPage(i);
@@ -294,9 +349,16 @@ const PDF = {
             doc.setFont("helvetica", "normal");
             doc.setFontSize(8);
 
-            doc.text("Validade do orçamento: 15 dias.", 15, 286);
+            doc.text(`Validade do orçamento: ${validade}.`, 15, 286);
             doc.text("Obrigado pela preferência!", 105, 286, { align: "center" });
             doc.text(`Página ${i} de ${totalPaginas}`, 195, 286, { align: "right" });
         }
+    },
+
+    formatarData(valor) {
+        if (!valor) return "";
+        const partes = String(valor).slice(0, 10).split("-");
+        if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        return valor;
     }
 };

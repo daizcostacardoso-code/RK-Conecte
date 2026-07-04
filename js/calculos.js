@@ -20,6 +20,10 @@ const Calculos = {
     },
 
     calcularItem(item, valores) {
+        if (typeof OrcamentoCalculos !== "undefined" && OrcamentoCalculos.usarFormulaProfissional(item)) {
+            return OrcamentoCalculos.calcularItem(item);
+        }
+
         const largura = Util.numero(item.largura);
         const altura = Util.numero(item.altura);
         const quantidade = Math.max(1, Util.numero(item.quantidade) || 1);
@@ -73,6 +77,10 @@ const Calculos = {
     },
 
     calcularTotais(itens, desconto) {
+        if (typeof OrcamentoCalculos !== "undefined") {
+            return OrcamentoCalculos.calcularTotais(itens, desconto);
+        }
+
         const lista = Array.isArray(itens) ? itens : [];
         const subtotal = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.total)), 0);
 

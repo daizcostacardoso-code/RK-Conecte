@@ -41,12 +41,18 @@ const Eventos = {
 
     camposCalculo() {
         const campos = [
+            "categoria",
+            "descricaoItem",
             "tipoVidro",
             "espessura",
             "cor",
             "largura",
             "altura",
             "quantidade",
+            "valorM2",
+            "valorFerragens",
+            "valorServico",
+            "observacoesItem",
             "acessorios"
         ];
 
@@ -66,7 +72,20 @@ const Eventos = {
     },
 
     camposDesconto() {
-        const campos = ["tipoDesconto", "desconto"];
+        const campos = [
+            "tipoDesconto",
+            "desconto",
+            "descontoValor",
+            "descontoPercentual",
+            "acrescimo",
+            "instalacao",
+            "frete",
+            "custoVidro",
+            "custoFerragens",
+            "custoMaoObra",
+            "custoTransporte",
+            "comissao"
+        ];
 
         campos.forEach(id => {
             const campo = Util.$(id);
@@ -87,10 +106,22 @@ const Eventos = {
 
     camposOrcamento() {
         const campos = [
+            "numeroOrcamento",
+            "dataCriacao",
+            "dataValidade",
+            "statusOrcamento",
+            "vendedor",
             "cliente",
             "telefone",
+            "email",
             "endereco",
-            "observacoes"
+            "enderecoObra",
+            "observacoesObra",
+            "observacoes",
+            "formaPagamento",
+            "entradaPagamento",
+            "parcelasPagamento",
+            "observacaoPagamento"
         ];
 
         campos.forEach(id => {
@@ -114,6 +145,7 @@ const Eventos = {
 
         if (!item.largura || !item.altura) {
             if (Util.$("area")) Util.$("area").value = "";
+            if (Util.$("totalItem")) Util.$("totalItem").value = "";
             if (Util.$("resultado")) Util.$("resultado").textContent = Util.moeda(0);
             return;
         }
