@@ -106,11 +106,24 @@ Transicoes permitidas para cancelamento:
 ## Regras de transicao
 
 - Toda transicao deve registrar evento no historico.
+- Toda transicao importante tambem pode emitir evento de dominio pelo Event Bus.
 - O evento deve conter status anterior, status novo, usuario, data e descricao.
 - A interface nao deve decidir sozinha se a transicao e valida.
 - A validacao deve ficar em servico de aplicacao ou modulo de dominio.
 - Transicoes fora do fluxo principal devem ser documentadas antes de implementadas.
 - Reabertura de Projeto arquivado ou cancelado deve ser tratada como regra explicita futura.
+
+## Eventos de dominio
+
+O Workflow deve poder emitir eventos como:
+
+- `projeto.status_alterado`
+- `projeto.aprovado`
+- `projeto.cancelado`
+- `projeto.concluido`
+- `projeto.arquivado`
+
+Esses eventos permitem que Timeline, Dashboard, Financeiro e Producao reajam ao ciclo de vida do Projeto sem acoplamento direto com a tela que iniciou a acao.
 
 ## Evento de historico esperado
 
@@ -137,4 +150,5 @@ O Workflow deve evoluir para um modulo reutilizavel que exponha funcoes como:
 - listar proximos status;
 - aplicar transicao;
 - registrar historico;
+- emitir evento de dominio;
 - atualizar datas importantes do Projeto.

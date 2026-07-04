@@ -1,0 +1,57 @@
+const WORKFLOW_TRANSITIONS = Object.freeze({
+    [WORKFLOW_STATE.RASCUNHO]: [
+        WORKFLOW_STATE.EM_ORCAMENTO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.EM_ORCAMENTO]: [
+        WORKFLOW_STATE.ENVIADO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.ENVIADO]: [
+        WORKFLOW_STATE.APROVADO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.APROVADO]: [
+        WORKFLOW_STATE.EM_PRODUCAO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.EM_PRODUCAO]: [
+        WORKFLOW_STATE.PRONTO_INSTALACAO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.PRONTO_INSTALACAO]: [
+        WORKFLOW_STATE.EM_INSTALACAO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.EM_INSTALACAO]: [
+        WORKFLOW_STATE.AGUARDANDO_PAGAMENTO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.AGUARDANDO_PAGAMENTO]: [
+        WORKFLOW_STATE.CONCLUIDO,
+        WORKFLOW_STATE.CANCELADO
+    ],
+    [WORKFLOW_STATE.CONCLUIDO]: [
+        WORKFLOW_STATE.GARANTIA
+    ],
+    [WORKFLOW_STATE.GARANTIA]: [
+        WORKFLOW_STATE.ARQUIVADO
+    ],
+    [WORKFLOW_STATE.ARQUIVADO]: [],
+    [WORKFLOW_STATE.CANCELADO]: []
+});
+
+function obterProximosEstados(estadoAtual) {
+    return [...(WORKFLOW_TRANSITIONS[estadoAtual] || [])];
+}
+
+function validarTransicao(estadoAtual, novoEstado) {
+    return obterProximosEstados(estadoAtual).includes(novoEstado);
+}
+
+const WorkflowValidator = {
+    transicoes: WORKFLOW_TRANSITIONS,
+    validarTransicao,
+    obterProximosEstados
+};
+

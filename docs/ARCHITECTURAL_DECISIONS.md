@@ -57,3 +57,11 @@ Este documento registra as decisoes arquiteturais centrais da v0.2.0. As decisoe
 **Contexto:** a v0.2.0 foca no Comercial, mas o MVP precisa crescer para producao, instalacao e financeiro.
 
 **Consequencia:** o modelo de Projeto deve aceitar dados comerciais, operacionais e financeiros desde a fundacao, mesmo que algumas telas sejam entregues em versoes futuras.
+
+## ADR-008 - Eventos de dominio desacoplam modulos
+
+**Decisao:** acoes importantes do dominio devem poder emitir eventos por um Event Bus central.
+
+**Contexto:** Timeline, Dashboard, Financeiro, Producao e Instalacao precisarao reagir a mudancas do Projeto sem criar dependencias diretas entre telas e modulos.
+
+**Consequencia:** novos modulos devem preferir ouvir eventos de dominio, como `projeto.status_alterado` ou `projeto.aprovado`, em vez de serem chamados diretamente pela interface.

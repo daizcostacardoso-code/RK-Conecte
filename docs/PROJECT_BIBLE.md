@@ -52,6 +52,8 @@ Orquestra casos de uso: criar Projeto, alterar status, registrar historico, vinc
 
 A Aplicacao deve ser o ponto de entrada preferencial para telas.
 
+O Event Bus pertence a base de aplicacao/core e permite que modulos reajam a eventos de dominio sem dependencia direta entre si.
+
 ### Infraestrutura
 
 Cuida de armazenamento e integracoes: Firestore, LocalStorage, Firebase Hosting, arquivos e futuras APIs.
@@ -97,6 +99,7 @@ Indicadores, alertas, previsoes, gargalos, desempenho comercial e apoio a decisa
 - Preservar compatibilidade com o fluxo atual de orcamento.
 - Preferir funcoes pequenas e servicos de aplicacao.
 - Evitar acesso direto ao Firestore dentro da interface.
+- Usar eventos de dominio para desacoplar reacoes entre modulos.
 - Atualizar documentacao ao alterar regras de negocio ou arquitetura.
 - Registrar historico para mudancas importantes de Projeto.
 

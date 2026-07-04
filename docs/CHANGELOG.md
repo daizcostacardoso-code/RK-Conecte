@@ -1,6 +1,13 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Implementado Event Bus inicial.
+- Criado padrao de eventos de dominio.
+- Preparada base para Timeline, Dashboard, Financeiro e Producao reagirem a acoes do Projeto.
+- Sprint 2.1: Workflow Engine.
+- Criada maquina de estados para o ciclo de vida de Projetos.
+- Adicionado registro de eventos de Workflow.
+- Adicionada validacao de transicoes de estado.
 - Formalizadas as decisoes arquiteturais do RK-Conecte.
 - Criado modelo de dominio inicial.
 - Documentado o conceito de Projeto como entidade central.
