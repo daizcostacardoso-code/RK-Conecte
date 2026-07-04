@@ -1,125 +1,127 @@
 # Project Bible - RK-Conecte
 
-## Identidade do produto
+## Visao do produto
 
-RK-Conecte e o sistema operacional da RK Vidracaria. O produto deve centralizar a rotina comercial, operacional e financeira em torno de uma entidade principal: o Projeto.
+RK-Conecte e o sistema operacional da RK Vidracaria. O produto deve organizar a rotina da empresa em uma linha clara: atendimento, orcamento, aprovacao, producao, instalacao, financeiro, garantia e historico.
 
-O Projeto representa uma oportunidade real de venda e execucao: uma solicitacao recebida, um orcamento em negociacao, uma obra aprovada, um servico em producao ou uma entrega finalizada.
-
-## Visao
-
-Transformar a rotina da vidracaria em um fluxo rastreavel, simples e rapido, reduzindo perda de informacao entre atendimento, orcamento, producao, instalacao e financeiro.
+A visao do produto e transformar demandas de clientes em Projetos rastreaveis, reduzindo perda de informacao e criando uma base confiavel para operacao, gestao e inteligencia.
 
 ## Missao
 
-Ajudar a RK Vidracaria a registrar cada demanda, acompanhar cada etapa e tomar decisoes com dados confiaveis, sem exigir um sistema pesado ou dificil de operar.
+Ajudar a RK Vidracaria a trabalhar com mais velocidade, simplicidade e controle, mantendo cada oportunidade, venda e obra dentro de um fluxo unico e acompanhavel.
 
-## Versao atual
+## Conceito de Projeto Vivo
 
-- Versao publicada: v0.1.0.
-- Versao em desenvolvimento: v0.2.0.
-- Branch de trabalho: `feature/v020-comercial`.
-- Foco da v0.2.0: Bloco Comercial do MVP.
+Projeto Vivo e o conceito central do RK-Conecte.
 
-## Principio central
+Um Projeto nao e apenas um cadastro. Ele muda de estado, recebe eventos, ganha anexos, fotos, pagamentos, tarefas, historico e indicadores. Ele acompanha a vida real da demanda desde o primeiro contato ate o arquivamento.
 
-Tudo que nasce no comercial deve virar Projeto ou se conectar a um Projeto.
+Na v0.2.0, o Projeto Vivo nasce no Comercial. Nas proximas versoes, ele deve avancar para Operacional, Financeiro, Inteligencia e estabilidade comercial.
 
-Antes da v0.2.0, o sistema trata o orcamento como principal objeto de trabalho. A partir da v0.2.0, o orcamento passa a ser uma parte do Projeto, nao o centro do sistema.
+## Regra arquitetural numero 1
+
+Toda funcionalidade pertence a um Projeto ou a Configuracao do sistema.
+
+Antes de criar uma funcionalidade nova, a pergunta obrigatoria e:
+
+```text
+Isto faz parte de um Projeto ou e uma Configuracao geral?
+```
+
+Se fizer parte da jornada de um cliente, deve se relacionar com Projeto. Se definir parametros globais do sistema, deve pertencer a Configuracao.
 
 ## Principios
 
-- Simplicidade: telas e fluxos devem ser diretos para uso diario.
-- Velocidade: registrar e encontrar informacao deve ser rapido.
-- Inteligencia: dados comerciais devem preparar relatorios e decisoes futuras.
+- Simplicidade: a equipe deve conseguir operar o sistema no ritmo do dia a dia.
+- Velocidade: criar, localizar e atualizar informacoes deve ser rapido.
 - Rastreabilidade: mudancas importantes devem gerar historico.
-- Escalabilidade: o MVP deve crescer sem reescrever o sistema inteiro.
+- Escalabilidade: o MVP deve crescer sem reescrever a base.
+- Clareza: regras de negocio devem ficar documentadas e fora de telas sempre que possivel.
+
+## Separacao em camadas
+
+### Dominio
+
+Contem as regras principais do negocio: Projeto, status, workflow, historico, orcamento, cliente, financeiro e demais entidades.
+
+O Dominio nao deve depender da interface.
+
+### Aplicacao
+
+Orquestra casos de uso: criar Projeto, alterar status, registrar historico, vincular orcamento, aprovar proposta e preparar dados para producao.
+
+A Aplicacao deve ser o ponto de entrada preferencial para telas.
+
+### Infraestrutura
+
+Cuida de armazenamento e integracoes: Firestore, LocalStorage, Firebase Hosting, arquivos e futuras APIs.
+
+Detalhes de infraestrutura nao devem vazar para a interface.
+
+### Interface
+
+Mostra dados, coleta entradas do usuario e chama servicos de aplicacao.
+
+A interface nao deve acessar Firestore diretamente nem concentrar regras de negocio sensiveis.
 
 ## Fluxo geral
 
 ```text
-cliente -> orcamento -> aprovacao -> producao -> instalacao -> financeiro
+cliente -> orcamento -> aprovacao -> producao -> instalacao -> financeiro -> garantia -> arquivamento
 ```
 
 O Projeto acompanha esse fluxo e guarda os dados essenciais de cada etapa.
-
-## Entidades principais
-
-### Projeto
-
-Entidade central do RK-Conecte.
-
-Guarda:
-
-- cliente;
-- endereco da obra;
-- origem da demanda;
-- etapa comercial;
-- status;
-- responsavel;
-- orcamento vinculado;
-- valor estimado;
-- valor fechado;
-- historico;
-- proximas acoes;
-- observacoes.
-
-### Orcamento
-
-Documento comercial com itens, calculos, totais, condicoes de pagamento e PDF.
-
-Na v0.2.0, o orcamento continua existindo, mas deve ser vinculado a um Projeto.
-
-### Solicitacao
-
-Pedido vindo do site publico ou registrado manualmente. Pode gerar um Projeto.
-
-### Cliente
-
-Pessoa ou empresa interessada no servico. Na fundacao do MVP, o cliente pode continuar embutido no Projeto. Uma colecao propria de clientes fica para evolucao futura.
 
 ## Blocos do sistema
 
 ### Comercial
 
-Responsavel por entrada de leads, cadastro de Projetos, orcamentos, follow-up, negociacao, aprovacao e perda.
+Clientes, produtos, servicos, orcamentos, propostas, aprovacoes e conversao em Projeto.
 
 ### Operacional
 
-Responsavel por medicao, producao, instalacao, entrega e pos-venda. Deve nascer depois da aprovacao comercial.
+Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
 
 ### Financeiro
 
-Responsavel por caixa, pagamentos, recebimentos, comissoes e margem. Na v0.2.0, recebe apenas a base de dados necessaria para evoluir depois.
+Recebimentos, pagamentos, custos, saldo, margem, comissoes e relatorios.
 
-## Regras de produto
+### Inteligencia
 
-- O sistema deve funcionar como PWA estatica, sem bundler.
-- O JavaScript deve seguir o padrao atual de objetos globais.
-- A compatibilidade com a v0.1.0 deve ser preservada.
-- Nenhuma informacao interna de custo deve aparecer para o cliente.
-- O Firestore deve ser a fonte de persistencia em nuvem, com fallback local quando possivel.
-- Mudancas estruturais devem ser documentadas antes ou junto da implementacao.
+Indicadores, alertas, previsoes, gargalos, desempenho comercial e apoio a decisao.
 
 ## Padrao de desenvolvimento
 
 - Fazer mudancas pequenas e organizadas.
-- Preferir funcoes curtas e objetos globais compativeis com o codigo atual.
-- Nao remover funcionalidades existentes sem motivo documentado.
-- Nao alterar telas criticas junto com mudancas de dominio.
-- Atualizar documentacao quando criar ou mudar regras de negocio.
+- Nao remover funcionalidades existentes sem necessidade clara.
+- Preservar compatibilidade com o fluxo atual de orcamento.
+- Preferir funcoes pequenas e servicos de aplicacao.
+- Evitar acesso direto ao Firestore dentro da interface.
+- Atualizar documentacao ao alterar regras de negocio ou arquitetura.
+- Registrar historico para mudancas importantes de Projeto.
+
+## Roadmap
+
+### v0.2.0 - Comercial
+
+Formalizar Projeto como entidade central e preparar o bloco comercial: clientes, produtos, servicos, orcamentos, aprovacao e conversao em Projeto.
+
+### v0.3.0 - Operacional
+
+Adicionar producao, instalacao, agenda operacional, fotos e acompanhamento de execucao.
+
+### v0.4.0 - Financeiro
+
+Conectar Projeto a pagamentos, recebimentos, custos, saldo, margem e relatorios financeiros.
+
+### v0.5.0 - Inteligencia
+
+Criar indicadores, alertas de pendencia, visao por gargalos, previsoes e apoio a decisao.
+
+### v1.0.0 - Comercial estavel
+
+Consolidar o fluxo comercial como experiencia estavel, confiavel e pronta para uso continuo.
 
 ## Como o Codex deve trabalhar
 
-O Codex deve ler a documentacao do dominio antes de implementar, preservar compatibilidade com o fluxo atual de orcamento e listar ao final os arquivos criados e alterados.
-
-## Definicao de pronto da v0.2.0
-
-A v0.2.0 esta pronta quando:
-
-- existir a colecao `projetos`;
-- for possivel modelar um Projeto de ponta a ponta;
-- houver base JavaScript para criar, normalizar, salvar, carregar e atualizar Projetos;
-- o fluxo comercial estiver documentado;
-- o orcamento puder ser associado a um Projeto em uma etapa seguinte;
-- o proximo Codex conseguir continuar a implementacao lendo `docs/GUIA_CODEX.md`.
+O Codex deve ler a documentacao do dominio antes de implementar, preservar compatibilidade com telas existentes, evitar mudancas grandes em uma unica tarefa e listar ao final todos os arquivos criados ou alterados.

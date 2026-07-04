@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Formalizadas as decisoes arquiteturais do RK-Conecte.
+- Criado modelo de dominio inicial.
+- Documentado o conceito de Projeto como entidade central.
+- Documentado o Workflow do ciclo de vida de um Projeto.
+- Definida a regra arquitetural numero 1: toda funcionalidade pertence a um Projeto ou a Configuracao.
 - Iniciada a fundacao do Bloco Comercial.
 - Criado conceito central de Projeto.
 - Criada documentacao base da arquitetura da v0.2.0.
