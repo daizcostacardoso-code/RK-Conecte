@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.4: Criado dominio Servicos no padrao Core v1.
+- Adicionados model, factory, validator, service e repository para Servicos.
+- Criados use cases para criar, buscar e listar Servicos.
+- Dominio Servicos preparado para futuro Catalogo de Servicos e Orcamento Inteligente.
 - Sprint 3.3: Clientes evoluido para Centro Comercial.
 - Adicionado resumo do cliente com dados principais de atendimento.
 - Criadas abas de Dados, Projetos, Orcamentos, Historico, Timeline e Observacoes.

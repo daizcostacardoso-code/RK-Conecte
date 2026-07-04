@@ -89,6 +89,12 @@ camada de Cliente deve seguir o Core v1 com Use Cases, Service, Repository e
 Adapter, sem acesso direto ao Firestore e sem alterar fluxos existentes de
 Orcamento, Dashboard, Producao ou Financeiro.
 
+Na Sprint 3.4, o dominio Servicos entra como estrutura de base do Bloco
+Comercial. Servicos segue o mesmo Core v1 de Cliente e Projeto, com model,
+factory, validator, service, repository e use cases. Esta sprint prepara o
+futuro Catalogo de Servicos e o Orcamento Inteligente, sem implementar tela,
+cadastro, catalogo, PDF, Firebase ou alteracoes no Orcamento atual.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -131,6 +137,10 @@ utilizando a infraestrutura de `ProjetoService`, Repository/Adapter,
 
 Sprint 3.1 inicia o Centro Comercial de Clientes com dominio Cliente, validacao,
 factory, service, repository e use cases dedicados.
+
+Sprint 3.4 cria o dominio Servicos como base para catalogo comercial e futuro
+Orcamento Inteligente, mantendo Repository/Adapter desacoplados e sem acesso
+direto ao Firestore.
 
 ### v0.3.0 - Operacional
 
