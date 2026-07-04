@@ -1,6 +1,9 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Iniciada a descoberta do Bloco Comercial.
+- Criados documentos de negocio, UX e fluxo comercial.
+- Documentada a jornada do cliente e o processo da vidracaria.
 - Implementado Repository Pattern inicial.
 - Criado Storage Adapter.
 - Criado Memory Adapter.
