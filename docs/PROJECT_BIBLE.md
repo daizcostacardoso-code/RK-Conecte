@@ -95,6 +95,13 @@ factory, validator, service, repository e use cases. Esta sprint prepara o
 futuro Catalogo de Servicos e o Orcamento Inteligente, sem implementar tela,
 cadastro, catalogo, PDF, Firebase ou alteracoes no Orcamento atual.
 
+Na Sprint 3.5, o Catalogo Comercial de Servicos ganha a primeira interface em
+`paginas/servicos.html`. A tela lista Servicos por meio de
+`ListarServicosUseCase`, visualiza detalhes por `BuscarServicoUseCase` e mantem
+placeholders para produtos sugeridos, ferragens sugeridas, campos obrigatorios e
+fluxo do Orcamento Inteligente. A interface nao acessa Firestore nem Repository
+diretamente e nao implementa cadastro, edicao ou inicio real de orcamento.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -141,6 +148,10 @@ factory, service, repository e use cases dedicados.
 Sprint 3.4 cria o dominio Servicos como base para catalogo comercial e futuro
 Orcamento Inteligente, mantendo Repository/Adapter desacoplados e sem acesso
 direto ao Firestore.
+
+Sprint 3.5 cria a primeira interface do Catalogo Comercial de Servicos,
+consumindo Use Cases e `ServicoService`, com cards comerciais, pesquisa e areas
+preparadas para o futuro Orcamento Inteligente.
 
 ### v0.3.0 - Operacional
 

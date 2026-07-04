@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.5: Criada primeira interface do Catalogo Comercial de Servicos.
+- Adicionada pagina `paginas/servicos.html` com cabecalho, busca, categorias, cards, visualizacao e placeholders do Orcamento Inteligente.
+- Criados `js/servicos/servico-ui.js` e `js/servicos/servico-controller.js` consumindo Use Cases/ServicoService sem acesso direto ao Firestore.
+- Atualizado estilo isolado do modulo Servicos em `css/style.css`.
 - Sprint 3.4: Criado dominio Servicos no padrao Core v1.
 - Adicionados model, factory, validator, service e repository para Servicos.
 - Criados use cases para criar, buscar e listar Servicos.

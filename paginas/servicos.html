@@ -3,100 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Nossos Serviços - RK Vidraçaria</title>
+    <title>Cat&aacute;logo Comercial de Servi&ccedil;os - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=3.2.0">
+    <link rel="stylesheet" href="../css/style.css?v=3.5.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
     <link rel="manifest" href="../manifest.webmanifest">
     <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
 </head>
-<body>
+<body class="servicos-page">
 
 <header>
     <div class="container">
-        <div class="marca-header">
-                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
-                <h1>RK Vidraçaria</h1>
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Centro Comercial</small>
             </div>
+        </div>
 
-<nav>
-
-    <ul>
-
-        <li><a href="../index.html">Início</a></li>
-
-        <li><a href="servicos.html">Serviços</a></li>
-
-        <li><a href="produtos.html">Produtos</a></li>
-
-        <li><a href="contato.html">Contato</a></li>
-
-        <li><a href="orcamento.html">Orçamento</a></li>
-
-        <li><a class="login" href="login.html">Login</a></li>
-
-    </ul>
-
-</nav>
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="orcamento.html">Or&ccedil;amento</a></li>
+                <li><a href="funcionario.html">Painel</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
     </div>
 </header>
 
-<section class="servicos">
+<main class="servicos-modulo">
     <div class="container">
-
-        <h2>Nossos Serviços</h2>
-        <p>Conheça os principais serviços oferecidos pela nossa vidraçaria.</p>
-
-        <div class="cards">
-
-            <div class="card">
-                <h3>🚿 Box para Banheiro</h3>
-                <p>Instalação de box em vidro temperado nas opções incolor, fumê, verde e serigrafado.</p>
+        <section class="servicos-cabecalho" aria-labelledby="servicosTitulo">
+            <div>
+                <span class="servicos-modulo-label">Centro Comercial</span>
+                <h1 id="servicosTitulo">Cat&aacute;logo Comercial de Servi&ccedil;os</h1>
             </div>
 
-            <div class="card">
-                <h3>🪞 Espelhos Sob Medida</h3>
-                <p>Espelhos personalizados para salas, banheiros, quartos, academias e empresas.</p>
+            <div class="servicos-cabecalho-acoes">
+                <label class="servicos-busca" for="buscaServico">
+                    <span>Pesquisar</span>
+                    <input type="search" id="buscaServico" placeholder="Pesquisar servi&ccedil;o...">
+                </label>
+                <button type="button" id="btnNovoServico" class="botao servicos-btn-principal">Novo Servi&ccedil;o</button>
+            </div>
+        </section>
+
+        <div id="servicosAviso" class="servicos-aviso" aria-live="polite"></div>
+
+        <section class="servicos-painel servicos-categorias-painel" aria-labelledby="servicosCategoriasTitulo">
+            <div class="servicos-painel-topo">
+                <div>
+                    <h2 id="servicosCategoriasTitulo">Categorias</h2>
+                    <p>Base comercial dispon&iacute;vel para o cat&aacute;logo.</p>
+                </div>
+            </div>
+            <div id="servicosCategorias" class="servicos-categorias-grid"></div>
+        </section>
+
+        <section class="servicos-layout">
+            <div class="servicos-painel servicos-lista-painel">
+                <div class="servicos-painel-topo">
+                    <div>
+                        <h2>Servi&ccedil;os</h2>
+                        <p id="servicosResumo">0 servi&ccedil;os cadastrados</p>
+                    </div>
+                </div>
+
+                <div id="servicosLista" class="servicos-grid-cards" aria-live="polite">
+                    <p class="servicos-estado-vazio">Nenhum servi&ccedil;o cadastrado.</p>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>🚪 Portas de Vidro</h3>
-                <p>Portas de correr e de abrir em vidro temperado para residências e comércios.</p>
-            </div>
+            <aside class="servicos-painel servicos-detalhe-painel" aria-labelledby="servicoDetalheTitulo">
+                <div class="servicos-painel-topo">
+                    <div>
+                        <span class="servicos-modulo-label">Resumo comercial</span>
+                        <h2 id="servicoDetalheTitulo">Visualiza&ccedil;&atilde;o do servi&ccedil;o</h2>
+                        <p id="servicoDetalheResumo">Selecione um servi&ccedil;o para visualizar.</p>
+                    </div>
+                </div>
 
-            <div class="card">
-                <h3>🪟 Janelas de Vidro</h3>
-                <p>Janelas modernas com excelente acabamento e alta durabilidade.</p>
-            </div>
+                <div id="servicoDetalheConteudo" class="servico-detalhe-conteudo"></div>
 
-            <div class="card">
-                <h3>🏢 Fachadas Comerciais</h3>
-                <p>Projetos completos de fachadas em vidro para lojas, escritórios e empresas.</p>
-            </div>
-
-            <div class="card">
-                <h3>🛠️ Manutenção</h3>
-                <p>Troca de vidros quebrados, regulagem de portas, manutenção de boxes e espelhos.</p>
-            </div>
-
-        </div>
-
-        <br><br>
-
-        <a href="../index.html" class="botao">← Voltar para a Página Inicial</a>
-
+                <div class="servico-preparacao-grid" aria-label="Campos preparados para o or&ccedil;amento inteligente">
+                    <section class="servico-placeholder-bloco">
+                        <h3>Produtos sugeridos</h3>
+                        <div id="servicoProdutosSugeridos" class="servico-placeholder-conteudo"></div>
+                    </section>
+                    <section class="servico-placeholder-bloco">
+                        <h3>Ferragens sugeridas</h3>
+                        <div id="servicoFerragensSugeridas" class="servico-placeholder-conteudo"></div>
+                    </section>
+                    <section class="servico-placeholder-bloco">
+                        <h3>Campos obrigat&oacute;rios</h3>
+                        <div id="servicoCamposObrigatorios" class="servico-placeholder-conteudo"></div>
+                    </section>
+                    <section class="servico-placeholder-bloco">
+                        <h3>Fluxo do or&ccedil;amento</h3>
+                        <div id="servicoFluxoOrcamento" class="servico-placeholder-conteudo"></div>
+                    </section>
+                </div>
+            </aside>
+        </section>
     </div>
-</section>
+</main>
 
 <footer>
-    <p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p>
-    <p>📞 (73) 9981-9768 | 📍 Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
-    <script src="../js/app-install.js?v=3.2.0"></script>
+<script src="../js/core/event-types.js?v=3.5.0"></script>
+<script src="../js/core/event-bus.js?v=3.5.0"></script>
+<script src="../js/core/event-dispatcher.js?v=3.5.0"></script>
+<script src="../js/core/event-listener.js?v=3.5.0"></script>
+<script src="../js/storage/storage-adapter.js?v=3.5.0"></script>
+<script src="../js/storage/memory-adapter.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-model.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-validator.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-factory.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-repository.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-service.js?v=3.5.0"></script>
+<script src="../js/usecases/servicos/buscar-servico-usecase.js?v=3.5.0"></script>
+<script src="../js/usecases/servicos/listar-servicos-usecase.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-ui.js?v=3.5.0"></script>
+<script src="../js/servicos/servico-controller.js?v=3.5.0"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
 </body>
 </html>

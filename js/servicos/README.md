@@ -8,8 +8,12 @@ segue a arquitetura Core v1: Use Cases -> Services -> Repository -> Adapter.
 ## Objetivo
 
 Representar servicos comerciais que futuramente poderao alimentar o Catalogo de
-Servicos e o Orcamento Inteligente, sem implementar interface, PDF, Firebase ou
-alteracoes no modulo de Orcamentos nesta sprint.
+Servicos e o Orcamento Inteligente.
+
+Na Sprint 3.5, o modulo recebeu a primeira interface do Catalogo Comercial de
+Servicos em `paginas/servicos.html`. A tela consome Use Cases e
+`ServicoService`, mantendo cadastro, edicao e inicio real de orcamento como
+etapas futuras.
 
 ## Arquivos
 
@@ -21,6 +25,9 @@ alteracoes no modulo de Orcamentos nesta sprint.
   a Firestore.
 - `servico-service.js`: fachada de aplicacao para criar, buscar, listar,
   atualizar e desativar Servicos.
+- `servico-ui.js`: renderizacao da tela do Catalogo Comercial de Servicos.
+- `servico-controller.js`: orquestracao da interface via Use Cases e
+  `ServicoService`.
 
 ## Estrutura do Servico
 
@@ -76,6 +83,10 @@ personalizado
 <script src="../js/servicos/servico-factory.js"></script>
 <script src="../js/servicos/servico-repository.js"></script>
 <script src="../js/servicos/servico-service.js"></script>
+<script src="../js/usecases/servicos/buscar-servico-usecase.js"></script>
+<script src="../js/usecases/servicos/listar-servicos-usecase.js"></script>
+<script src="../js/servicos/servico-ui.js"></script>
+<script src="../js/servicos/servico-controller.js"></script>
 ```
 
 ## Fluxo
@@ -97,7 +108,14 @@ O dominio Servicos prepara os dados que poderao orientar o orcamento no futuro:
 Nesta sprint, esses campos sao apenas estrutura de dominio. Eles nao alteram o
 orcamento atual.
 
+Na interface da Sprint 3.5, esses campos aparecem apenas como areas preparadas:
+produtos sugeridos, ferragens sugeridas, campos obrigatorios e fluxo do
+orcamento. Nenhum comportamento de Orcamento Inteligente foi implementado.
+
 ## Regra arquitetural
 
 O modulo nao acessa Firestore diretamente. Persistencia deve acontecer somente
 por Repository + Adapter.
+
+A interface deve chamar Use Cases e `ServicoService`. Ela nao deve acessar
+`ServicoRepository` diretamente.
