@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.9B: Implementado o fluxo guiado do Orcamento Inteligente.
+- Controller passa a selecionar Cliente, Projeto, Servico, adicionar/remover Produtos, solicitar calculo ao Motor de Calculo e atualizar o resumo.
+- UI passa a renderizar etapa atual, estados de selecao, produtos, calculo pendente e resumo atualizado.
+- Orquestrador complementado para remover produtos e limpar calculo/resultado quando selecoes ou produtos mudam.
+- Tela antiga de Orcamento preservada; sem PDF, aprovacao, persistencia definitiva, Firebase ou Firestore direto na interface.
 - Sprint 3.9A: Criada estrutura inicial da tela do Orcamento Inteligente.
 - Adicionada pagina `paginas/orcamento-inteligente.html` com cabecalho, etapas, containers e estados vazios.
 - Criados controller e UI iniciais para preparar contexto via Orchestrator/Factory, sem fluxo completo ou calculo duplicado.

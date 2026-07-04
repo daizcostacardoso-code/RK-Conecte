@@ -14,12 +14,20 @@ const OrcamentoOrchestrator = {
             contexto,
             ORCAMENTO_STATE.CLIENTE_SELECIONADO,
             {
-                cliente: resultado.cliente
+                cliente: resultado.cliente,
+                projeto: null,
+                servico: null,
+                produtos: [],
+                calculo: null,
+                resultado: null
             },
             "cliente_selecionado",
             "Cliente selecionado para o orcamento.",
             {
                 clienteId: resultado.cliente?.id || ""
+            },
+            {
+                permitirRetorno: true
             }
         );
 
@@ -37,13 +45,20 @@ const OrcamentoOrchestrator = {
             contexto,
             ORCAMENTO_STATE.PROJETO_SELECIONADO,
             {
-                projeto: resultado.projeto
+                projeto: resultado.projeto,
+                servico: null,
+                produtos: [],
+                calculo: null,
+                resultado: null
             },
             "projeto_selecionado",
             "Projeto selecionado para o orcamento.",
             {
                 projetoId: resultado.projeto?.id || "",
                 workflow
+            },
+            {
+                permitirRetorno: true
             }
         );
 
@@ -60,13 +75,19 @@ const OrcamentoOrchestrator = {
             contexto,
             ORCAMENTO_STATE.SERVICO_SELECIONADO,
             {
-                servico: resultado.servico
+                servico: resultado.servico,
+                produtos: [],
+                calculo: null,
+                resultado: null
             },
             "servico_selecionado",
             "Servico selecionado para o orcamento.",
             {
                 servicoId: resultado.servico?.id || "",
                 tipoCalculo: resultado.servico?.tipoCalculo || ""
+            },
+            {
+                permitirRetorno: true
             }
         );
 
@@ -85,13 +106,54 @@ const OrcamentoOrchestrator = {
             atual,
             ORCAMENTO_STATE.PRODUTOS_ADICIONADOS,
             {
-                produtos
+                produtos,
+                calculo: null,
+                resultado: null
             },
             "produto_adicionado",
             "Produto adicionado ao orcamento.",
             {
                 produtoId: resultado.produto?.id || "",
                 totalProdutos: produtos.length
+            },
+            {
+                permitirRetorno: true
+            }
+        );
+
+        return this.respostaSucesso(atualizado);
+    },
+
+    async removerProduto(contexto = {}, entrada) {
+        const atual = OrcamentoContext.normalizar(contexto);
+        const produtos = [...atual.produtos];
+        const indice = this.obterIndiceProduto(produtos, entrada);
+
+        if (indice < 0) {
+            return this.respostaErro(atual, ["Produto nao encontrado no orcamento."]);
+        }
+
+        const [produtoRemovido] = produtos.splice(indice, 1);
+        const status = produtos.length
+            ? ORCAMENTO_STATE.PRODUTOS_ADICIONADOS
+            : ORCAMENTO_STATE.SERVICO_SELECIONADO;
+
+        const atualizado = this.atualizarStatus(
+            atual,
+            status,
+            {
+                produtos,
+                calculo: null,
+                resultado: null
+            },
+            "produto_removido",
+            "Produto removido do orcamento.",
+            {
+                produtoId: produtoRemovido?.id || "",
+                totalProdutos: produtos.length
+            },
+            {
+                permitirRetorno: true
             }
         );
 
@@ -294,6 +356,14 @@ const OrcamentoOrchestrator = {
     },
 
     async resolverPorService(entrada, service, metodo, chave, mensagemNaoEncontrado) {
+        if (entrada && typeof entrada === "object") {
+            return {
+                sucesso: true,
+                [chave]: entrada,
+                erros: []
+            };
+        }
+
         const id = this.obterId(entrada);
 
         if (id && service && typeof service[metodo] === "function") {
@@ -310,14 +380,6 @@ const OrcamentoOrchestrator = {
                 sucesso: false,
                 [chave]: null,
                 erros: resultado?.erros || [mensagemNaoEncontrado]
-            };
-        }
-
-        if (entrada && typeof entrada === "object") {
-            return {
-                sucesso: true,
-                [chave]: entrada,
-                erros: []
             };
         }
 
@@ -347,9 +409,10 @@ const OrcamentoOrchestrator = {
         };
     },
 
-    atualizarStatus(contexto, status, alteracoes, tipoEvento, descricaoEvento, dadosEvento = {}) {
+    atualizarStatus(contexto, status, alteracoes, tipoEvento, descricaoEvento, dadosEvento = {}, opcoes = {}) {
         const atual = OrcamentoContext.normalizar(contexto);
-        const proximoStatus = OrcamentoState.podeAvancar(atual.status, status) ? status : atual.status;
+        const podeRetornar = opcoes.permitirRetorno === true;
+        const proximoStatus = (podeRetornar || OrcamentoState.podeAvancar(atual.status, status)) ? status : atual.status;
 
         return OrcamentoContext.atualizar(
             atual,
@@ -374,6 +437,26 @@ const OrcamentoOrchestrator = {
         if (typeof entrada === "string") return entrada;
         if (typeof entrada === "number") return String(entrada);
         return entrada.id || entrada.clienteId || entrada.projetoId || entrada.servicoId || entrada.produtoId || "";
+    },
+
+    obterIndiceProduto(produtos = [], entrada) {
+        if (typeof entrada === "number" && Number.isInteger(entrada)) {
+            return entrada >= 0 && entrada < produtos.length ? entrada : -1;
+        }
+
+        if (entrada && typeof entrada === "object" && Number.isInteger(entrada.indice)) {
+            return entrada.indice >= 0 && entrada.indice < produtos.length ? entrada.indice : -1;
+        }
+
+        const id = this.obterId(entrada);
+        if (!id) return -1;
+
+        return produtos.findIndex(produto => {
+            const produtoId = this.obterId(produto);
+            return produtoId === id
+                || produto?.itemId === id
+                || produto?.orcamentoItemId === id;
+        });
     },
 
     respostaSucesso(contexto, detalhes = {}) {

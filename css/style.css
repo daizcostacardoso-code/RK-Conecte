@@ -6646,3 +6646,273 @@ body.login-pro-body {
         padding: 15px;
     }
 }
+
+/* Sprint 3.9B - Fluxo guiado do Orcamento Inteligente */
+
+.orcamento-inteligente-status {
+    color: #5d6975;
+    font-size: 13px;
+}
+
+.orcamento-inteligente-status.erro {
+    color: #b42318;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-status.info {
+    color: #0b48b6;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-principal>.orcamento-inteligente-painel:not(.orcamento-inteligente-secao-oculta) {
+    grid-column: 1 / -1;
+}
+
+.orcamento-inteligente-secao-oculta {
+    display: none;
+}
+
+.orcamento-inteligente-placeholder {
+    display: block;
+    min-height: 260px;
+    align-items: initial;
+}
+
+.orcamento-inteligente-fluxo {
+    display: grid;
+    gap: 14px;
+}
+
+.orcamento-inteligente-estado {
+    border-left: 4px solid #cfd9e4;
+    background: #fbfcfe;
+    color: #44515f;
+    padding: 10px 12px;
+}
+
+.orcamento-inteligente-estado strong {
+    display: block;
+    font-size: 14px;
+}
+
+.orcamento-inteligente-estado.ok {
+    border-left-color: #2f9e44;
+    background: #f3fbf6;
+    color: #146c43;
+}
+
+.orcamento-inteligente-estado.pendente {
+    border-left-color: #f59f00;
+    background: #fff8e8;
+    color: #7a4d00;
+}
+
+.orcamento-inteligente-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.orcamento-inteligente-form label,
+.orcamento-inteligente-campo label {
+    color: #344252;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-form>label {
+    grid-column: 1 / -1;
+}
+
+.orcamento-inteligente-form>select {
+    grid-column: 1 / 2;
+}
+
+.orcamento-inteligente-form>.orcamento-inteligente-btn-form {
+    grid-column: 2 / 3;
+}
+
+.orcamento-inteligente-form select,
+.orcamento-inteligente-form input,
+.orcamento-inteligente-form textarea {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #cfd9e4;
+    border-radius: 7px;
+    background: #fff;
+    color: #1f2933;
+    font-size: 14px;
+    padding: 9px 11px;
+}
+
+.orcamento-inteligente-form textarea {
+    min-height: 86px;
+    resize: vertical;
+}
+
+.orcamento-inteligente-form input[readonly] {
+    background: #eef2f6;
+}
+
+.orcamento-inteligente-form-calculo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.orcamento-inteligente-campo {
+    display: grid;
+    gap: 5px;
+}
+
+.orcamento-inteligente-campo-cheio,
+.orcamento-inteligente-form-calculo .orcamento-inteligente-btn-form {
+    grid-column: 1 / -1;
+}
+
+.orcamento-inteligente-btn-form {
+    width: auto;
+    min-height: 42px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.orcamento-inteligente-selecionado {
+    display: grid;
+    gap: 4px;
+    border-top: 1px solid #e3ebf3;
+    padding-top: 12px;
+}
+
+.orcamento-inteligente-selecionado span,
+.orcamento-inteligente-lista-produtos span {
+    color: #617080;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-selecionado strong,
+.orcamento-inteligente-lista-produtos strong {
+    color: #1f2933;
+    font-size: 15px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.orcamento-inteligente-selecionado small {
+    color: #5d6975;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.orcamento-inteligente-lista-vazia {
+    border: 1px dashed #cfd9e4;
+    border-radius: 7px;
+    color: #44515f;
+    padding: 12px;
+}
+
+.orcamento-inteligente-lista-produtos {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+}
+
+.orcamento-inteligente-lista-produtos li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #e3ebf3;
+    padding-bottom: 10px;
+}
+
+.orcamento-inteligente-lista-produtos li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.orcamento-inteligente-lista-produtos div {
+    display: grid;
+    gap: 4px;
+}
+
+.orcamento-inteligente-resultado {
+    display: grid;
+    gap: 4px;
+    border-left: 4px solid #2f9e44;
+    background: #f3fbf6;
+    color: #146c43;
+    padding: 12px;
+}
+
+.orcamento-inteligente-resultado.erro {
+    border-left-color: #dc3545;
+    background: #fff1f1;
+    color: #b42318;
+}
+
+.orcamento-inteligente-resultado span {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-resultado strong {
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.orcamento-inteligente-navegacao {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid #e3ebf3;
+    padding-top: 12px;
+}
+
+.orcamento-inteligente-navegacao .btn-pequeno {
+    margin-top: 0;
+}
+
+.orcamento-inteligente-navegacao button[disabled],
+.orcamento-inteligente-lista-produtos button[disabled] {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.orcamento-inteligente-resumo-status {
+    min-height: auto;
+    border: 1px solid #dbe4ed;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    color: #7a4d00;
+    background: #fff8e8;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-resumo-status.ok {
+    color: #146c43;
+    background: #f3fbf6;
+    border-color: #badbcc;
+}
+
+@media (max-width: 820px) {
+    .orcamento-inteligente-form,
+    .orcamento-inteligente-form-calculo {
+        grid-template-columns: 1fr;
+    }
+
+    .orcamento-inteligente-btn-form,
+    .orcamento-inteligente-navegacao .btn-pequeno,
+    .orcamento-inteligente-lista-produtos .btn-pequeno {
+        width: 100%;
+    }
+
+    .orcamento-inteligente-lista-produtos li,
+    .orcamento-inteligente-navegacao {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

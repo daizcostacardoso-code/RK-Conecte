@@ -1,12 +1,12 @@
 const OrcamentoInteligenteUI = {
     elementos: {},
     etapas: [
-        { chave: "cliente", rotulo: "Cliente", status: "CLIENTE_SELECIONADO" },
-        { chave: "projeto", rotulo: "Projeto", status: "PROJETO_SELECIONADO" },
-        { chave: "servico", rotulo: "Servi\u00e7o", status: "SERVICO_SELECIONADO" },
-        { chave: "produtos", rotulo: "Produtos", status: "PRODUTOS_ADICIONADOS" },
-        { chave: "calculo", rotulo: "C\u00e1lculo", status: "CALCULADO" },
-        { chave: "resumo", rotulo: "Resumo", status: "FINALIZADO" }
+        { chave: "cliente", rotulo: "Cliente" },
+        { chave: "projeto", rotulo: "Projeto" },
+        { chave: "servico", rotulo: "Servico" },
+        { chave: "produtos", rotulo: "Produtos" },
+        { chave: "calculo", rotulo: "Calculo" },
+        { chave: "resumo", rotulo: "Resumo" }
     ],
 
     iniciar() {
@@ -15,6 +15,8 @@ const OrcamentoInteligenteUI = {
 
     mapearElementos() {
         this.elementos = {
+            modulo: document.querySelector(".orcamento-inteligente-modulo"),
+            principal: document.querySelector(".orcamento-inteligente-principal"),
             btnNovo: document.getElementById("btnNovoOrcamentoInteligente"),
             status: document.getElementById("orcamentoInteligenteStatus"),
             etapas: document.getElementById("orcamentoInteligenteEtapas"),
@@ -27,15 +29,26 @@ const OrcamentoInteligenteUI = {
         };
     },
 
-    renderizarEtapas(contexto = {}) {
+    renderizarEtapaAtual(contexto = {}, dados = {}, etapaAtual = "cliente") {
+        this.renderizarEtapas(contexto, etapaAtual);
+        this.renderizarCliente(contexto, dados.clientes || []);
+        this.renderizarProjeto(contexto, dados.projetos || []);
+        this.renderizarServico(contexto, dados.servicos || []);
+        this.renderizarProdutos(contexto, dados.produtos || []);
+        this.renderizarCalculo(contexto);
+        this.renderizarResumo(contexto);
+        this.exibirSecaoAtual(etapaAtual);
+    },
+
+    renderizarEtapas(contexto = {}, etapaAtual = "cliente") {
         const container = this.elementos.etapas;
         if (!container) return;
 
-        const statusAtual = contexto.status || "INICIADO";
-        const indiceAtual = this.indiceEtapa(statusAtual);
-
         container.innerHTML = this.etapas.map((etapa, indice) => {
-            const estado = indice < indiceAtual ? "concluida" : indice === indiceAtual ? "ativa" : "pendente";
+            const estado = etapa.chave === etapaAtual
+                ? "ativa"
+                : this.etapaConcluida(etapa.chave, contexto) ? "concluida" : "pendente";
+
             return `
                 <article class="orcamento-inteligente-etapa ${estado}">
                     <span>${indice + 1}</span>
@@ -44,43 +57,206 @@ const OrcamentoInteligenteUI = {
             `;
         }).join("");
 
-        if (this.elementos.status) {
-            this.elementos.status.textContent = `Status: ${this.rotuloStatus(statusAtual)}`;
-        }
+        this.atualizarStatus(this.estadoOperacional(contexto));
     },
 
-    renderizarEstadoVazio(contexto = {}) {
-        this.renderizarPlaceholder("cliente", contexto.cliente
-            ? this.resumoEntidade(contexto.cliente, "Cliente selecionado.")
-            : "Nenhum cliente selecionado.");
-        this.renderizarPlaceholder("projeto", contexto.projeto
-            ? this.resumoEntidade(contexto.projeto, "Projeto selecionado.")
-            : "Nenhum projeto selecionado.");
-        this.renderizarPlaceholder("servico", contexto.servico
-            ? this.resumoEntidade(contexto.servico, "Servi\u00e7o selecionado.")
-            : "Nenhum servi\u00e7o selecionado.");
-        this.renderizarPlaceholder("produtos", this.resumoProdutos(contexto.produtos));
-        this.renderizarPlaceholder("calculo", contexto.resultado
-            ? this.resumoResultado(contexto.resultado)
-            : "C\u00e1lculo ainda n\u00e3o realizado.");
+    renderizarCliente(contexto = {}, clientes = []) {
+        const container = this.elementos.cliente;
+        if (!container) return;
+
+        const clienteSelecionado = contexto.cliente || null;
+        const options = this.renderizarOptions(clientes, clienteSelecionado?.id);
+
+        container.innerHTML = `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo(clienteSelecionado ? "Cliente selecionado" : "Cliente nao selecionado", !!clienteSelecionado)}
+                <form class="orcamento-inteligente-form" data-orcamento-form="cliente">
+                    <label for="orcamentoClienteSelect">Cliente</label>
+                    <select id="orcamentoClienteSelect" name="clienteId" required>
+                        <option value="">Selecione um cliente</option>
+                        ${options}
+                    </select>
+                    <button type="submit" class="botao orcamento-inteligente-btn-form">Selecionar cliente</button>
+                </form>
+                ${clienteSelecionado ? this.renderizarEntidadeSelecionada("Cliente atual", clienteSelecionado) : ""}
+                ${this.renderizarNavegacao({ podeVoltar: false, podeAvancar: !!clienteSelecionado })}
+            </div>
+        `;
+    },
+
+    renderizarProjeto(contexto = {}, projetos = []) {
+        const container = this.elementos.projeto;
+        if (!container) return;
+
+        if (!contexto.cliente) {
+            container.innerHTML = `
+                <div class="orcamento-inteligente-fluxo">
+                    ${this.renderizarEstadoFluxo("Cliente nao selecionado", false)}
+                    ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: false })}
+                </div>
+            `;
+            return;
+        }
+
+        const projetoSelecionado = contexto.projeto || null;
+        const options = this.renderizarOptions(projetos, projetoSelecionado?.id);
+
+        container.innerHTML = `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo(projetoSelecionado ? "Projeto selecionado" : "Projeto nao selecionado", !!projetoSelecionado)}
+                <form class="orcamento-inteligente-form" data-orcamento-form="projeto">
+                    <label for="orcamentoProjetoSelect">Projeto</label>
+                    <select id="orcamentoProjetoSelect" name="projetoId" required>
+                        <option value="">Selecione um projeto</option>
+                        ${options}
+                    </select>
+                    <button type="submit" class="botao orcamento-inteligente-btn-form">Selecionar projeto</button>
+                </form>
+                ${projetoSelecionado ? this.renderizarEntidadeSelecionada("Projeto atual", projetoSelecionado) : ""}
+                ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: !!projetoSelecionado })}
+            </div>
+        `;
+    },
+
+    renderizarServico(contexto = {}, servicos = []) {
+        const container = this.elementos.servico;
+        if (!container) return;
+
+        if (!contexto.projeto) {
+            container.innerHTML = `
+                <div class="orcamento-inteligente-fluxo">
+                    ${this.renderizarEstadoFluxo("Projeto nao selecionado", false)}
+                    ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: false })}
+                </div>
+            `;
+            return;
+        }
+
+        const servicoSelecionado = contexto.servico || null;
+        const options = this.renderizarOptions(servicos, servicoSelecionado?.id);
+
+        container.innerHTML = `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo(servicoSelecionado ? "Servico selecionado" : "Servico nao selecionado", !!servicoSelecionado)}
+                <form class="orcamento-inteligente-form" data-orcamento-form="servico">
+                    <label for="orcamentoServicoSelect">Servico</label>
+                    <select id="orcamentoServicoSelect" name="servicoId" required>
+                        <option value="">Selecione um servico</option>
+                        ${options}
+                    </select>
+                    <button type="submit" class="botao orcamento-inteligente-btn-form">Selecionar servico</button>
+                </form>
+                ${servicoSelecionado ? this.renderizarEntidadeSelecionada("Servico atual", servicoSelecionado) : ""}
+                ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: !!servicoSelecionado })}
+            </div>
+        `;
+    },
+
+    renderizarProdutos(contexto = {}, produtosDisponiveis = []) {
+        const container = this.elementos.produtos;
+        if (!container) return;
+
+        if (!contexto.servico) {
+            container.innerHTML = `
+                <div class="orcamento-inteligente-fluxo">
+                    ${this.renderizarEstadoFluxo("Servico nao selecionado", false)}
+                    ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: false })}
+                </div>
+            `;
+            return;
+        }
+
+        const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
+
+        container.innerHTML = `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo(produtos.length ? "Produtos adicionados" : "Sem produtos", produtos.length > 0)}
+                <form class="orcamento-inteligente-form" data-orcamento-form="produto">
+                    <label for="orcamentoProdutoSelect">Produto</label>
+                    <select id="orcamentoProdutoSelect" name="produtoId" required>
+                        <option value="">Selecione um produto</option>
+                        ${this.renderizarOptions(produtosDisponiveis)}
+                    </select>
+                    <button type="submit" class="botao orcamento-inteligente-btn-form">Adicionar produto</button>
+                </form>
+                ${this.renderizarListaProdutos(produtos)}
+                ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: produtos.length > 0 })}
+            </div>
+        `;
+    },
+
+    renderizarCalculo(contexto = {}) {
+        const container = this.elementos.calculo;
+        if (!container) return;
+
+        const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
+        if (!produtos.length) {
+            container.innerHTML = `
+                <div class="orcamento-inteligente-fluxo">
+                    ${this.renderizarEstadoFluxo("Sem produtos", false)}
+                    ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: false })}
+                </div>
+            `;
+            return;
+        }
+
+        const calculo = contexto.calculo || {};
+        const produtoReferencia = produtos[0] || {};
+        const tipoCalculo = calculo.tipoCalculo
+            || contexto.servico?.tipoCalculo
+            || produtoReferencia.tipoCalculo
+            || "unidade";
+
+        container.innerHTML = `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo(contexto.resultado?.sucesso ? "Resumo atualizado" : "Calculo pendente", !!contexto.resultado?.sucesso)}
+                <form class="orcamento-inteligente-form orcamento-inteligente-form-calculo" data-orcamento-form="calculo">
+                    <input type="hidden" name="tipoCalculo" value="${this.escapar(tipoCalculo)}">
+                    <div class="orcamento-inteligente-campo">
+                        <label>Tipo de calculo</label>
+                        <input type="text" value="${this.escapar(this.rotuloTipoCalculo(tipoCalculo))}" readonly>
+                    </div>
+                    <div class="orcamento-inteligente-campo">
+                        <label for="orcamentoCalculoQuantidade">Quantidade</label>
+                        <input id="orcamentoCalculoQuantidade" type="number" name="quantidade" min="0" step="0.01" value="${this.valorCalculo(calculo.quantidade, 1)}" required>
+                    </div>
+                    ${this.renderizarCamposMedida(tipoCalculo, calculo)}
+                    <div class="orcamento-inteligente-campo">
+                        <label for="orcamentoCalculoValorUnitario">Valor unitario</label>
+                        <input id="orcamentoCalculoValorUnitario" type="number" name="valorUnitario" min="0" step="0.01" value="${this.valorCalculo(calculo.valorUnitario, produtoReferencia.precoVenda || 0)}" required>
+                    </div>
+                    <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
+                        <label for="orcamentoCalculoObservacoes">Observacoes</label>
+                        <textarea id="orcamentoCalculoObservacoes" name="observacoes" rows="3">${this.escapar(calculo.observacoes || "")}</textarea>
+                    </div>
+                    <button type="submit" class="botao orcamento-inteligente-btn-form">Calcular orcamento</button>
+                </form>
+                ${contexto.resultado ? this.renderizarResultado(contexto.resultado) : ""}
+                ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: !!contexto.resultado?.sucesso, rotuloAvancar: "Atualizar resumo" })}
+            </div>
+        `;
     },
 
     renderizarResumo(contexto = {}) {
         const container = this.elementos.resumo;
         if (!container) return;
 
+        const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
+        const resultado = contexto.resultado || null;
         const campos = [
-            ["Status", this.rotuloStatus(contexto.status || "INICIADO")],
-            ["Cliente", this.nomeEntidade(contexto.cliente) || "Nenhum cliente selecionado."],
-            ["Projeto", this.nomeEntidade(contexto.projeto) || "Nenhum projeto selecionado."],
-            ["Servi\u00e7o", this.nomeEntidade(contexto.servico) || "Nenhum servi\u00e7o selecionado."],
-            ["Produtos", `${Array.isArray(contexto.produtos) ? contexto.produtos.length : 0}`],
-            ["Resultado", contexto.resultado ? this.resumoResultado(contexto.resultado) : "C\u00e1lculo ainda n\u00e3o realizado."],
-            ["Criado em", this.formatarData(contexto.criadoEm)],
+            ["Estado", this.estadoOperacional(contexto)],
+            ["Cliente", this.nomeEntidade(contexto.cliente) || "Cliente nao selecionado."],
+            ["Projeto", this.nomeEntidade(contexto.projeto) || "Projeto nao selecionado."],
+            ["Servico", this.nomeEntidade(contexto.servico) || "Servico nao selecionado."],
+            ["Produtos", produtos.length ? String(produtos.length) : "Sem produtos."],
+            ["Calculo", resultado?.sucesso ? this.resumoResultado(resultado) : "Calculo pendente."],
             ["Atualizado em", this.formatarData(contexto.atualizadoEm)]
         ];
 
         container.innerHTML = `
+            <div class="orcamento-inteligente-resumo-status ${resultado?.sucesso ? "ok" : "pendente"}">
+                ${this.escapar(resultado?.sucesso ? "Resumo atualizado" : "Resumo pendente")}
+            </div>
             <dl>
                 ${campos.map(([rotulo, valor]) => `
                     <div>
@@ -92,44 +268,247 @@ const OrcamentoInteligenteUI = {
         `;
     },
 
-    renderizarPlaceholder(chave, conteudo) {
-        const elemento = this.elementos[chave];
-        if (!elemento) return;
-
-        elemento.innerHTML = `<p>${this.escapar(conteudo)}</p>`;
+    renderizarEstadoVazio(contexto = {}) {
+        this.renderizarEtapaAtual(contexto, {}, "cliente");
     },
 
-    resumoProdutos(produtos = []) {
-        if (!Array.isArray(produtos) || !produtos.length) {
-            return "Nenhum produto adicionado.";
+    renderizarCamposMedida(tipoCalculo, calculo = {}) {
+        const tipo = this.normalizarTipoCalculo(tipoCalculo);
+
+        if (tipo === "area_m2" || tipo === "AREA_M2") {
+            return `
+                <div class="orcamento-inteligente-campo">
+                    <label for="orcamentoCalculoLargura">Largura</label>
+                    <input id="orcamentoCalculoLargura" type="number" name="largura" min="0" step="0.01" value="${this.valorCalculo(calculo.largura, 0)}" required>
+                </div>
+                <div class="orcamento-inteligente-campo">
+                    <label for="orcamentoCalculoAltura">Altura</label>
+                    <input id="orcamentoCalculoAltura" type="number" name="altura" min="0" step="0.01" value="${this.valorCalculo(calculo.altura, 0)}" required>
+                </div>
+            `;
         }
 
-        return produtos.map(produto => this.nomeEntidade(produto) || "Produto").join(", ");
+        if (tipo === "linear_m" || tipo === "LINEAR_M") {
+            return `
+                <div class="orcamento-inteligente-campo">
+                    <label for="orcamentoCalculoComprimento">Comprimento</label>
+                    <input id="orcamentoCalculoComprimento" type="number" name="comprimento" min="0" step="0.01" value="${this.valorCalculo(calculo.comprimento, 0)}" required>
+                </div>
+            `;
+        }
+
+        return "";
     },
 
-    resumoEntidade(entidade = {}, fallback) {
-        return this.nomeEntidade(entidade) || fallback;
+    renderizarOptions(itens = [], selecionadoId = "") {
+        if (!Array.isArray(itens) || !itens.length) {
+            return "";
+        }
+
+        return itens.map(item => {
+            const id = item.id || "";
+            const selected = id && id === selecionadoId ? " selected" : "";
+            return `<option value="${this.escapar(id)}"${selected}>${this.escapar(this.rotuloOption(item))}</option>`;
+        }).join("");
+    },
+
+    renderizarEntidadeSelecionada(rotulo, entidade = {}) {
+        return `
+            <div class="orcamento-inteligente-selecionado">
+                <span>${this.escapar(rotulo)}</span>
+                <strong>${this.escapar(this.nomeEntidade(entidade) || "Selecionado")}</strong>
+                ${this.descricaoEntidade(entidade) ? `<small>${this.escapar(this.descricaoEntidade(entidade))}</small>` : ""}
+            </div>
+        `;
+    },
+
+    renderizarListaProdutos(produtos = []) {
+        if (!Array.isArray(produtos) || !produtos.length) {
+            return `<div class="orcamento-inteligente-lista-vazia">Sem produtos.</div>`;
+        }
+
+        return `
+            <ul class="orcamento-inteligente-lista-produtos">
+                ${produtos.map((produto, indice) => `
+                    <li>
+                        <div>
+                            <strong>${this.escapar(this.nomeEntidade(produto) || "Produto")}</strong>
+                            <span>${this.escapar(this.descricaoProduto(produto))}</span>
+                        </div>
+                        <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="remover-produto" data-indice="${indice}">
+                            Remover
+                        </button>
+                    </li>
+                `).join("")}
+            </ul>
+        `;
+    },
+
+    renderizarResultado(resultado = {}) {
+        const sucesso = resultado && resultado.sucesso !== false;
+        const texto = sucesso
+            ? this.resumoResultado(resultado)
+            : this.errosResultado(resultado).join(" ");
+
+        return `
+            <div class="orcamento-inteligente-resultado ${sucesso ? "ok" : "erro"}">
+                <span>${this.escapar(sucesso ? "Resultado" : "Calculo nao concluido")}</span>
+                <strong>${this.escapar(texto)}</strong>
+            </div>
+        `;
+    },
+
+    renderizarEstadoFluxo(texto, concluido) {
+        return `
+            <div class="orcamento-inteligente-estado ${concluido ? "ok" : "pendente"}">
+                <strong>${this.escapar(texto)}</strong>
+            </div>
+        `;
+    },
+
+    renderizarNavegacao({ podeVoltar = true, podeAvancar = true, rotuloAvancar = "Avancar" } = {}) {
+        return `
+            <div class="orcamento-inteligente-navegacao">
+                <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="voltar" ${podeVoltar ? "" : "disabled"}>
+                    Voltar
+                </button>
+                <button type="button" class="btn-pequeno" data-orcamento-action="avancar" ${podeAvancar ? "" : "disabled"}>
+                    ${this.escapar(rotuloAvancar)}
+                </button>
+            </div>
+        `;
+    },
+
+    exibirSecaoAtual(etapaAtual = "cliente") {
+        const chaveVisivel = etapaAtual === "resumo" ? "calculo" : etapaAtual;
+        ["cliente", "projeto", "servico", "produtos", "calculo"].forEach(chave => {
+            const elemento = this.elementos[chave];
+            const painel = elemento?.closest(".orcamento-inteligente-painel");
+            if (!painel) return;
+            painel.classList.toggle("orcamento-inteligente-secao-oculta", chave !== chaveVisivel);
+        });
+    },
+
+    mostrarAviso(mensagem, tipo = "info") {
+        const status = this.elementos.status;
+        if (!status) return;
+
+        status.textContent = mensagem || "";
+        status.className = `orcamento-inteligente-status ${tipo}`;
+    },
+
+    atualizarStatus(mensagem) {
+        const status = this.elementos.status;
+        if (!status) return;
+
+        status.textContent = mensagem || "";
+        status.className = "orcamento-inteligente-status";
+    },
+
+    etapaConcluida(chave, contexto = {}) {
+        const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
+        const mapa = {
+            cliente: !!contexto.cliente,
+            projeto: !!contexto.projeto,
+            servico: !!contexto.servico,
+            produtos: produtos.length > 0,
+            calculo: !!contexto.resultado?.sucesso,
+            resumo: !!contexto.resultado?.sucesso
+        };
+
+        return !!mapa[chave];
+    },
+
+    estadoOperacional(contexto = {}) {
+        const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
+
+        if (!contexto.cliente) return "Cliente nao selecionado";
+        if (!contexto.projeto) return "Projeto nao selecionado";
+        if (!contexto.servico) return "Servico nao selecionado";
+        if (!produtos.length) return "Sem produtos";
+        if (!contexto.resultado?.sucesso) return "Calculo pendente";
+        return "Resumo atualizado";
+    },
+
+    rotuloOption(item = {}) {
+        const nome = this.nomeEntidade(item) || "Item";
+        const complemento = item.numero || item.codigo || item.categoria || item.unidadeVenda || "";
+        return complemento && complemento !== nome ? `${nome} - ${complemento}` : nome;
     },
 
     nomeEntidade(entidade = {}) {
         if (!entidade) return "";
-        return entidade.nome || entidade.titulo || entidade.numero || entidade.codigo || entidade.id || "";
+        return entidade.nome
+            || entidade.nomeFantasia
+            || entidade.titulo
+            || entidade.numero
+            || entidade.codigo
+            || entidade.id
+            || "";
+    },
+
+    descricaoEntidade(entidade = {}) {
+        if (!entidade) return "";
+        return entidade.descricao
+            || entidade.cliente?.nome
+            || entidade.obra?.endereco
+            || entidade.telefonePrincipal
+            || entidade.email
+            || "";
+    },
+
+    descricaoProduto(produto = {}) {
+        const partes = [
+            produto.categoria,
+            produto.subcategoria,
+            produto.unidadeVenda,
+            produto.precoVenda ? this.formatarMoeda(produto.precoVenda) : ""
+        ].filter(Boolean);
+
+        return partes.join(" | ") || "Produto do orcamento";
     },
 
     resumoResultado(resultado = {}) {
         if (!resultado || resultado.sucesso === false) {
-            return "C\u00e1lculo ainda n\u00e3o realizado.";
+            return "Calculo pendente.";
         }
 
-        const unidade = resultado.unidade ? ` ${resultado.unidade}` : "";
-        return `${resultado.valorCalculado ?? 0}${unidade}`;
+        const unidade = resultado.unidade ? ` (${resultado.unidade})` : "";
+        return `${this.formatarMoeda(resultado.valorCalculado || 0)}${unidade}`;
     },
 
-    indiceEtapa(status) {
-        const indice = this.etapas.findIndex(etapa => etapa.status === status);
-        if (status === "INICIADO") return 0;
-        if (indice < 0) return 0;
-        return indice;
+    errosResultado(resultado = {}) {
+        const erros = resultado?.detalhes?.erros || [];
+        return Array.isArray(erros) && erros.length ? erros : ["Erro ao calcular orcamento."];
+    },
+
+    valorCalculo(valor, fallback = 0) {
+        const numero = valor === undefined || valor === null || valor === "" ? fallback : valor;
+        return this.escapar(Number(numero || 0));
+    },
+
+    normalizarTipoCalculo(tipoCalculo) {
+        if (typeof CalculoModel !== "undefined" && typeof CalculoModel.normalizarTipoCalculo === "function") {
+            return CalculoModel.normalizarTipoCalculo(tipoCalculo);
+        }
+
+        return String(tipoCalculo || "").toLowerCase();
+    },
+
+    rotuloTipoCalculo(tipoCalculo) {
+        const tipo = this.normalizarTipoCalculo(tipoCalculo);
+        const rotulos = {
+            AREA_M2: "Area (m2)",
+            LINEAR_M: "Linear (m)",
+            UNIDADE: "Unidade",
+            PERSONALIZADO: "Personalizado",
+            area_m2: "Area (m2)",
+            linear_m: "Linear (m)",
+            unidade: "Unidade",
+            personalizado: "Personalizado"
+        };
+
+        return rotulos[tipo] || tipo || "Unidade";
     },
 
     rotuloStatus(status) {
@@ -137,7 +516,7 @@ const OrcamentoInteligenteUI = {
             INICIADO: "Iniciado",
             CLIENTE_SELECIONADO: "Cliente selecionado",
             PROJETO_SELECIONADO: "Projeto selecionado",
-            SERVICO_SELECIONADO: "Servi\u00e7o selecionado",
+            SERVICO_SELECIONADO: "Servico selecionado",
             PRODUTOS_ADICIONADOS: "Produtos adicionados",
             CALCULADO: "Calculado",
             VALIDADO: "Validado",
@@ -148,11 +527,11 @@ const OrcamentoInteligenteUI = {
     },
 
     formatarData(valor) {
-        if (!valor) return "N\u00e3o informado";
+        if (!valor) return "Nao informado";
 
         const data = new Date(valor);
         if (Number.isNaN(data.getTime())) {
-            return "N\u00e3o informado";
+            return "Nao informado";
         }
 
         return data.toLocaleString("pt-BR", {
@@ -161,6 +540,17 @@ const OrcamentoInteligenteUI = {
             year: "numeric",
             hour: "2-digit",
             minute: "2-digit"
+        });
+    },
+
+    formatarMoeda(valor) {
+        if (typeof Util !== "undefined" && typeof Util.moeda === "function") {
+            return Util.moeda(valor);
+        }
+
+        return Number(valor || 0).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
         });
     },
 

@@ -133,6 +133,16 @@ O controller inicializa apenas um contexto por `CriarOrcamentoUseCase`,
 sem PDF, sem aprovacao, sem Firebase, sem Firestore e sem alterar a tela antiga
 de orcamento.
 
+Na Sprint 3.9B, o Orcamento Inteligente passa a ter fluxo guiado funcional:
+Cliente -> Projeto -> Servico -> Produtos -> Calculo -> Resumo. A interface
+renderiza uma etapa por vez e chama apenas controller/use cases/orquestrador. O
+controller consome `ClienteService`, `ProjetoService`, `ServicoService` e
+`ProdutoService` para montar as opcoes, chama `OrcamentoOrchestrator` para
+selecionar entidades e produtos, e solicita o calculo por
+`CalcularOrcamentoUseCase`/`CalculoService`. O resumo e atualizado a partir do
+contexto retornado, sem PDF, sem aprovacao, sem persistencia definitiva, sem
+Firebase e sem acesso direto a Firestore pela interface.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -199,6 +209,10 @@ de calculo sem criar interface ou persistencia nova.
 Sprint 3.9A cria a estrutura inicial da tela do Orcamento Inteligente, mantendo
 o fluxo apenas preparado para a 3.9B e consumindo o Orchestrator somente para
 iniciar contexto.
+
+Sprint 3.9B implementa o fluxo guiado do Orcamento Inteligente sobre o
+Orquestrador, reutilizando Services, WorkflowEngine e Motor de Calculo, sem
+alterar a tela antiga ou criar persistencia definitiva.
 
 ### v0.3.0 - Operacional
 
