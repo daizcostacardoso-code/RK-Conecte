@@ -54,11 +54,15 @@ A Aplicacao deve ser o ponto de entrada preferencial para telas.
 
 O Event Bus pertence a base de aplicacao/core e permite que modulos reajam a eventos de dominio sem dependencia direta entre si.
 
+Use Cases representam a camada de aplicacao. Eles coordenam validacao, repositorios e eventos de dominio sem depender da interface.
+
 ### Infraestrutura
 
 Cuida de armazenamento e integracoes: Firestore, LocalStorage, Firebase Hosting, arquivos e futuras APIs.
 
 Detalhes de infraestrutura nao devem vazar para a interface.
+
+Repositorios e adapters formam a ponte entre Aplicacao e Infraestrutura. O reposititorio fala com um adapter; o adapter decide se os dados ficam em memoria, LocalStorage, Firestore ou outra tecnologia futura.
 
 ### Interface
 
@@ -99,6 +103,7 @@ Indicadores, alertas, previsoes, gargalos, desempenho comercial e apoio a decisa
 - Preservar compatibilidade com o fluxo atual de orcamento.
 - Preferir funcoes pequenas e servicos de aplicacao.
 - Evitar acesso direto ao Firestore dentro da interface.
+- Usar Repository Pattern para persistencia de dominio.
 - Usar eventos de dominio para desacoplar reacoes entre modulos.
 - Atualizar documentacao ao alterar regras de negocio ou arquitetura.
 - Registrar historico para mudancas importantes de Projeto.

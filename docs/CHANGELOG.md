@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Implementado Repository Pattern inicial.
+- Criado Storage Adapter.
+- Criado Memory Adapter.
+- Criada estrutura do Firestore Adapter.
+- Criado primeiro Use Case: CriarProjetoUseCase.
 - Implementado Event Bus inicial.
 - Criado padrao de eventos de dominio.
 - Preparada base para Timeline, Dashboard, Financeiro e Producao reagirem a acoes do Projeto.

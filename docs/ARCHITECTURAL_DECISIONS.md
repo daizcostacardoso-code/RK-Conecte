@@ -65,3 +65,11 @@ Este documento registra as decisoes arquiteturais centrais da v0.2.0. As decisoe
 **Contexto:** Timeline, Dashboard, Financeiro, Producao e Instalacao precisarao reagir a mudancas do Projeto sem criar dependencias diretas entre telas e modulos.
 
 **Consequencia:** novos modulos devem preferir ouvir eventos de dominio, como `projeto.status_alterado` ou `projeto.aprovado`, em vez de serem chamados diretamente pela interface.
+
+## ADR-009 - Persistencia deve usar Repository + Adapter
+
+**Decisao:** casos de uso devem depender de repositorios, e repositorios devem depender de adapters de armazenamento.
+
+**Contexto:** o RK-Conecte precisa funcionar com memoria durante desenvolvimento e testes, mas deve poder evoluir para Firestore sem reescrever regras de aplicacao.
+
+**Consequencia:** telas e use cases nao devem conhecer Firestore diretamente. A troca de tecnologia de persistencia deve ocorrer pela escolha do adapter.
