@@ -102,6 +102,13 @@ placeholders para produtos sugeridos, ferragens sugeridas, campos obrigatorios e
 fluxo do Orcamento Inteligente. A interface nao acessa Firestore nem Repository
 diretamente e nao implementa cadastro, edicao ou inicio real de orcamento.
 
+Na Sprint 3.6, o dominio Produtos entra como estrutura de base do Bloco
+Comercial. Produtos segue o Core v1 com model, factory, validator, service,
+repository e use cases. Esta sprint prepara o futuro Catalogo de Produtos e o
+Orcamento Inteligente, com categorias, subcategorias de vidro, precificacao e
+atributos tecnicos, sem implementar tela, HTML, CSS, Firebase ou alteracoes no
+Orcamento atual.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -152,6 +159,10 @@ direto ao Firestore.
 Sprint 3.5 cria a primeira interface do Catalogo Comercial de Servicos,
 consumindo Use Cases e `ServicoService`, com cards comerciais, pesquisa e areas
 preparadas para o futuro Orcamento Inteligente.
+
+Sprint 3.6 cria o dominio Produtos como base para catalogo de produtos e futuro
+Orcamento Inteligente, mantendo Repository/Adapter desacoplados e sem acesso
+direto ao Firestore.
 
 ### v0.3.0 - Operacional
 
