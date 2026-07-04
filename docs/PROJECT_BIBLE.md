@@ -96,6 +96,12 @@ Recebimentos, pagamentos, custos, saldo, margem, comissoes e relatorios.
 
 Indicadores, alertas, previsoes, gargalos, desempenho comercial e apoio a decisao.
 
+Na Sprint 2.5, o primeiro Dashboard nasce dentro deste bloco como uma leitura
+consolidada de Projetos. Ele consome `ProjetoService`, prepara indicadores por
+status e usa `MemoryAdapter` apenas para dados simulados quando ainda nao houver
+Projetos cadastrados. O Dashboard nao acessa Firestore nem Repository
+diretamente e nao cria novas regras de negocio.
+
 ## Padrao de desenvolvimento
 
 - Fazer mudancas pequenas e organizadas.
@@ -113,6 +119,10 @@ Indicadores, alertas, previsoes, gargalos, desempenho comercial e apoio a decisa
 ### v0.2.0 - Comercial
 
 Formalizar Projeto como entidade central e preparar o bloco comercial: clientes, produtos, servicos, orcamentos, aprovacao e conversao em Projeto.
+
+Sprint 2.5 encerra o Core v1 com o primeiro Dashboard baseado em Projeto,
+utilizando a infraestrutura de `ProjetoService`, Repository/Adapter,
+`MemoryAdapter` e Workflow Engine ja preparada nas sprints anteriores.
 
 ### v0.3.0 - Operacional
 

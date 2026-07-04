@@ -5,6 +5,11 @@
 - Criado Storage Adapter.
 - Criado Memory Adapter.
 - Criada estrutura do Firestore Adapter.
+- Sprint 2.5: Primeiro Dashboard baseado em Projetos.
+- Criada estrutura `js/dashboard/` com model, service, controller e utils.
+- Dashboard passa a consumir Projetos pelo `ProjetoService`.
+- Dados simulados do Dashboard usam `MemoryAdapter` quando ainda nao houver Projetos cadastrados.
+- Indicadores iniciais preparados para Projetos, Em orcamento, Enviados, Aprovados, Producao, Instalacao, Concluidos e Cancelados.
 - Criado primeiro Use Case: CriarProjetoUseCase.
 - Implementado Event Bus inicial.
 - Criado padrao de eventos de dominio.

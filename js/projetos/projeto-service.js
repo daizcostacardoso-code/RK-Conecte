@@ -35,6 +35,14 @@ const ProjetoService = {
         return ProjetoStorage.salvar(projeto);
     },
 
+    async listar() {
+        return ProjetoStorage.listar();
+    },
+
+    async carregar(id) {
+        return ProjetoStorage.carregar(id);
+    },
+
     async alterarStatus(projeto, status, usuario = "Sistema", extras = {}) {
         const atualizado = ProjetoModel.atualizar(projeto, {
             ...extras,
