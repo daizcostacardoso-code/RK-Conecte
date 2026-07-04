@@ -1,6 +1,12 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.2: Criada primeira interface do modulo Clientes.
+- Adicionada pagina `paginas/clientes.html` com cabecalho, busca, lista, cadastro rapido e detalhe inicial.
+- Interface de Clientes passa a consumir Use Cases/ClienteService sem acesso direto a persistencia.
+- Sprint 3.1: Inicio do Centro Comercial de Clientes.
+- Criada camada de dominio Cliente com model, factory, validator, service e repository.
+- Criados use cases para criar, buscar e listar Clientes.
 - Iniciada a descoberta do Bloco Comercial.
 - Criados documentos de negocio, UX e fluxo comercial.
 - Documentada a jornada do cliente e o processo da vidracaria.

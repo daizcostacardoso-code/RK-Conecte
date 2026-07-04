@@ -84,6 +84,11 @@ O Projeto acompanha esse fluxo e guarda os dados essenciais de cada etapa.
 
 Clientes, produtos, servicos, orcamentos, propostas, aprovacoes e conversao em Projeto.
 
+Na Sprint 3.1, o Bloco Comercial inicia pelo Centro Comercial de Clientes. A
+camada de Cliente deve seguir o Core v1 com Use Cases, Service, Repository e
+Adapter, sem acesso direto ao Firestore e sem alterar fluxos existentes de
+Orcamento, Dashboard, Producao ou Financeiro.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -123,6 +128,9 @@ Formalizar Projeto como entidade central e preparar o bloco comercial: clientes,
 Sprint 2.5 encerra o Core v1 com o primeiro Dashboard baseado em Projeto,
 utilizando a infraestrutura de `ProjetoService`, Repository/Adapter,
 `MemoryAdapter` e Workflow Engine ja preparada nas sprints anteriores.
+
+Sprint 3.1 inicia o Centro Comercial de Clientes com dominio Cliente, validacao,
+factory, service, repository e use cases dedicados.
 
 ### v0.3.0 - Operacional
 

@@ -119,3 +119,21 @@ Pesquisar -> nenhum resultado -> criar Cliente -> criar Projeto
 - Historico visivel.
 - Projetos do cliente em destaque.
 - Nenhuma informacao importante deve depender apenas de memoria da equipe.
+
+## Sprint 3.2 - Primeira interface
+
+A primeira tela do modulo Clientes deve priorizar a rotina comercial imediata:
+
+- buscar clientes pelo campo principal no cabecalho;
+- listar Nome, Tipo, Telefone, Cidade, Status, Ultima atualizacao e Acoes;
+- cadastrar rapidamente dados essenciais do primeiro contato;
+- abrir um detalhe preparado para Dados principais, Enderecos, Contatos,
+  Projetos vinculados, Orcamentos, Timeline e Observacoes.
+
+Diretriz tecnica de UX:
+
+- a interface nao acessa persistencia diretamente;
+- a criacao, busca e listagem devem passar pelos Use Cases ou pelo
+  `ClienteService`;
+- campos ainda nao cobertos pelo cadastro rapido devem aparecer como areas
+  preparadas para evolucao posterior.
