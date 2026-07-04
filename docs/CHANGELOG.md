@@ -5,6 +5,8 @@
 - Criado Storage Adapter.
 - Criado Memory Adapter.
 - Criada estrutura do Firestore Adapter.
+- Sprint 2.5.1: Revisao arquitetural do Core v1.
+- Criado documento `docs/CORE_REVIEW.md` com auditoria tecnica, checklist e riscos.
 - Sprint 2.5: Primeiro Dashboard baseado em Projetos.
 - Criada estrutura `js/dashboard/` com model, service, controller e utils.
 - Dashboard passa a consumir Projetos pelo `ProjetoService`.
