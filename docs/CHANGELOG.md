@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.7: Criado Motor de Calculo Comercial desacoplado.
+- Adicionados model, validator, engine e service para Calculos.
+- Criados use cases para calcular area, linear e unidade.
+- Motor preparado para futuro Orcamento Inteligente, Catalogos, Financeiro, Simulacoes e Dashboard, sem interface ou alteracoes no Orcamento atual.
 - Sprint 3.6: Criado dominio Produtos no padrao Core v1.
 - Adicionados model, factory, validator, service e repository para Produtos.
 - Criados use cases para criar, buscar e listar Produtos.

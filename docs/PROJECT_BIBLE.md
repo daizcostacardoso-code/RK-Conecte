@@ -109,6 +109,14 @@ Orcamento Inteligente, com categorias, subcategorias de vidro, precificacao e
 atributos tecnicos, sem implementar tela, HTML, CSS, Firebase ou alteracoes no
 Orcamento atual.
 
+Na Sprint 3.7, nasce o Motor de Calculo Comercial como modulo reutilizavel e
+desacoplado em `js/calculos/`. O motor segue o Core v1 sem persistencia, no
+fluxo Use Cases -> `CalculoService` -> `CalculoValidator` -> `CalculoEngine`.
+Ele calcula area, metro linear e unidade com resultado padronizado, preparando
+base futura para Orcamento Inteligente, Catalogo de Servicos, Catalogo de
+Produtos, Financeiro, Simulacoes e Dashboard. Esta sprint nao altera o
+orcamento legado, telas, HTML, CSS, Firebase ou Firestore.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -163,6 +171,10 @@ preparadas para o futuro Orcamento Inteligente.
 Sprint 3.6 cria o dominio Produtos como base para catalogo de produtos e futuro
 Orcamento Inteligente, mantendo Repository/Adapter desacoplados e sem acesso
 direto ao Firestore.
+
+Sprint 3.7 cria o Motor de Calculo Comercial como infraestrutura compartilhada
+para calculos de area, linear e unidade, mantendo o modulo sem interface,
+persistencia ou acoplamento com o Orcamento atual.
 
 ### v0.3.0 - Operacional
 
