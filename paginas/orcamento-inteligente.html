@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Or&ccedil;amento Inteligente - RK Vidra&ccedil;aria</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=3.9.0">
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="orcamento-inteligente-page">
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Centro Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="servicos.html">Servi&ccedil;os</a></li>
+                <li><a href="orcamento.html">Or&ccedil;amento</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="orcamento-inteligente-modulo">
+    <div class="container">
+        <section class="orcamento-inteligente-cabecalho" aria-labelledby="orcamentoInteligenteTitulo">
+            <div>
+                <span class="orcamento-inteligente-label">Centro Comercial</span>
+                <h1 id="orcamentoInteligenteTitulo">Or&ccedil;amento Inteligente</h1>
+                <p>Crie or&ccedil;amentos guiados por servi&ccedil;o</p>
+            </div>
+
+            <button type="button" id="btnNovoOrcamentoInteligente" class="botao orcamento-inteligente-btn-principal">
+                Novo or&ccedil;amento
+            </button>
+        </section>
+
+        <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoInteligenteEtapasTitulo">
+            <div class="orcamento-inteligente-painel-topo">
+                <div>
+                    <h2 id="orcamentoInteligenteEtapasTitulo">Etapas</h2>
+                    <p id="orcamentoInteligenteStatus">Contexto em prepara&ccedil;&atilde;o.</p>
+                </div>
+            </div>
+            <div id="orcamentoInteligenteEtapas" class="orcamento-inteligente-etapas"></div>
+        </section>
+
+        <section class="orcamento-inteligente-layout">
+            <div class="orcamento-inteligente-principal">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoClienteTitulo">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Cliente</span>
+                            <h2 id="orcamentoClienteTitulo">Sele&ccedil;&atilde;o de cliente</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteCliente" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProjetoTitulo">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Projeto</span>
+                            <h2 id="orcamentoProjetoTitulo">Sele&ccedil;&atilde;o de projeto</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteProjeto" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoServicoTitulo">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Servi&ccedil;o</span>
+                            <h2 id="orcamentoServicoTitulo">Sele&ccedil;&atilde;o de servi&ccedil;o</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteServico" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProdutosTitulo">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Produtos</span>
+                            <h2 id="orcamentoProdutosTitulo">Produtos do or&ccedil;amento</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteProdutos" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoCalculoTitulo">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">C&aacute;lculo</span>
+                            <h2 id="orcamentoCalculoTitulo">Resultado do c&aacute;lculo</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteCalculo" class="orcamento-inteligente-placeholder"></div>
+                </section>
+            </div>
+
+            <aside class="orcamento-inteligente-painel orcamento-inteligente-resumo-painel" aria-labelledby="orcamentoResumoTitulo">
+                <div class="orcamento-inteligente-painel-topo">
+                    <div>
+                        <span class="orcamento-inteligente-label">Resumo</span>
+                        <h2 id="orcamentoResumoTitulo">Resumo final</h2>
+                    </div>
+                </div>
+                <div id="orcamentoInteligenteResumo" class="orcamento-inteligente-resumo"></div>
+            </aside>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="../js/orcamentos/orcamento-state.js?v=3.9.0"></script>
+<script src="../js/orcamentos/orcamento-context.js?v=3.9.0"></script>
+<script src="../js/orcamentos/orcamento-factory.js?v=3.9.0"></script>
+<script src="../js/orcamentos/orcamento-orchestrator.js?v=3.9.0"></script>
+<script src="../js/usecases/orcamentos/criar-orcamento-usecase.js?v=3.9.0"></script>
+<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=3.9.0"></script>
+<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=3.9.0"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>

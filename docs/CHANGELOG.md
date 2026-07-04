@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.9A: Criada estrutura inicial da tela do Orcamento Inteligente.
+- Adicionada pagina `paginas/orcamento-inteligente.html` com cabecalho, etapas, containers e estados vazios.
+- Criados controller e UI iniciais para preparar contexto via Orchestrator/Factory, sem fluxo completo ou calculo duplicado.
+- Estilo isolado do Orcamento Inteligente adicionado em `css/style.css`.
 - Sprint 3.8: Criado Orquestrador do Orcamento para o futuro Orcamento Inteligente.
 - Adicionados contexto, estados, factory e orchestrator em `js/orcamentos/`.
 - Criados use cases para criar, calcular e validar Orcamento via Orchestrator.

@@ -125,6 +125,14 @@ coordenar o fluxo do futuro Orcamento Inteligente. O modulo vive em
 acessa Repository diretamente, nao acessa Firestore e nao altera interface,
 HTML, CSS, Firebase ou o Orcamento legado.
 
+Na Sprint 3.9A, nasce a primeira estrutura visual do Orcamento Inteligente em
+`paginas/orcamento-inteligente.html`. A tela exibe cabecalho, etapas, areas para
+cliente, projeto, servico, produtos, calculo e resumo, alem de estados vazios.
+O controller inicializa apenas um contexto por `CriarOrcamentoUseCase`,
+`OrcamentoOrchestrator` ou `OrcamentoFactory`, sem duplicar regra de calculo,
+sem PDF, sem aprovacao, sem Firebase, sem Firestore e sem alterar a tela antiga
+de orcamento.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -187,6 +195,10 @@ persistencia ou acoplamento com o Orcamento atual.
 Sprint 3.8 cria o Orquestrador do Orcamento como camada de aplicacao para a
 futura tela de Orcamento Inteligente, coordenando dominios comerciais e o motor
 de calculo sem criar interface ou persistencia nova.
+
+Sprint 3.9A cria a estrutura inicial da tela do Orcamento Inteligente, mantendo
+o fluxo apenas preparado para a 3.9B e consumindo o Orchestrator somente para
+iniciar contexto.
 
 ### v0.3.0 - Operacional
 
