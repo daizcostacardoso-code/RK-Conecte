@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.8: Criado Orquestrador do Orcamento para o futuro Orcamento Inteligente.
+- Adicionados contexto, estados, factory e orchestrator em `js/orcamentos/`.
+- Criados use cases para criar, calcular e validar Orcamento via Orchestrator.
+- Orquestrador passa a coordenar Cliente, Projeto, Servico, Produto, Calculo e Workflow sem interface, Firestore ou alteracoes no Orcamento legado.
 - Sprint 3.7: Criado Motor de Calculo Comercial desacoplado.
 - Adicionados model, validator, engine e service para Calculos.
 - Criados use cases para calcular area, linear e unidade.

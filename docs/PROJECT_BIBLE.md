@@ -117,6 +117,14 @@ base futura para Orcamento Inteligente, Catalogo de Servicos, Catalogo de
 Produtos, Financeiro, Simulacoes e Dashboard. Esta sprint nao altera o
 orcamento legado, telas, HTML, CSS, Firebase ou Firestore.
 
+Na Sprint 3.8, o Orquestrador do Orcamento entra como camada de aplicacao para
+coordenar o fluxo do futuro Orcamento Inteligente. O modulo vive em
+`js/orcamentos/` e usa contexto, estados, factory e orchestrator para integrar
+`ClienteService`, `ProjetoService`, `ServicoService`, `ProdutoService`,
+`CalculoService` e `WorkflowEngine`. O Orchestrator nao calcula formulas, nao
+acessa Repository diretamente, nao acessa Firestore e nao altera interface,
+HTML, CSS, Firebase ou o Orcamento legado.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -175,6 +183,10 @@ direto ao Firestore.
 Sprint 3.7 cria o Motor de Calculo Comercial como infraestrutura compartilhada
 para calculos de area, linear e unidade, mantendo o modulo sem interface,
 persistencia ou acoplamento com o Orcamento atual.
+
+Sprint 3.8 cria o Orquestrador do Orcamento como camada de aplicacao para a
+futura tela de Orcamento Inteligente, coordenando dominios comerciais e o motor
+de calculo sem criar interface ou persistencia nova.
 
 ### v0.3.0 - Operacional
 
