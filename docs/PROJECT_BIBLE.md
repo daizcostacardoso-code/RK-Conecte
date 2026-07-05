@@ -215,6 +215,16 @@ cliente, projeto, servicos, produtos, resumo financeiro, observacoes, condicoes
 comerciais, validade, assinaturas e rodape. O adapter ja deixa pontos de
 extensao para logo real, QR Code e assinatura digital.
 
+Na Sprint 4.6, nasce o fluxo de Aprovacao Comercial do Documento Comercial em
+`js/comercial/`. O modulo define estados comerciais proprios (`RASCUNHO`,
+`EM_REVISAO`, `APROVADO`, `REPROVADO`), valida o Documento Comercial pelo
+Document Pipeline e registra a evolucao em AppState dentro de
+`configuracoes.comercial`. A tela `paginas/aprovacao-comercial.html` permite
+solicitar aprovacao, aprovar, reprovar e voltar para revisao, disparando os
+eventos `documento.em_revisao`, `documento.aprovado` e `documento.reprovado`
+quando o EventBus esta disponivel. Esta sprint nao converte em Projeto e nao
+altera Workflow, EventBus, AppState, Export Service, Renderer ou PDF Adapter.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -333,6 +343,12 @@ Sprint 4.5 implementa o PDF real dentro do `PdfAdapter`, preservando
 `ExportService`, Document Pipeline e Renderer. Novos adapters devem seguir a
 mesma regra: conhecer apenas sua tecnologia interna e receber Documento
 Comercial pronto pelo contrato de exportacao.
+
+Sprint 4.6 cria o fluxo de Aprovacao Comercial do Documento Comercial, com
+estados comerciais, validacoes, use cases e tela propria. A aprovacao passa a
+ser o marco de entrada para a futura Conversao em Projeto, mantendo a sprint
+sem persistencia definitiva, sem Firestore e sem alterar os modulos centrais ja
+estabilizados.
 
 ### v0.4.0 - Operacional
 

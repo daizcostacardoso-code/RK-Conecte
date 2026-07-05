@@ -1,6 +1,12 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.6: Criado o fluxo de Aprovacao Comercial do Documento Comercial.
+- Adicionado modulo `js/comercial/` com model, validator, service, controller e README.
+- Adicionados use cases `AprovarDocumentoUseCase` e `ReprovarDocumentoUseCase` em `js/usecases/comercial/`.
+- Adicionada tela `paginas/aprovacao-comercial.html` para solicitar aprovacao, aprovar, reprovar e voltar para revisao.
+- Fluxo usa Document Pipeline, Workflow, AppState e ExportService sem Firestore, sem conversao em Projeto e sem alterar Workflow, EventBus, AppState, Renderer, ExportService ou PDF Adapter.
+- Estado comercial passa a ser guardado em `configuracoes.comercial`, preservando as chaves originais do AppState.
 - Sprint 4.5: Implementada geracao real do PDF Comercial dentro do `PdfAdapter`.
 - Instalada dependencia `pdf-lib`, encapsulada exclusivamente em `js/export/adapters/pdf-adapter.js`.
 - PDF passa a ser gerado a partir dos dados do Documento Comercial, com logo placeholder, empresa, cliente, projeto, servicos, produtos, resumo financeiro, observacoes, condicoes comerciais, validade, assinaturas e rodape.

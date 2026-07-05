@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Aprova&ccedil;&atilde;o Comercial - RK Vidra&ccedil;aria</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=4.6.0">
+
+    <meta name="theme-color" content="#0f766e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+
+    <style>
+        .comercial-page {
+            background: #f6f8f7;
+            color: #17201f;
+        }
+
+        .comercial-main {
+            min-height: calc(100vh - 180px);
+            padding: 32px 0 48px;
+        }
+
+        .comercial-shell {
+            max-width: 1160px;
+            margin: 0 auto;
+            border: 1px solid #d9e3df;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
+            overflow: hidden;
+        }
+
+        .comercial-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5ece9;
+            background: #ffffff;
+        }
+
+        .comercial-eyebrow {
+            margin: 0 0 8px;
+            color: #0f766e;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .comercial-header h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.05;
+        }
+
+        .comercial-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .comercial-summary span {
+            border: 1px solid #d9e3df;
+            border-radius: 999px;
+            background: #f8fbfa;
+            color: #40504d;
+            font-size: 0.9rem;
+            padding: 6px 10px;
+        }
+
+        .comercial-grid {
+            display: grid;
+            grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.5fr);
+            min-height: 560px;
+        }
+
+        .comercial-panel {
+            padding: 24px;
+            border-right: 1px solid #e5ece9;
+            background: #fbfcfb;
+        }
+
+        .comercial-section {
+            padding: 18px 0;
+            border-bottom: 1px solid #edf2f0;
+        }
+
+        .comercial-section:first-child {
+            padding-top: 0;
+        }
+
+        .comercial-section:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .comercial-section h2 {
+            margin: 0 0 12px;
+            color: #25302e;
+            font-size: 0.9rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .comercial-status {
+            display: grid;
+            gap: 8px;
+            border: 1px solid #dfe8e5;
+            border-left: 4px solid #60736f;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 14px;
+        }
+
+        .comercial-status[data-status="EM_REVISAO"] {
+            border-left-color: #b7791f;
+        }
+
+        .comercial-status[data-status="APROVADO"] {
+            border-left-color: #0f766e;
+        }
+
+        .comercial-status[data-status="REPROVADO"] {
+            border-left-color: #b91c1c;
+        }
+
+        .comercial-status strong {
+            font-size: 1.1rem;
+        }
+
+        .comercial-status span,
+        .comercial-note {
+            margin: 0;
+            color: #52605d;
+            font-size: 0.94rem;
+            line-height: 1.45;
+        }
+
+        .comercial-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .comercial-button {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid #cbd8d3;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #16211f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+            font: inherit;
+            transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+
+        .comercial-button:hover,
+        .comercial-button:focus-visible {
+            border-color: #0f766e;
+            background: #eef8f6;
+            outline: none;
+        }
+
+        .comercial-button:disabled {
+            border-color: #dfe8e5;
+            background: #f4f7f6;
+            color: #8a9693;
+            cursor: not-allowed;
+        }
+
+        .comercial-preview-area {
+            min-width: 0;
+            padding: 24px;
+            background: #ffffff;
+        }
+
+        .comercial-message,
+        .comercial-preview {
+            border: 1px solid #dfe8e5;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .comercial-message {
+            margin-bottom: 14px;
+            padding: 14px 16px;
+        }
+
+        .comercial-message p {
+            margin: 0;
+            color: #4c5b58;
+        }
+
+        .comercial-message[data-tipo="erro"] {
+            border-color: #f3b4b4;
+            background: #fff5f5;
+        }
+
+        .comercial-message[data-tipo="sucesso"] {
+            border-color: #a7d9c8;
+            background: #f1fbf7;
+        }
+
+        .comercial-preview {
+            min-height: 460px;
+            overflow: auto;
+            padding: 18px;
+        }
+
+        .comercial-preview-empty {
+            min-height: 420px;
+            display: grid;
+            place-items: center;
+            color: #6b7774;
+            text-align: center;
+        }
+
+        .comercial-preview-empty p {
+            margin: 0;
+        }
+
+        @media (max-width: 900px) {
+            .comercial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comercial-panel {
+                border-right: 0;
+                border-bottom: 1px solid #e5ece9;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .comercial-main {
+                padding: 18px 0 32px;
+            }
+
+            .comercial-header,
+            .comercial-panel,
+            .comercial-preview-area {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body class="comercial-page">
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Formaliza&ccedil;&atilde;o Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="orcamento-inteligente.html">Or&ccedil;amento Inteligente</a></li>
+                <li><a href="compartilhar-documento.html">Documento</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="comercial-main">
+    <div class="container">
+        <div id="aprovacaoComercialRoot"></div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="../js/core/event-types.js?v=4.6.0"></script>
+<script src="../js/core/event-bus.js?v=4.6.0"></script>
+<script src="../js/core/app-state-events.js?v=4.6.0"></script>
+<script src="../js/core/app-state.js?v=4.6.0"></script>
+<script src="../js/core/app-state-service.js?v=4.6.0"></script>
+<script src="../js/workflow/workflow-state.js?v=4.6.0"></script>
+<script src="../js/workflow/workflow-validator.js?v=4.6.0"></script>
+<script src="../js/workflow/workflow-events.js?v=4.6.0"></script>
+<script src="../js/workflow/workflow-engine.js?v=4.6.0"></script>
+<script src="../js/documentos/document-model.js?v=4.6.0"></script>
+<script src="../js/documentos/document-builder.js?v=4.6.0"></script>
+<script src="../js/documentos/document-validator.js?v=4.6.0"></script>
+<script src="../js/documentos/document-service.js?v=4.6.0"></script>
+<script src="../js/documentos/document-renderer.js?v=4.6.0"></script>
+<script src="../js/documentos/document-html-renderer.js?v=4.6.0"></script>
+<script src="../js/export/export-model.js?v=4.6.0"></script>
+<script src="../js/export/export-validator.js?v=4.6.0"></script>
+<script src="../js/export/export-service.js?v=4.6.0"></script>
+<script src="../js/comercial/comercial-model.js?v=4.6.0"></script>
+<script src="../js/comercial/comercial-validator.js?v=4.6.0"></script>
+<script src="../js/comercial/comercial-service.js?v=4.6.0"></script>
+<script src="../js/usecases/comercial/aprovar-documento-usecase.js?v=4.6.0"></script>
+<script src="../js/usecases/comercial/reprovar-documento-usecase.js?v=4.6.0"></script>
+<script src="../js/comercial/comercial-controller.js?v=4.6.0"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>
