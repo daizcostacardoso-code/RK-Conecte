@@ -35,7 +35,7 @@ const OrcamentoInteligenteUI = {
         this.renderizarProjeto(contexto, dados.projetos || []);
         this.renderizarServico(contexto, dados.servicos || []);
         this.renderizarProdutos(contexto, dados.produtos || []);
-        this.renderizarCalculo(contexto);
+        this.renderizarCalculo(contexto, etapaAtual);
         this.renderizarResumo(contexto);
         this.exibirSecaoAtual(etapaAtual);
     },
@@ -185,9 +185,14 @@ const OrcamentoInteligenteUI = {
         `;
     },
 
-    renderizarCalculo(contexto = {}) {
+    renderizarCalculo(contexto = {}, etapaAtual = "calculo") {
         const container = this.elementos.calculo;
         if (!container) return;
+
+        if (etapaAtual === "resumo") {
+            container.innerHTML = this.renderizarConsolidacao(contexto);
+            return;
+        }
 
         const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
         if (!produtos.length) {
@@ -241,16 +246,17 @@ const OrcamentoInteligenteUI = {
         const container = this.elementos.resumo;
         if (!container) return;
 
+        const resumo = contexto.resumo || {};
         const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
         const resultado = contexto.resultado || null;
         const campos = [
-            ["Estado", this.estadoOperacional(contexto)],
-            ["Cliente", this.nomeEntidade(contexto.cliente) || "Cliente nao selecionado."],
-            ["Projeto", this.nomeEntidade(contexto.projeto) || "Projeto nao selecionado."],
-            ["Servico", this.nomeEntidade(contexto.servico) || "Servico nao selecionado."],
-            ["Produtos", produtos.length ? String(produtos.length) : "Sem produtos."],
-            ["Calculo", resultado?.sucesso ? this.resumoResultado(resultado) : "Calculo pendente."],
-            ["Atualizado em", this.formatarData(contexto.atualizadoEm)]
+            ["Cliente", resumo.cliente?.nome || this.nomeEntidade(contexto.cliente) || "Cliente nao selecionado."],
+            ["Projeto", resumo.projeto?.nome || this.nomeEntidade(contexto.projeto) || "Projeto nao selecionado."],
+            ["Servico", resumo.servico?.nome || this.nomeEntidade(contexto.servico) || "Servico nao selecionado."],
+            ["Quantidade de produtos", String(resumo.quantidadeProdutos ?? produtos.length)],
+            ["Valor total", this.formatarMoeda(resumo.valorTotal ?? resultado?.valorCalculado ?? 0)],
+            ["Tipo de calculo", this.rotuloTipoCalculo(resumo.tipoCalculo || contexto.calculo?.tipoCalculo || contexto.servico?.tipoCalculo || "")],
+            ["Status", this.rotuloStatus(resumo.status || contexto.status || "INICIADO")]
         ];
 
         container.innerHTML = `
@@ -265,11 +271,146 @@ const OrcamentoInteligenteUI = {
                     </div>
                 `).join("")}
             </dl>
+            ${this.renderizarTotais(contexto)}
         `;
     },
 
     renderizarEstadoVazio(contexto = {}) {
         this.renderizarEtapaAtual(contexto, {}, "cliente");
+    },
+
+    renderizarConsolidacao(contexto = {}) {
+        return `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo(contexto.orcamentoPreparado ? "Orcamento finalizado" : "Consolidacao do orcamento", !!contexto.resultado?.sucesso)}
+                ${this.renderizarTotais(contexto)}
+                <form class="orcamento-inteligente-form-complementos" data-orcamento-form="complementos">
+                    ${this.renderizarObservacoes(contexto)}
+                    ${this.renderizarCondicoes(contexto)}
+                    <button type="submit" class="botao orcamento-inteligente-btn-form">Atualizar complementos</button>
+                </form>
+                ${this.renderizarValidacao(contexto)}
+                ${contexto.orcamentoPreparado ? this.renderizarPreparacaoPdf(contexto) : ""}
+                <div class="orcamento-inteligente-navegacao">
+                    <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="voltar">Voltar</button>
+                    <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="validar-orcamento">Validar</button>
+                    <button type="button" class="btn-pequeno" data-orcamento-action="finalizar-orcamento">Finalizar orcamento</button>
+                </div>
+            </div>
+        `;
+    },
+
+    renderizarTotais(contexto = {}) {
+        const totais = contexto.resumo?.totais || {};
+
+        return `
+            <section class="orcamento-inteligente-subpainel orcamento-inteligente-totais">
+                <h3>Totais</h3>
+                <dl>
+                    <div>
+                        <dt>Subtotal</dt>
+                        <dd>${this.escapar(this.formatarMoeda(totais.subtotal || 0))}</dd>
+                    </div>
+                    <div>
+                        <dt>Desconto</dt>
+                        <dd>${this.escapar(this.formatarMoeda(totais.desconto || 0))} <small>placeholder</small></dd>
+                    </div>
+                    <div>
+                        <dt>Acrescimo</dt>
+                        <dd>${this.escapar(this.formatarMoeda(totais.acrescimo || 0))} <small>placeholder</small></dd>
+                    </div>
+                    <div class="orcamento-inteligente-total-geral">
+                        <dt>Total geral</dt>
+                        <dd>${this.escapar(this.formatarMoeda(totais.totalGeral || 0))}</dd>
+                    </div>
+                </dl>
+            </section>
+        `;
+    },
+
+    renderizarObservacoes(contexto = {}) {
+        const observacoes = contexto.observacoes || {};
+
+        return `
+            <section class="orcamento-inteligente-subpainel">
+                <h3>Observacoes</h3>
+                <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
+                    <label for="orcamentoObservacaoLivre">Campo livre</label>
+                    <textarea id="orcamentoObservacaoLivre" name="observacaoLivre" rows="3">${this.escapar(observacoes.livre || "")}</textarea>
+                </div>
+                <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
+                    <label for="orcamentoObservacoesComerciais">Observacoes comerciais</label>
+                    <textarea id="orcamentoObservacoesComerciais" name="observacoesComerciais" rows="3">${this.escapar(observacoes.comerciais || "")}</textarea>
+                </div>
+                <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
+                    <label for="orcamentoObservacoesTecnicas">Observacoes tecnicas</label>
+                    <textarea id="orcamentoObservacoesTecnicas" name="observacoesTecnicas" rows="3">${this.escapar(observacoes.tecnicas || "")}</textarea>
+                </div>
+            </section>
+        `;
+    },
+
+    renderizarCondicoes(contexto = {}) {
+        const condicoes = contexto.condicoesComerciais || {};
+
+        return `
+            <section class="orcamento-inteligente-subpainel">
+                <h3>Condicoes comerciais</h3>
+                <div class="orcamento-inteligente-campo">
+                    <label for="orcamentoFormaPagamento">Forma de pagamento</label>
+                    <input id="orcamentoFormaPagamento" type="text" name="formaPagamento" value="${this.escapar(condicoes.formaPagamento || "")}">
+                </div>
+                <div class="orcamento-inteligente-campo">
+                    <label for="orcamentoPrazoEntrega">Prazo de entrega</label>
+                    <input id="orcamentoPrazoEntrega" type="text" name="prazoEntrega" value="${this.escapar(condicoes.prazoEntrega || "")}">
+                </div>
+                <div class="orcamento-inteligente-campo">
+                    <label for="orcamentoValidadeProposta">Validade da proposta</label>
+                    <input id="orcamentoValidadeProposta" type="text" name="validadeProposta" value="${this.escapar(condicoes.validadeProposta || "")}">
+                </div>
+            </section>
+        `;
+    },
+
+    renderizarValidacao(contexto = {}) {
+        const validacao = contexto.validacaoFinal || null;
+
+        if (!validacao) {
+            return `
+                <section class="orcamento-inteligente-validacao pendente">
+                    <strong>Validacao final pendente.</strong>
+                </section>
+            `;
+        }
+
+        if (validacao.valido) {
+            return `
+                <section class="orcamento-inteligente-validacao ok">
+                    <strong>Validacao final concluida.</strong>
+                </section>
+            `;
+        }
+
+        const erros = Array.isArray(validacao.erros) ? validacao.erros : [];
+        return `
+            <section class="orcamento-inteligente-validacao erro">
+                <strong>Validacao final encontrou pendencias.</strong>
+                <ul>
+                    ${erros.map(erro => `<li>${this.escapar(erro)}</li>`).join("")}
+                </ul>
+            </section>
+        `;
+    },
+
+    renderizarPreparacaoPdf(contexto = {}) {
+        const preparado = contexto.orcamentoPreparado || {};
+
+        return `
+            <section class="orcamento-inteligente-validacao ok">
+                <strong>Objeto padronizado preparado para PDF Comercial.</strong>
+                <span>${this.escapar(preparado.preparadoPara || "PDF_COMERCIAL")} | ${this.escapar(preparado.versao || "3.9C")}</span>
+            </section>
+        `;
     },
 
     renderizarCamposMedida(tipoCalculo, calculo = {}) {

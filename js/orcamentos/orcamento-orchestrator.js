@@ -19,7 +19,10 @@ const OrcamentoOrchestrator = {
                 servico: null,
                 produtos: [],
                 calculo: null,
-                resultado: null
+                resultado: null,
+                resumo: null,
+                validacaoFinal: null,
+                orcamentoPreparado: null
             },
             "cliente_selecionado",
             "Cliente selecionado para o orcamento.",
@@ -49,7 +52,10 @@ const OrcamentoOrchestrator = {
                 servico: null,
                 produtos: [],
                 calculo: null,
-                resultado: null
+                resultado: null,
+                resumo: null,
+                validacaoFinal: null,
+                orcamentoPreparado: null
             },
             "projeto_selecionado",
             "Projeto selecionado para o orcamento.",
@@ -78,7 +84,10 @@ const OrcamentoOrchestrator = {
                 servico: resultado.servico,
                 produtos: [],
                 calculo: null,
-                resultado: null
+                resultado: null,
+                resumo: null,
+                validacaoFinal: null,
+                orcamentoPreparado: null
             },
             "servico_selecionado",
             "Servico selecionado para o orcamento.",
@@ -108,7 +117,10 @@ const OrcamentoOrchestrator = {
             {
                 produtos,
                 calculo: null,
-                resultado: null
+                resultado: null,
+                resumo: null,
+                validacaoFinal: null,
+                orcamentoPreparado: null
             },
             "produto_adicionado",
             "Produto adicionado ao orcamento.",
@@ -144,7 +156,10 @@ const OrcamentoOrchestrator = {
             {
                 produtos,
                 calculo: null,
-                resultado: null
+                resultado: null,
+                resumo: null,
+                validacaoFinal: null,
+                orcamentoPreparado: null
             },
             "produto_removido",
             "Produto removido do orcamento.",
@@ -178,7 +193,14 @@ const OrcamentoOrchestrator = {
             ORCAMENTO_STATE.CALCULADO,
             {
                 calculo,
-                resultado
+                resultado,
+                resumo: this.montarResumo({
+                    ...atual,
+                    calculo,
+                    resultado
+                }),
+                validacaoFinal: null,
+                orcamentoPreparado: null
             },
             "orcamento_calculado",
             "Orcamento calculado pelo motor comercial.",
@@ -208,6 +230,10 @@ const OrcamentoOrchestrator = {
             erros.push("Servico e obrigatorio para validar o orcamento.");
         }
 
+        if (!Array.isArray(atual.produtos) || !atual.produtos.length) {
+            erros.push("Pelo menos um produto e obrigatorio para validar o orcamento.");
+        }
+
         if (!atual.calculo) {
             erros.push("Calculo e obrigatorio para validar o orcamento.");
         } else {
@@ -224,13 +250,25 @@ const OrcamentoOrchestrator = {
         const workflow = this.obterWorkflowProjeto(atual.projeto);
 
         if (erros.length) {
-            return this.respostaErro(atual, erros, { workflow });
+            const comValidacao = OrcamentoContext.atualizar(atual, {
+                validacaoFinal: {
+                    valido: false,
+                    erros
+                }
+            });
+            return this.respostaErro(comValidacao, erros, { workflow });
         }
 
         const atualizado = this.atualizarStatus(
             atual,
             ORCAMENTO_STATE.VALIDADO,
-            {},
+            {
+                resumo: this.montarResumo(atual),
+                validacaoFinal: {
+                    valido: true,
+                    erros: []
+                }
+            },
             "orcamento_validado",
             "Orcamento validado pelo orquestrador.",
             {
@@ -247,10 +285,22 @@ const OrcamentoOrchestrator = {
             return validacao;
         }
 
+        const contextoFinal = {
+            ...validacao.contexto,
+            status: ORCAMENTO_STATE.FINALIZADO
+        };
+        const resumo = this.montarResumo(contextoFinal);
         const atualizado = this.atualizarStatus(
             validacao.contexto,
             ORCAMENTO_STATE.FINALIZADO,
-            {},
+            {
+                resumo,
+                orcamentoPreparado: null,
+                validacaoFinal: {
+                    valido: true,
+                    erros: []
+                }
+            },
             "orcamento_finalizado",
             "Orcamento finalizado pelo orquestrador.",
             {
@@ -259,7 +309,110 @@ const OrcamentoOrchestrator = {
             }
         );
 
+        const finalizado = OrcamentoContext.atualizar(atualizado, {
+            orcamentoPreparado: this.montarOrcamentoPreparado(atualizado, resumo)
+        });
+
+        return this.respostaSucesso(finalizado);
+    },
+
+    async atualizarComplementos(contexto = {}, dados = {}) {
+        const atual = OrcamentoContext.normalizar(contexto);
+        const complementado = {
+            ...atual,
+            observacoes: {
+                ...atual.observacoes,
+                ...(dados.observacoes || {})
+            },
+            condicoesComerciais: {
+                ...atual.condicoesComerciais,
+                ...(dados.condicoesComerciais || {})
+            }
+        };
+        const atualizado = OrcamentoContext.atualizar(
+            atual,
+            {
+                observacoes: complementado.observacoes,
+                condicoesComerciais: complementado.condicoesComerciais,
+                resumo: this.montarResumo(complementado),
+                orcamentoPreparado: null
+            },
+            {
+                tipo: "orcamento_complementos_atualizados",
+                descricao: "Complementos do orcamento atualizados.",
+                dados: {
+                    possuiObservacoes: !!dados.observacoes,
+                    possuiCondicoes: !!dados.condicoesComerciais
+                }
+            }
+        );
+
         return this.respostaSucesso(atualizado);
+    },
+
+    montarResumo(contexto = {}) {
+        const atual = OrcamentoContext.normalizar(contexto);
+        const produtos = Array.isArray(atual.produtos) ? atual.produtos : [];
+        const totais = this.montarTotais(atual);
+
+        return {
+            cliente: {
+                id: atual.cliente?.id || "",
+                nome: atual.cliente?.nome || atual.cliente?.nomeFantasia || ""
+            },
+            projeto: {
+                id: atual.projeto?.id || "",
+                nome: atual.projeto?.titulo || atual.projeto?.numero || atual.projeto?.codigo || ""
+            },
+            servico: {
+                id: atual.servico?.id || "",
+                nome: atual.servico?.nome || "",
+                tipoCalculo: atual.calculo?.tipoCalculo || atual.servico?.tipoCalculo || ""
+            },
+            quantidadeProdutos: produtos.length,
+            valorTotal: totais.totalGeral,
+            tipoCalculo: atual.calculo?.tipoCalculo || atual.servico?.tipoCalculo || "",
+            status: atual.status,
+            totais,
+            observacoes: atual.observacoes,
+            condicoesComerciais: atual.condicoesComerciais
+        };
+    },
+
+    montarTotais(contexto = {}) {
+        const resultado = contexto.resultado || {};
+        const calculo = contexto.calculo || {};
+        const subtotal = this.numero(resultado.valorCalculado);
+
+        return {
+            subtotal,
+            desconto: this.numero(calculo.desconto),
+            acrescimo: this.numero(calculo.acrescimo),
+            totalGeral: subtotal
+        };
+    },
+
+    montarOrcamentoPreparado(contexto = {}, resumo = null) {
+        const atual = OrcamentoContext.normalizar(contexto);
+        const resumoFinal = resumo || this.montarResumo(atual);
+
+        return {
+            preparadoPara: "PDF_COMERCIAL",
+            versao: "3.9C",
+            status: atual.status,
+            geradoEm: OrcamentoContext.agoraISO(),
+            cliente: atual.cliente,
+            projeto: atual.projeto,
+            servico: atual.servico,
+            produtos: atual.produtos,
+            calculo: atual.calculo,
+            resultado: atual.resultado,
+            totais: resumoFinal.totais,
+            observacoes: atual.observacoes,
+            condicoesComerciais: atual.condicoesComerciais,
+            historico: atual.historico,
+            resumo: resumoFinal
+        };
     },
 
     montarCalculo(contexto = {}, dadosCalculo = {}) {
@@ -457,6 +610,15 @@ const OrcamentoOrchestrator = {
                 || produto?.itemId === id
                 || produto?.orcamentoItemId === id;
         });
+    },
+
+    numero(valor) {
+        if (valor === undefined || valor === null || valor === "") {
+            return 0;
+        }
+
+        const numero = Number(valor);
+        return Number.isFinite(numero) ? numero : 0;
     },
 
     respostaSucesso(contexto, detalhes = {}) {

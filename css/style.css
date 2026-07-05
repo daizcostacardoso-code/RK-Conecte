@@ -6898,6 +6898,124 @@ body.login-pro-body {
     border-color: #badbcc;
 }
 
+/* Sprint 3.9C - Consolidacao do Orcamento Inteligente */
+
+.orcamento-inteligente-subpainel {
+    display: grid;
+    gap: 10px;
+    border: 1px solid #dbe4ed;
+    border-radius: 8px;
+    background: #fbfcfe;
+    padding: 12px;
+}
+
+.orcamento-inteligente-subpainel h3 {
+    color: #052a52;
+    font-size: 15px;
+    line-height: 1.25;
+}
+
+.orcamento-inteligente-totais dl {
+    display: grid;
+    gap: 0;
+    border: 1px solid #dbe4ed;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.orcamento-inteligente-totais div,
+.orcamento-inteligente-resumo .orcamento-inteligente-totais div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    min-height: auto;
+    padding: 10px 12px;
+    border-bottom: 1px solid #dbe4ed;
+    background: #fff;
+}
+
+.orcamento-inteligente-totais div:last-child {
+    border-bottom: none;
+}
+
+.orcamento-inteligente-totais dt {
+    color: #617080;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-totais dd {
+    color: #1f2933;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    text-align: right;
+}
+
+.orcamento-inteligente-totais small {
+    color: #7a4d00;
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.orcamento-inteligente-total-geral dt,
+.orcamento-inteligente-total-geral dd {
+    color: #0b48b6;
+    font-size: 16px;
+}
+
+.orcamento-inteligente-form-complementos {
+    display: grid;
+    gap: 14px;
+}
+
+.orcamento-inteligente-form-complementos .orcamento-inteligente-subpainel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.orcamento-inteligente-form-complementos .orcamento-inteligente-subpainel h3,
+.orcamento-inteligente-form-complementos .orcamento-inteligente-campo-cheio {
+    grid-column: 1 / -1;
+}
+
+.orcamento-inteligente-form-complementos .orcamento-inteligente-btn-form {
+    justify-self: end;
+}
+
+.orcamento-inteligente-validacao {
+    display: grid;
+    gap: 8px;
+    border-left: 4px solid #f59f00;
+    background: #fff8e8;
+    color: #7a4d00;
+    padding: 12px;
+}
+
+.orcamento-inteligente-validacao.ok {
+    border-left-color: #2f9e44;
+    background: #f3fbf6;
+    color: #146c43;
+}
+
+.orcamento-inteligente-validacao.erro {
+    border-left-color: #dc3545;
+    background: #fff1f1;
+    color: #b42318;
+}
+
+.orcamento-inteligente-validacao ul {
+    display: grid;
+    gap: 5px;
+    margin: 0;
+    padding-left: 18px;
+}
+
+.orcamento-inteligente-validacao span {
+    font-size: 12px;
+    font-weight: 700;
+}
+
 @media (max-width: 820px) {
     .orcamento-inteligente-form,
     .orcamento-inteligente-form-calculo {
@@ -6914,5 +7032,13 @@ body.login-pro-body {
     .orcamento-inteligente-navegacao {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .orcamento-inteligente-form-complementos .orcamento-inteligente-subpainel {
+        grid-template-columns: 1fr;
+    }
+
+    .orcamento-inteligente-form-complementos .orcamento-inteligente-btn-form {
+        justify-self: stretch;
     }
 }

@@ -143,6 +143,24 @@ selecionar entidades e produtos, e solicita o calculo por
 contexto retornado, sem PDF, sem aprovacao, sem persistencia definitiva, sem
 Firebase e sem acesso direto a Firestore pela interface.
 
+Na Sprint 3.9C, o MVP do Orcamento Inteligente e consolidado. O contexto passa
+a carregar resumo, observacoes, condicoes comerciais, validacao final e objeto
+padronizado preparado para PDF Comercial. O painel de resumo exibe Cliente,
+Projeto, Servico, quantidade de produtos, valor total, tipo de calculo e
+status. Os totais usam o resultado do Motor de Calculo, mantendo desconto e
+acrescimo apenas como placeholders. A finalizacao valida cliente, projeto,
+servico, produtos e resultado de calculo, sem gerar PDF, sem aprovacao, sem
+persistencia definitiva e sem acesso direto a Firestore pela interface.
+
+Na Sprint 3.10, a arquitetura da v0.2.x e auditada sem alteracao de
+comportamento. A revisao consolida Core, Workflow, Event Bus, Repository
+Pattern, Storage Adapter, Dashboard, Projeto, Cliente, Servicos, Produtos,
+Motor de Calculo, Orquestrador e Orcamento Inteligente em
+`docs/ARCHITECTURE_REVIEW_V020.md`. A conclusao registra arquitetura pronta
+para iniciar o Epico 4, com atencao especial a legado com Firestore direto,
+Projeto ainda parcialmente fora do Repository Pattern, arquivos grandes e
+necessidade de testes automatizados.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -213,6 +231,15 @@ iniciar contexto.
 Sprint 3.9B implementa o fluxo guiado do Orcamento Inteligente sobre o
 Orquestrador, reutilizando Services, WorkflowEngine e Motor de Calculo, sem
 alterar a tela antiga ou criar persistencia definitiva.
+
+Sprint 3.9C consolida o MVP do Orcamento Inteligente com resumo final,
+observacoes, condicoes comerciais, validacao e objeto preparado para o futuro
+PDF Comercial da Sprint 4.1.
+
+Sprint 3.10 realiza a auditoria geral da v0.2.x, documentando mapa da
+arquitetura, fluxo comercial completo, pontos fortes, pontos de atencao,
+debitos tecnicos e recomendacoes para a v0.3.0, sem alterar codigo ou regras de
+negocio.
 
 ### v0.3.0 - Operacional
 

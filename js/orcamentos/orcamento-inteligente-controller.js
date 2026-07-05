@@ -69,6 +69,11 @@ const OrcamentoInteligenteController = {
 
         if (tipo === "calculo") {
             await this.calcularOrcamento(this.extrairDadosCalculo(dados));
+            return;
+        }
+
+        if (tipo === "complementos") {
+            await this.atualizarComplementos(this.extrairComplementos(dados));
         }
     },
 
@@ -90,6 +95,16 @@ const OrcamentoInteligenteController = {
 
         if (acao === "remover-produto") {
             await this.removerProduto(Number(botao.dataset.indice));
+            return;
+        }
+
+        if (acao === "validar-orcamento") {
+            await this.validarOrcamento();
+            return;
+        }
+
+        if (acao === "finalizar-orcamento") {
+            await this.finalizarOrcamento();
         }
     },
 
@@ -156,7 +171,53 @@ const OrcamentoInteligenteController = {
     },
 
     atualizarResumo() {
-        OrcamentoInteligenteUI.renderizarResumo(this.contexto || {});
+        OrcamentoInteligenteUI.renderizarResumo(this.contextoComResumo());
+    },
+
+    gerarResumo() {
+        if (typeof OrcamentoOrchestrator !== "undefined" && typeof OrcamentoOrchestrator.montarResumo === "function") {
+            return OrcamentoOrchestrator.montarResumo(this.contexto || {});
+        }
+
+        return (this.contexto || {}).resumo || null;
+    },
+
+    async validarOrcamento() {
+        const resultado = await OrcamentoOrchestrator.validar(this.contexto || {});
+        this.contexto = resultado.contexto;
+        this.renderizarEtapaAtual();
+        this.atualizarResumo();
+
+        if (!resultado.sucesso) {
+            this.mostrarAviso(resultado.erros.join(" "), "erro");
+        } else {
+            this.mostrarAviso("Orcamento validado para finalizacao.", "info");
+        }
+
+        return resultado;
+    },
+
+    async finalizarOrcamento() {
+        await this.atualizarComplementos(this.coletarComplementosDaTela(), { silencioso: true });
+
+        const validacao = await this.validarOrcamento();
+        if (!validacao.sucesso) {
+            return validacao;
+        }
+
+        const resultado = await OrcamentoOrchestrator.finalizar(this.contexto || {});
+        this.contexto = resultado.contexto;
+        this.etapaAtual = "resumo";
+        this.renderizarEtapaAtual();
+        this.atualizarResumo();
+
+        if (!resultado.sucesso) {
+            this.mostrarAviso(resultado.erros.join(" "), "erro");
+        } else {
+            this.mostrarAviso("Orcamento finalizado e preparado para PDF comercial.", "info");
+        }
+
+        return resultado;
     },
 
     avancarEtapa() {
@@ -187,7 +248,7 @@ const OrcamentoInteligenteController = {
 
     renderizarEtapaAtual() {
         OrcamentoInteligenteUI.renderizarEtapaAtual(
-            this.contexto || {},
+            this.contextoComResumo(),
             {
                 clientes: this.obterClientesDisponiveis(),
                 projetos: this.obterProjetosDisponiveis(),
@@ -223,6 +284,26 @@ const OrcamentoInteligenteController = {
 
     mostrarAviso(mensagem, tipo = "info") {
         OrcamentoInteligenteUI.mostrarAviso(mensagem, tipo);
+    },
+
+    async atualizarComplementos(complementos = {}, opcoes = {}) {
+        const resultado = await OrcamentoOrchestrator.atualizarComplementos(this.contexto || {}, complementos);
+        this.contexto = resultado.contexto;
+
+        if (!opcoes.silencioso) {
+            this.renderizarEtapaAtual();
+            this.atualizarResumo();
+            this.mostrarAviso("Complementos do orcamento atualizados.", "info");
+        }
+
+        return resultado;
+    },
+
+    contextoComResumo() {
+        return {
+            ...(this.contexto || {}),
+            resumo: this.gerarResumo()
+        };
     },
 
     async carregarDados() {
@@ -370,6 +451,33 @@ const OrcamentoInteligenteController = {
             valorUnitario: this.numero(dados.get("valorUnitario"), 0),
             observacoes: String(dados.get("observacoes") || "").trim()
         };
+    },
+
+    extrairComplementos(dados) {
+        return {
+            observacoes: {
+                livre: dados.get("observacaoLivre"),
+                comerciais: dados.get("observacoesComerciais"),
+                tecnicas: dados.get("observacoesTecnicas")
+            },
+            condicoesComerciais: {
+                formaPagamento: dados.get("formaPagamento"),
+                prazoEntrega: dados.get("prazoEntrega"),
+                validadeProposta: dados.get("validadeProposta")
+            }
+        };
+    },
+
+    coletarComplementosDaTela() {
+        const form = document.querySelector("[data-orcamento-form='complementos']");
+        if (!form) {
+            return {
+                observacoes: {},
+                condicoesComerciais: {}
+            };
+        }
+
+        return this.extrairComplementos(new FormData(form));
     },
 
     numero(valor, padrao = 0) {

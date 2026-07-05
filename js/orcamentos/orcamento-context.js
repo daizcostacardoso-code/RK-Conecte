@@ -9,6 +9,11 @@ const OrcamentoContext = {
             produtos: [],
             calculo: null,
             resultado: null,
+            observacoes: {},
+            condicoesComerciais: {},
+            resumo: null,
+            validacaoFinal: null,
+            orcamentoPreparado: null,
             status: ORCAMENTO_STATE.INICIADO,
             historico: [],
             criadoEm: agora,
@@ -27,6 +32,11 @@ const OrcamentoContext = {
             produtos: Array.isArray(dados.produtos) ? dados.produtos : [],
             calculo: dados.calculo || null,
             resultado: dados.resultado || null,
+            observacoes: this.normalizarObservacoes(dados.observacoes),
+            condicoesComerciais: this.normalizarCondicoes(dados.condicoesComerciais),
+            resumo: dados.resumo || null,
+            validacaoFinal: dados.validacaoFinal || null,
+            orcamentoPreparado: dados.orcamentoPreparado || null,
             status: this.normalizarStatus(dados.status),
             historico: Array.isArray(dados.historico) ? dados.historico : [],
             criadoEm: dados.criadoEm || agora,
@@ -72,6 +82,22 @@ const OrcamentoContext = {
         }
 
         return ORCAMENTO_STATE.INICIADO;
+    },
+
+    normalizarObservacoes(observacoes = {}) {
+        return {
+            livre: String(observacoes?.livre || "").trim(),
+            comerciais: String(observacoes?.comerciais || "").trim(),
+            tecnicas: String(observacoes?.tecnicas || "").trim()
+        };
+    },
+
+    normalizarCondicoes(condicoes = {}) {
+        return {
+            formaPagamento: String(condicoes?.formaPagamento || "").trim(),
+            prazoEntrega: String(condicoes?.prazoEntrega || "").trim(),
+            validadeProposta: String(condicoes?.validadeProposta || "").trim()
+        };
     },
 
     agoraISO() {

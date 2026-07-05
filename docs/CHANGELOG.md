@@ -1,6 +1,15 @@
 # Changelog
 
 ## v0.2.0 - Em desenvolvimento
+- Sprint 3.10: Realizada auditoria geral da arquitetura v0.2.x.
+- Criado `docs/ARCHITECTURE_REVIEW_V020.md` com visao geral, mapa da arquitetura, fluxo comercial completo, pontos fortes, pontos de atencao, debitos tecnicos, melhorias futuras e recomendacoes para v0.3.0.
+- Revisados Core, Workflow, Event Bus, Repository Pattern, Storage Adapter, Dashboard, Projeto, Cliente, Servicos, Produtos, Motor de Calculo, Orquestrador e Orcamento Inteligente.
+- Registrada nota geral 8.0/10 e avaliacao de prontidao para iniciar o Epico 4 com ressalvas de governanca arquitetural.
+- Sprint 3.9C: Consolidado o MVP do Orcamento Inteligente.
+- Painel de resumo passa a exibir Cliente, Projeto, Servico, quantidade de produtos, valor total, tipo de calculo e status.
+- Adicionados totais consolidados com subtotal, desconto e acrescimo como placeholders, e total geral vindo do resultado do Motor de Calculo.
+- Adicionados campos de observacoes livres, comerciais e tecnicas, alem de condicoes comerciais preparadas para forma de pagamento, prazo de entrega e validade da proposta.
+- Implementadas validacao final, finalizacao em memoria e objeto padronizado preparado para PDF Comercial, sem gerar PDF, aprovar, persistir definitivamente ou acessar Firestore direto.
 - Sprint 3.9B: Implementado o fluxo guiado do Orcamento Inteligente.
 - Controller passa a selecionar Cliente, Projeto, Servico, adicionar/remover Produtos, solicitar calculo ao Motor de Calculo e atualizar o resumo.
 - UI passa a renderizar etapa atual, estados de selecao, produtos, calculo pendente e resumo atualizado.

@@ -10,6 +10,10 @@ Inteligente em `paginas/orcamento-inteligente.html`. Na Sprint 3.9B, essa tela
 passa a executar um fluxo guiado: Cliente -> Projeto -> Servico -> Produtos ->
 Calculo -> Resumo, usando o Orquestrador e o Motor de Calculo.
 
+Na Sprint 3.9C, o MVP do Orcamento Inteligente e consolidado com resumo final,
+totais, observacoes, condicoes comerciais, validacao e objeto padronizado
+preparado para PDF Comercial.
+
 ## Orquestrador do Orcamento
 
 O Orquestrador coordena o fluxo de criacao de um orcamento usando dominios ja
@@ -37,6 +41,11 @@ servico
 produtos
 calculo
 resultado
+observacoes
+condicoesComerciais
+resumo
+validacaoFinal
+orcamentoPreparado
 status
 historico
 criadoEm
@@ -109,6 +118,9 @@ adicionarProduto()
 removerProduto()
 calcularOrcamento()
 atualizarResumo()
+gerarResumo()
+validarOrcamento()
+finalizarOrcamento()
 avancarEtapa()
 voltarEtapa()
 ```
@@ -122,6 +134,10 @@ renderizarServico()
 renderizarProdutos()
 renderizarResumo()
 renderizarEtapaAtual()
+renderizarTotais()
+renderizarObservacoes()
+renderizarCondicoes()
+renderizarValidacao()
 ```
 
 ## Estados exibidos no fluxo guiado
@@ -144,12 +160,55 @@ Resumo atualizado
 - Sem regras de calculo na UI.
 - Tela antiga de orcamento preservada.
 
-## Preparacao para Sprint 3.9C
+## Base entregue pela Sprint 3.9B
 
-O fluxo ja deixa o contexto completo em memoria com cliente, projeto, servico,
-produtos, calculo e resultado. A proxima sprint pode evoluir revisao comercial,
-validacao visual mais rica, versoes de rascunho ou integracao futura sem mover
-formulas para a interface.
+O fluxo deixou o contexto completo em memoria com cliente, projeto, servico,
+produtos, calculo e resultado, preparando a consolidacao feita na Sprint 3.9C
+sem mover formulas para a interface.
+
+## Consolidacao da Sprint 3.9C
+
+O resumo consolidado contem:
+
+```text
+Cliente
+Projeto
+Servico
+Quantidade de produtos
+Valor total
+Tipo de calculo
+Status
+```
+
+Os totais exibidos sao:
+
+```text
+Subtotal
+Desconto (placeholder)
+Acrescimo (placeholder)
+Total geral
+```
+
+O controller valida antes de finalizar:
+
+```text
+Cliente informado
+Projeto informado
+Servico informado
+Pelo menos um produto
+Resultado do calculo disponivel
+```
+
+Ao finalizar, o Orquestrador monta `orcamentoPreparado`, um objeto padronizado
+para a Sprint 4.1 (PDF Comercial). Esse objeto nao e persistido definitivamente
+e nenhum PDF e gerado nesta sprint.
+
+## Preparacao para Sprint 4.1
+
+A Sprint 4.1 pode consumir `contexto.orcamentoPreparado` para gerar o PDF
+Comercial. A estrutura ja contem cliente, projeto, servico, produtos, calculo,
+resultado, totais, observacoes, condicoes comerciais, resumo e historico, sem
+regra de PDF implementada na Sprint 3.9C.
 
 ## Ordem sugerida para a tela 3.9A
 
