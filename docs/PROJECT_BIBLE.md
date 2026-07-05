@@ -161,6 +161,28 @@ para iniciar o Epico 4, com atencao especial a legado com Firestore direto,
 Projeto ainda parcialmente fora do Repository Pattern, arquivos grandes e
 necessidade de testes automatizados.
 
+Na Sprint 4.1, o PDF Comercial Profissional ganha uma camada de dominio propria
+em `js/pdf/`. O modulo prepara modelo, validator, service e template logico a
+partir do contexto do `OrcamentoOrchestrator`, usando
+`contexto.orcamentoPreparado` quando disponivel. Esta sprint nao gera arquivo,
+nao faz download, nao imprime, nao usa bibliotecas externas, nao usa canvas, nao
+transforma HTML em PDF e nao acessa Firestore. A geracao efetiva fica reservada
+para a Sprint 4.2.
+
+Ainda na Sprint 4.1, nasce o Document Pipeline em `js/documentos/`. Essa camada
+transforma o Orcamento Inteligente em um Documento Comercial estruturado,
+reutilizavel por PDF, impressao, WhatsApp, e-mail e visualizacao web. O pipeline
+usa o contexto do `OrcamentoOrchestrator`, preserva Services comerciais como
+dependencias de aplicacao e nao acessa Firestore, HTML, CSS ou bibliotecas
+externas.
+
+Na Sprint 4.2, o Documento Comercial recebe a primeira camada de renderizacao.
+`DocumentRenderer` valida e prepara visualizacao, `DocumentHtmlRenderer` gera
+uma string HTML limpa e `DocumentPrintRenderer` prepara estrutura de impressao
+futura sem executar impressao. O renderizador recebe apenas o Documento
+Comercial ja montado, nao conhece `OrcamentoOrchestrator`, nao acessa Firestore
+e nao altera telas existentes.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -241,15 +263,34 @@ arquitetura, fluxo comercial completo, pontos fortes, pontos de atencao,
 debitos tecnicos e recomendacoes para a v0.3.0, sem alterar codigo ou regras de
 negocio.
 
-### v0.3.0 - Operacional
+### v0.3.0 - Formalizacao Comercial
+
+Preparar proposta comercial profissional, PDF Comercial e estrutura formal de
+apresentacao do orcamento, mantendo o Orcamento Inteligente como fonte unica de
+dados.
+
+Sprint 4.1 prepara a camada de dominio do PDF Comercial Profissional, criando
+modelo, service, validator, template e use case dedicados, sem alterar o fluxo
+do Orcamento Inteligente e sem gerar PDF real.
+
+Sprint 4.1 tambem cria o Document Pipeline, uma fundacao generica para montar
+Documento Comercial a partir do Orcamento Inteligente. Esse objeto estruturado
+sera a entrada preferencial para PDF, impressao, WhatsApp, e-mail e visualizacao
+web nas proximas sprints.
+
+Sprint 4.2 cria a renderizacao visual do Documento Comercial, gerando HTML
+organizado por use case a partir do documento ja montado. Essa camada prepara a
+proxima sprint de PDF real sem duplicar dados do Orcamento Inteligente.
+
+### v0.4.0 - Operacional
 
 Adicionar producao, instalacao, agenda operacional, fotos e acompanhamento de execucao.
 
-### v0.4.0 - Financeiro
+### v0.5.0 - Financeiro
 
 Conectar Projeto a pagamentos, recebimentos, custos, saldo, margem e relatorios financeiros.
 
-### v0.5.0 - Inteligencia
+### v0.6.0 - Inteligencia
 
 Criar indicadores, alertas de pendencia, visao por gargalos, previsoes e apoio a decisao.
 

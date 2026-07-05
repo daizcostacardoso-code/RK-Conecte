@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.3.0 - Formalizacao Comercial
+- Sprint 4.2: Criado o primeiro renderizador visual do Documento Comercial.
+- Adicionados `DocumentRenderer`, `DocumentHtmlRenderer` e `DocumentPrintRenderer` em `js/documentos/`.
+- Adicionado `RenderizarDocumentoUseCase` para receber Documento Comercial, validar, renderizar HTML e retornar `{ sucesso, html, erros }`.
+- Renderizacao preparada para PDF real futuro sem acessar Firestore, sem conhecer OrcamentoOrchestrator, sem alterar telas existentes e sem executar impressao.
+- Sprint 4.1 Document Pipeline: Criada a fundacao de Documento Comercial reutilizavel.
+- Adicionado modulo `js/documentos/` com model, builder, service, validator e README.
+- Adicionado `GerarDocumentoUseCase` em `js/usecases/documentos/` para preparar documento estruturado a partir do contexto do `OrcamentoOrchestrator`.
+- Pipeline preparado para PDF, impressao, WhatsApp, e-mail e visualizacao web, sem gerar PDF, HTML, CSS, canvas, download, impressao ou Firestore.
+- Sprint 4.1: Criada a camada de dominio do PDF Comercial Profissional.
+- Adicionado modulo `js/pdf/` com model, service, template, validator e README.
+- Adicionado `GerarPdfUseCase` em `js/usecases/pdf/` para preparar modelo, template e exportacao futura a partir do contexto do `OrcamentoOrchestrator`.
+- Estrutura preparada sem download, impressao, exportacao real, bibliotecas externas, canvas, HTML para PDF, Firestore ou alteracao no fluxo do Orcamento Inteligente.
+
 ## v0.2.0 - Em desenvolvimento
 - Sprint 3.10: Realizada auditoria geral da arquitetura v0.2.x.
 - Criado `docs/ARCHITECTURE_REVIEW_V020.md` com visao geral, mapa da arquitetura, fluxo comercial completo, pontos fortes, pontos de atencao, debitos tecnicos, melhorias futuras e recomendacoes para v0.3.0.
