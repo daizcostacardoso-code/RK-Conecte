@@ -73,3 +73,11 @@ Este documento registra as decisoes arquiteturais centrais da v0.2.0. As decisoe
 **Contexto:** o RK-Conecte precisa funcionar com memoria durante desenvolvimento e testes, mas deve poder evoluir para Firestore sem reescrever regras de aplicacao.
 
 **Consequencia:** telas e use cases nao devem conhecer Firestore diretamente. A troca de tecnologia de persistencia deve ocorrer pela escolha do adapter.
+
+## ADR-010 - Estado de aplicacao deve ter uma fonte central em memoria
+
+**Decisao:** o RK-Conecte deve manter um App State central em `js/core/` para estado de aplicacao transitorio.
+
+**Contexto:** Orcamento, Documento, Cliente e Projeto precisam compartilhar selecoes e contexto sem criar acoplamento direto entre telas, services e renderizadores.
+
+**Consequencia:** estado de usuario, empresa, cliente selecionado, projeto selecionado, orcamento atual, servico selecionado, produtos selecionados, documento atual, configuracoes, loading e erros deve passar pelo `AppState`/`AppStateService` nas proximas sprints. O AppState nao substitui repositories, nao persiste dados, nao acessa Firestore e deve emitir eventos pelo EventBus somente quando ele estiver disponivel.

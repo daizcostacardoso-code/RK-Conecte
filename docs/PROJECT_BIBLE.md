@@ -176,6 +176,13 @@ usa o contexto do `OrcamentoOrchestrator`, preserva Services comerciais como
 dependencias de aplicacao e nao acessa Firestore, HTML, CSS ou bibliotecas
 externas.
 
+Na Sprint 4.1.5, o Core recebe o App State Manager em `js/core/`. Essa
+infraestrutura centraliza estado de aplicacao em memoria para usuario, empresa,
+cliente selecionado, projeto selecionado, orcamento atual, servico selecionado,
+produtos selecionados, documento atual, configuracoes, loading e erros. O
+AppState nao persiste dados, nao acessa Firestore, nao altera telas e apenas
+emite eventos pelo EventBus quando ele estiver disponivel.
+
 Na Sprint 4.2, o Documento Comercial recebe a primeira camada de renderizacao.
 `DocumentRenderer` valida e prepara visualizacao, `DocumentHtmlRenderer` gera
 uma string HTML limpa e `DocumentPrintRenderer` prepara estrutura de impressao
@@ -277,6 +284,11 @@ Sprint 4.1 tambem cria o Document Pipeline, uma fundacao generica para montar
 Documento Comercial a partir do Orcamento Inteligente. Esse objeto estruturado
 sera a entrada preferencial para PDF, impressao, WhatsApp, e-mail e visualizacao
 web nas proximas sprints.
+
+Sprint 4.1.5 cria o App State Manager como infraestrutura de estado em memoria.
+O objetivo e preparar uma fonte central para Orcamento, Documento, Cliente e
+Projeto nas proximas sprints, sem mudar comportamento existente, sem persistir
+dados e sem acessar Firebase ou Firestore.
 
 Sprint 4.2 cria a renderizacao visual do Documento Comercial, gerando HTML
 organizado por use case a partir do documento ja montado. Essa camada prepara a

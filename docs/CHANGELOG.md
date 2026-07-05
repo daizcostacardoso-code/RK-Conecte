@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.1.5: Criado o App State Manager como infraestrutura central de estado em memoria.
+- Adicionados `AppState`, `AppStateService` e `AppStateEvents` em `js/core/`.
+- Estado central preparado para usuario, empresa, cliente, projeto, orcamento, servico, produtos, documento, configuracoes, loading e erros.
+- AppState passa a emitir `app.state.changed`, `app.state.item_changed` e `app.state.cleared` pelo EventBus apenas quando disponivel.
+- Estrutura criada sem alterar HTML, CSS, Firebase, Firestore, telas existentes ou fluxo do orcamento.
 - Sprint 4.2: Criado o primeiro renderizador visual do Documento Comercial.
 - Adicionados `DocumentRenderer`, `DocumentHtmlRenderer` e `DocumentPrintRenderer` em `js/documentos/`.
 - Adicionado `RenderizarDocumentoUseCase` para receber Documento Comercial, validar, renderizar HTML e retornar `{ sucesso, html, erros }`.
