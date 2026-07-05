@@ -10,6 +10,12 @@ Comercial. O renderizador gera uma string HTML limpa a partir do documento ja
 montado, sem criar telas, sem CSS, sem Firebase, sem Firestore, sem download e
 sem executar impressao.
 
+Na Sprint 4.4, o modulo recebeu a Central de Compartilhamento do Documento. A
+central e a primeira interface da Formalizacao Comercial e usa somente
+Documento Comercial pronto, `DocumentHtmlRenderer`, `ExportService`, adapters e
+AppState. Ela nao cria regra de negocio, nao altera o Orcamento Inteligente e
+mantem WhatsApp, Email e Link como placeholders.
+
 ## Objetivo
 
 Gerar um Documento Comercial padronizado que possa ser consumido futuramente por:
@@ -49,6 +55,10 @@ Ele nao acessa repositories, adapters, LocalStorage ou Firestore diretamente.
   por `DocumentHtmlRenderer`/`HtmlRenderer`.
 - `document-print-renderer.js`: prepara estrutura de impressao futura por
   `DocumentPrintRenderer`/`PrintRenderer`, sem executar impressao.
+- `document-share-ui.js`: renderiza a Central de Compartilhamento, preview,
+  historico e mensagens.
+- `document-share-controller.js`: coordena visualizacao, PDF simulado,
+  impressao futura e placeholders de compartilhamento.
 
 ## Modelo
 
@@ -100,6 +110,13 @@ js/documentos/document-service.js
 js/documentos/document-renderer.js
 js/documentos/document-html-renderer.js
 js/documentos/document-print-renderer.js
+js/export/export-model.js
+js/export/export-validator.js
+js/export/adapters/pdf-adapter.js
+js/export/adapters/print-adapter.js
+js/export/export-service.js
+js/documentos/document-share-ui.js
+js/documentos/document-share-controller.js
 js/usecases/documentos/gerar-documento-usecase.js
 js/usecases/documentos/renderizar-documento-usecase.js
 ```
@@ -141,3 +158,29 @@ O retorno padrao do use case e:
 O renderizador nao conhece `OrcamentoOrchestrator`, nao acessa Firestore e nao
 altera nenhuma tela existente. A string HTML gerada serve como base para PDF
 real, impressao futura, visualizacao web e compartilhamentos comerciais.
+
+## Central de Compartilhamento
+
+```text
+Documento Comercial
+    -> DocumentHtmlRenderer
+    -> ExportService
+    -> PdfAdapter ou PrintAdapter
+```
+
+A central implementa:
+
+```text
+abrir()
+fechar()
+visualizar()
+exportarPdf()
+imprimir()
+email()
+whatsapp()
+copiarLink()
+```
+
+O AppState recebe `documentoAtual` quando houver documento carregado. A ultima
+acao da central fica em `configuracoes.ultimaAcaoExportacao`, preservando a
+estrutura atual do AppState.

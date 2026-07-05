@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.4: Criada a Central de Compartilhamento do Documento Comercial.
+- Adicionada pagina `paginas/compartilhar-documento.html` para visualizar, exportar PDF simulado, preparar impressao e exibir placeholders de WhatsApp, Email e Link.
+- Adicionados `DocumentShareController` e `DocumentShareUI` em `js/documentos/`, reutilizando Document Pipeline, Document Renderer, Export Service, adapters e AppState.
+- Central salva `documentoAtual` no AppState e registra a ultima acao em `configuracoes.ultimaAcaoExportacao`, sem alterar AppState.
+- Interface criada sem PDF real, envio, backend, download, `window.print`, Firestore ou mudancas no Orcamento Inteligente.
 - Sprint 4.3: Criada a infraestrutura de Export Service e adapters de exportacao.
 - Adicionado modulo `js/export/` com model, validator, service, README e adapters para PDF e impressao.
 - Adicionado `ExportarDocumentoUseCase` em `js/usecases/export/` para conectar Documento Comercial, renderizacao HTML e adapter escolhido.

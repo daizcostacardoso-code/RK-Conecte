@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Compartilhar Documento - RK Vidra&ccedil;aria</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=4.4.0">
+
+    <meta name="theme-color" content="#0f766e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+
+    <style>
+        .document-share-page {
+            background: #f6f8f7;
+            color: #17201f;
+        }
+
+        .document-share-main {
+            min-height: calc(100vh - 180px);
+            padding: 32px 0 48px;
+        }
+
+        .document-share-shell {
+            max-width: 1120px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #d9e3df;
+            border-radius: 8px;
+            box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
+            overflow: hidden;
+        }
+
+        .document-share-header,
+        .document-share-footer {
+            padding: 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5ece9;
+        }
+
+        .document-share-footer {
+            border-top: 1px solid #e5ece9;
+            border-bottom: 0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .document-share-footer .document-share-button {
+            width: auto;
+            min-width: 140px;
+        }
+
+        .document-share-eyebrow {
+            margin: 0 0 8px;
+            color: #0f766e;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .document-share-header h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.05;
+        }
+
+        .document-share-header p {
+            margin: 10px 0 0;
+            color: #52605d;
+            font-size: 1.05rem;
+        }
+
+        .document-share-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+            gap: 0;
+        }
+
+        .document-share-actions {
+            padding: 24px;
+            border-right: 1px solid #e5ece9;
+        }
+
+        .document-share-section {
+            padding: 18px 0;
+            border-bottom: 1px solid #edf2f0;
+        }
+
+        .document-share-section:first-child {
+            padding-top: 0;
+        }
+
+        .document-share-section:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .document-share-section h2 {
+            margin: 0 0 12px;
+            color: #25302e;
+            font-size: 0.9rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .document-share-button-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .document-share-button {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid #cbd8d3;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #16211f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            font: inherit;
+            text-align: left;
+            transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+
+        .document-share-button:hover,
+        .document-share-button:focus-visible {
+            border-color: #0f766e;
+            background: #eef8f6;
+            outline: none;
+        }
+
+        .document-share-button-primary {
+            border-color: #0f766e;
+            background: #0f766e;
+            color: #ffffff;
+        }
+
+        .document-share-button-primary:hover,
+        .document-share-button-primary:focus-visible {
+            background: #0b5f59;
+            color: #ffffff;
+        }
+
+        .document-share-button-token {
+            min-width: 54px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.1);
+            color: #0f766e;
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            text-align: center;
+        }
+
+        .document-share-button-primary .document-share-button-token {
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+        }
+
+        .document-share-preview-area {
+            min-width: 0;
+            padding: 24px;
+            background: #fbfcfb;
+        }
+
+        .document-share-message,
+        .document-share-history,
+        .document-share-preview {
+            border: 1px solid #dfe8e5;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .document-share-message,
+        .document-share-history {
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+
+        .document-share-message p,
+        .document-share-history p {
+            margin: 0;
+            color: #4c5b58;
+        }
+
+        .document-share-message[data-tipo="erro"] {
+            border-color: #f3b4b4;
+            background: #fff5f5;
+        }
+
+        .document-share-message[data-tipo="sucesso"] {
+            border-color: #a7d9c8;
+            background: #f1fbf7;
+        }
+
+        .document-share-preview {
+            min-height: 420px;
+            overflow: auto;
+            padding: 18px;
+        }
+
+        .document-share-preview-empty {
+            min-height: 360px;
+            display: grid;
+            place-items: center;
+            color: #6b7774;
+            text-align: center;
+        }
+
+        .document-share-closed {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px;
+            border: 1px solid #d9e3df;
+            border-radius: 8px;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        @media (max-width: 860px) {
+            .document-share-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .document-share-actions {
+                border-right: 0;
+                border-bottom: 1px solid #e5ece9;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .document-share-main {
+                padding: 18px 0 32px;
+            }
+
+            .document-share-header,
+            .document-share-actions,
+            .document-share-preview-area,
+            .document-share-footer {
+                padding: 18px;
+            }
+
+            .document-share-footer {
+                justify-content: stretch;
+            }
+
+            .document-share-footer .document-share-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="document-share-page">
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Formaliza&ccedil;&atilde;o Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="orcamento-inteligente.html">Or&ccedil;amento Inteligente</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="document-share-main">
+    <div class="container">
+        <div id="documentShareRoot"></div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="../js/core/event-types.js?v=4.4.0"></script>
+<script src="../js/core/event-bus.js?v=4.4.0"></script>
+<script src="../js/core/app-state-events.js?v=4.4.0"></script>
+<script src="../js/core/app-state.js?v=4.4.0"></script>
+<script src="../js/core/app-state-service.js?v=4.4.0"></script>
+<script src="../js/documentos/document-model.js?v=4.4.0"></script>
+<script src="../js/documentos/document-builder.js?v=4.4.0"></script>
+<script src="../js/documentos/document-validator.js?v=4.4.0"></script>
+<script src="../js/documentos/document-service.js?v=4.4.0"></script>
+<script src="../js/documentos/document-renderer.js?v=4.4.0"></script>
+<script src="../js/documentos/document-html-renderer.js?v=4.4.0"></script>
+<script src="../js/export/export-model.js?v=4.4.0"></script>
+<script src="../js/export/export-validator.js?v=4.4.0"></script>
+<script src="../js/export/adapters/pdf-adapter.js?v=4.4.0"></script>
+<script src="../js/export/adapters/print-adapter.js?v=4.4.0"></script>
+<script src="../js/export/export-service.js?v=4.4.0"></script>
+<script src="../js/documentos/document-share-ui.js?v=4.4.0"></script>
+<script src="../js/documentos/document-share-controller.js?v=4.4.0"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>

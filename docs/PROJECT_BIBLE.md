@@ -198,6 +198,15 @@ simuladas, sem biblioteca externa, sem download, sem PDF real, sem
 `window.print` e sem acesso a Firestore. A biblioteca PDF definitiva deve ficar
 encapsulada no adapter em sprint futura.
 
+Na Sprint 4.4, a primeira tela da Formalizacao Comercial entra como Central de
+Compartilhamento do Documento. A pagina `paginas/compartilhar-documento.html`
+reutiliza Document Pipeline, Document Renderer, Export Service, adapters e
+AppState para visualizar o Documento Comercial, exportar PDF simulado, preparar
+impressao futura e exibir placeholders integrados para WhatsApp, Email e Link.
+A central nao altera Orcamento Inteligente, Motor de Calculo, Document Pipeline,
+Document Builder, Document Renderer, Export Service, Workflow, Repository ou
+AppState.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -306,6 +315,11 @@ Sprint 4.3 cria o Export Service e os adapters de PDF/impressao como
 infraestrutura desacoplada. O fluxo passa a ser Documento Comercial ->
 Renderer HTML -> Export Service -> Adapter escolhido, ainda sem gerar arquivo
 real, sem download e sem impressao automatica.
+
+Sprint 4.4 cria a Central de Compartilhamento como primeira interface de
+entrega do Documento Comercial ao cliente. A tela usa somente documento pronto,
+preview HTML e exportacao simulada, preparando as proximas sprints de PDF real,
+impressao e canais de envio sem duplicar regras de negocio.
 
 ### v0.4.0 - Operacional
 
