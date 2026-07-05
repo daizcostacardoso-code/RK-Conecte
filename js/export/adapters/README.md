@@ -12,11 +12,21 @@ preparar()
 
 ## PDF Adapter
 
-`PdfAdapter` prepara uma estrutura simulada para PDF Comercial futuro.
+`PdfAdapter` gera o PDF Comercial real a partir dos dados do Documento
+Comercial.
 
-Ele nao usa biblioteca externa, nao gera arquivo real, nao cria blob, nao cria
-URL e nao inicia download. A proxima sprint podera substituir apenas a parte
-interna do adapter por uma biblioteca PDF real, mantendo o contrato externo.
+Ele e o unico modulo autorizado a conhecer `pdf-lib`. Nenhum outro modulo deve
+importar, carregar ou depender diretamente dessa biblioteca.
+
+O adapter nao cria URL, nao inicia download, nao acessa Firestore e nao chama
+Services de dominio. O resultado real fica disponivel por:
+
+```js
+const resultado = PdfAdapter.gerar(exportacao);
+const arquivo = await resultado.arquivo.gerar();
+```
+
+`arquivo.bytes` contem o `Uint8Array` do PDF.
 
 ## Print Adapter
 
@@ -36,5 +46,5 @@ erros
 detalhes
 ```
 
-Quando `gerar()` for chamado nesta sprint, `arquivo`, `blob` e `url` continuam
-nulos para deixar explicito que a exportacao real ainda nao existe.
+`blob` e `url` continuam nulos. O adapter entrega bytes de PDF, deixando
+download, preview externo e envio para camadas futuras.

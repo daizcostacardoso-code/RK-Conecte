@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.5: Implementada geracao real do PDF Comercial dentro do `PdfAdapter`.
+- Instalada dependencia `pdf-lib`, encapsulada exclusivamente em `js/export/adapters/pdf-adapter.js`.
+- PDF passa a ser gerado a partir dos dados do Documento Comercial, com logo placeholder, empresa, cliente, projeto, servicos, produtos, resumo financeiro, observacoes, condicoes comerciais, validade, assinaturas e rodape.
+- Adapter preparado para logo real, QR Code e assinatura digital futuros, sem alterar ExportService, Document Pipeline, Renderer, Workflow ou AppState.
+- Geracao real validada via bytes `Uint8Array`, sem Firestore, sem Services de dominio, sem download e sem outros imports de `pdf-lib`.
 - Sprint 4.4: Criada a Central de Compartilhamento do Documento Comercial.
 - Adicionada pagina `paginas/compartilhar-documento.html` para visualizar, exportar PDF simulado, preparar impressao e exibir placeholders de WhatsApp, Email e Link.
 - Adicionados `DocumentShareController` e `DocumentShareUI` em `js/documentos/`, reutilizando Document Pipeline, Document Renderer, Export Service, adapters e AppState.

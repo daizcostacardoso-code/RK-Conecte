@@ -207,6 +207,14 @@ A central nao altera Orcamento Inteligente, Motor de Calculo, Document Pipeline,
 Document Builder, Document Renderer, Export Service, Workflow, Repository ou
 AppState.
 
+Na Sprint 4.5, o `PdfAdapter` ganha a implementacao real com `pdf-lib`. A
+biblioteca fica encapsulada exclusivamente em `js/export/adapters/pdf-adapter.js`;
+nenhum outro modulo deve importar `pdf-lib`. O PDF Comercial e gerado somente a
+partir dos dados do Documento Comercial, contendo logo placeholder, empresa,
+cliente, projeto, servicos, produtos, resumo financeiro, observacoes, condicoes
+comerciais, validade, assinaturas e rodape. O adapter ja deixa pontos de
+extensao para logo real, QR Code e assinatura digital.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -320,6 +328,11 @@ Sprint 4.4 cria a Central de Compartilhamento como primeira interface de
 entrega do Documento Comercial ao cliente. A tela usa somente documento pronto,
 preview HTML e exportacao simulada, preparando as proximas sprints de PDF real,
 impressao e canais de envio sem duplicar regras de negocio.
+
+Sprint 4.5 implementa o PDF real dentro do `PdfAdapter`, preservando
+`ExportService`, Document Pipeline e Renderer. Novos adapters devem seguir a
+mesma regra: conhecer apenas sua tecnologia interna e receber Documento
+Comercial pronto pelo contrato de exportacao.
 
 ### v0.4.0 - Operacional
 

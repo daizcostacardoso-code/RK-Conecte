@@ -1,0 +1,10 @@
+warning: in the working copy of 'docs/CHANGELOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/PROJECT_BIBLE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'js/export/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'js/export/adapters/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'js/export/adapters/pdf-adapter.js', LF will be replaced by CRLF the next time Git touches it
+docs/CHANGELOG.md
+docs/PROJECT_BIBLE.md
+js/export/README.md
+js/export/adapters/README.md
+js/export/adapters/pdf-adapter.js
