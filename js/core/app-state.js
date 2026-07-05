@@ -4,6 +4,7 @@ const APP_STATE_DEFAULTS = Object.freeze({
     clienteSelecionado: null,
     projetoSelecionado: null,
     orcamentoAtual: null,
+    ordemAtual: null,
     servicoSelecionado: null,
     produtosSelecionados: [],
     documentoAtual: null,

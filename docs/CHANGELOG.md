@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.0 - Operacional
+- Sprint 5.1: Criado o Centro de Producao como dominio operacional inicial.
+- Adicionado modulo `js/producao/` com model, validator, repository, service e README para Ordem de Producao.
+- Adicionado `CriarOrdemProducaoUseCase` em `js/usecases/producao/`.
+- Ordem de Producao nasce vinculada a `projetoId`, com status `PENDENTE`, `PLANEJADA`, `EM_PRODUCAO` e `FINALIZADA`.
+- `ProducaoRepository` usa Repository Pattern com `MemoryAdapter` como padrao, sem Firestore.
+- `ProducaoService` reutiliza ProjetoService como referencia de Projeto, registra Workflow quando disponivel, dispara `ordem.criada`, `ordem.iniciada` e `ordem.finalizada` pelo EventBus e salva `ordemAtual` no AppState.
+- AppState recebeu suporte explicito para `ordemAtual`.
+- Estrutura preparada para o futuro Planejamento consumir ordens por Projeto, sem alterar Comercial, ProjetoService, Workflow, EventBus, Repository global, Documentos, Export ou Dashboard Comercial.
+
 ## v0.3.0 - Formalizacao Comercial
 - RC1 v0.3.0 Comercial: fechado o risco de publicacao do `pdf-lib` ao versionar o artefato browser em `js/vendor/pdf-lib.min.js` e atualizar o fallback do `PdfAdapter` para caminho estatico publicado.
 - RC1 tambem documenta em `docs/releases/RC1_v0.3.0.md` que a Conversao em Projeto da v0.3.0 cria Projeto Executivo em memoria/AppState, enquanto a persistencia definitiva fica para a v0.4 Producao via componente apropriado.

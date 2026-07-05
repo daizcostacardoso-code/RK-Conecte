@@ -249,6 +249,17 @@ ExportService.
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
 
+Na Sprint 5.1, nasce o Centro de Producao em `js/producao/` como primeiro
+dominio do bloco operacional. A entidade Ordem de Producao pertence a um
+Projeto por `projetoId` e carrega `id`, `status`, `dataCriacao`,
+`responsavel`, `prioridade` e `observacoes`. O modulo segue o padrao existente
+com model, validator, service, repository e use case, usa Repository Pattern
+com `MemoryAdapter` como padrao, registra eventos pelo EventBus quando
+disponivel, grava `ordemAtual` no AppState e registra historico operacional no
+Workflow sem alterar as regras globais de Projeto. Esta sprint nao cria tela,
+nao acessa Firestore e nao altera Comercial, ProjetoService, Documentos,
+Export, Dashboard Comercial, Workflow, EventBus ou Repository global.
+
 ### Financeiro
 
 Recebimentos, pagamentos, custos, saldo, margem, comissoes e relatorios.
@@ -383,6 +394,14 @@ services e estados ja existentes.
 ### v0.4.0 - Operacional
 
 Adicionar producao, instalacao, agenda operacional, fotos e acompanhamento de execucao.
+
+Sprint 5.1 cria a fundacao do Centro de Producao com a entidade Ordem de
+Producao, estados `PENDENTE`, `PLANEJADA`, `EM_PRODUCAO` e `FINALIZADA`,
+eventos `ordem.criada`, `ordem.iniciada` e `ordem.finalizada`, uso de
+ProjetoService, Workflow, EventBus, Repository Pattern e AppState. O
+Planejamento deve consumir essa camada criando ordens por `projetoId`, definindo
+responsavel/prioridade e conduzindo a ordem ate o inicio da producao sem acessar
+Repository ou Firestore diretamente.
 
 ### v0.5.0 - Financeiro
 
