@@ -235,6 +235,16 @@ quando o EventBus esta disponivel. Esta sprint nao acessa Firestore, nao chama
 repository diretamente e nao altera ProjetoService, Workflow, AppState,
 Document Pipeline, Export Service ou Motor de Calculo.
 
+Na Sprint 4.8, a Formalizacao Comercial recebe o Dashboard Comercial em
+`paginas/dashboard-comercial.html`. O modulo `js/dashboard-comercial/` consulta
+AppState, ProjetoService, ComercialService e DocumentService para apresentar
+Total de Orcamentos, Documentos Aprovados, Projetos Convertidos, Taxa de
+Conversao, Valor em Negociacao, Ultimos Orcamentos, Ultimas Atividades e
+Proximas Acoes. O dashboard e somente leitura: nao altera AppState, nao cria
+novas regras de negocio, nao acessa Firestore diretamente e nao modifica Core,
+Workflow, EventBus, ProjetoService, ComercialService, DocumentService ou
+ExportService.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -364,6 +374,11 @@ Sprint 4.7 cria a Conversao em Projeto Executivo a partir de Documento Comercial
 aprovado. A conversao reaproveita `ProjetoService`, `ComercialService`,
 AppState, Workflow e EventBus, deixando Producao preparada para consumir o
 Projeto gerado como entrada operacional futura.
+
+Sprint 4.8 cria o Dashboard Comercial como leitura consolidada da
+Formalizacao Comercial. A tela prepara a evolucao para BI ao separar consulta,
+agregacao de exibicao e renderizacao visual, mantendo a fonte dos dados nos
+services e estados ja existentes.
 
 ### v0.4.0 - Operacional
 

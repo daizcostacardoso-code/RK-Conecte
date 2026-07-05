@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.8: Criado o Dashboard Comercial como tela de leitura da Formalizacao Comercial.
+- Adicionada pagina `paginas/dashboard-comercial.html` com Resumo Comercial, Valor em Negociacao, Ultimos Orcamentos, Ultimas Atividades e Proximas Acoes.
+- Adicionado modulo `js/dashboard-comercial/` com controller, UI e README.
+- Dashboard consulta AppState, ProjetoService, ComercialService e DocumentService sem alterar estado, sem acessar Firestore diretamente e sem criar novas regras de negocio.
+- KPIs exibem Total de Orcamentos, Total de Documentos Aprovados, Total de Projetos Convertidos e Taxa de Conversao a partir de dados ja existentes.
 - Sprint 4.7: Criada a Conversao em Projeto a partir de Documento Comercial aprovado.
 - Adicionado modulo `js/conversao/` com model, validator, service e README.
 - Adicionado `ConverterProjetoUseCase` em `js/usecases/conversao/`.
