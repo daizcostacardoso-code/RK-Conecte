@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Converter em Projeto - RK Vidra&ccedil;aria</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=4.7.0">
+
+    <meta name="theme-color" content="#0f766e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+
+    <style>
+        .conversao-page {
+            background: #f6f8f7;
+            color: #17201f;
+        }
+
+        .conversao-main {
+            min-height: calc(100vh - 180px);
+            padding: 32px 0 48px;
+        }
+
+        .conversao-shell {
+            max-width: 880px;
+            margin: 0 auto;
+            border: 1px solid #d9e3df;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
+            overflow: hidden;
+        }
+
+        .conversao-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5ece9;
+            background: #ffffff;
+        }
+
+        .conversao-eyebrow {
+            margin: 0 0 8px;
+            color: #0f766e;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .conversao-header h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.05;
+        }
+
+        .conversao-body {
+            padding: 28px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .conversao-flow {
+            display: grid;
+            gap: 14px;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .conversao-step {
+            width: min(100%, 520px);
+            border: 1px solid #dfe8e5;
+            border-radius: 8px;
+            background: #fbfcfb;
+            padding: 18px;
+        }
+
+        .conversao-step strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 1.05rem;
+        }
+
+        .conversao-step span {
+            color: #52605d;
+        }
+
+        .conversao-arrow {
+            color: #0f766e;
+            font-size: 1.7rem;
+            line-height: 1;
+        }
+
+        .conversao-button {
+            min-height: 48px;
+            min-width: 220px;
+            border: 1px solid #0f766e;
+            border-radius: 6px;
+            background: #0f766e;
+            color: #ffffff;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            padding: 10px 16px;
+            transition: background 0.18s ease, border-color 0.18s ease;
+        }
+
+        .conversao-button:hover,
+        .conversao-button:focus-visible {
+            border-color: #0b5f59;
+            background: #0b5f59;
+            outline: none;
+        }
+
+        .conversao-button:disabled {
+            border-color: #cbd8d3;
+            background: #eef2f0;
+            color: #7b8985;
+            cursor: not-allowed;
+        }
+
+        .conversao-message {
+            width: min(100%, 620px);
+            margin: 0 auto;
+            border: 1px solid #dfe8e5;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 14px 16px;
+        }
+
+        .conversao-message p {
+            margin: 0;
+            color: #4c5b58;
+        }
+
+        .conversao-message[data-tipo="erro"] {
+            border-color: #f3b4b4;
+            background: #fff5f5;
+        }
+
+        .conversao-message[data-tipo="sucesso"] {
+            border-color: #a7d9c8;
+            background: #f1fbf7;
+        }
+
+        @media (max-width: 560px) {
+            .conversao-main {
+                padding: 18px 0 32px;
+            }
+
+            .conversao-header,
+            .conversao-body {
+                padding: 18px;
+            }
+
+            .conversao-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="conversao-page">
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Formaliza&ccedil;&atilde;o Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="orcamento-inteligente.html">Or&ccedil;amento Inteligente</a></li>
+                <li><a href="aprovacao-comercial.html">Aprova&ccedil;&atilde;o</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="conversao-main">
+    <div class="container">
+        <div id="converterProjetoRoot"></div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="../js/core/event-types.js?v=4.7.0"></script>
+<script src="../js/core/event-bus.js?v=4.7.0"></script>
+<script src="../js/core/app-state-events.js?v=4.7.0"></script>
+<script src="../js/core/app-state.js?v=4.7.0"></script>
+<script src="../js/core/app-state-service.js?v=4.7.0"></script>
+<script src="../js/workflow/workflow-state.js?v=4.7.0"></script>
+<script src="../js/workflow/workflow-validator.js?v=4.7.0"></script>
+<script src="../js/workflow/workflow-events.js?v=4.7.0"></script>
+<script src="../js/workflow/workflow-engine.js?v=4.7.0"></script>
+<script src="../js/projetos/projeto-status.js?v=4.7.0"></script>
+<script src="../js/projetos/projeto-model.js?v=4.7.0"></script>
+<script src="../js/projetos/projeto-service.js?v=4.7.0"></script>
+<script src="../js/documentos/document-model.js?v=4.7.0"></script>
+<script src="../js/documentos/document-builder.js?v=4.7.0"></script>
+<script src="../js/documentos/document-validator.js?v=4.7.0"></script>
+<script src="../js/documentos/document-service.js?v=4.7.0"></script>
+<script src="../js/documentos/document-renderer.js?v=4.7.0"></script>
+<script src="../js/comercial/comercial-model.js?v=4.7.0"></script>
+<script src="../js/comercial/comercial-validator.js?v=4.7.0"></script>
+<script src="../js/comercial/comercial-service.js?v=4.7.0"></script>
+<script src="../js/conversao/conversao-model.js?v=4.7.0"></script>
+<script src="../js/conversao/conversao-validator.js?v=4.7.0"></script>
+<script src="../js/conversao/conversao-service.js?v=4.7.0"></script>
+<script src="../js/usecases/conversao/converter-projeto-usecase.js?v=4.7.0"></script>
+<script>
+    const ConverterProjetoPage = {
+        rootId: "converterProjetoRoot",
+        estado: {
+            documento: null,
+            comercial: null,
+            conversao: null,
+            mensagem: null
+        },
+
+        iniciar() {
+            this.carregar();
+            this.renderizar();
+        },
+
+        carregar() {
+            this.estado.documento = this.obterDocumentoAtual();
+            this.estado.comercial = this.estado.documento && typeof ComercialService !== "undefined"
+                ? ComercialService.obterRegistroAtual(this.estado.documento)
+                : null;
+            this.estado.conversao = typeof ConversaoService !== "undefined"
+                ? ConversaoService.obterConversaoAtual()
+                : null;
+        },
+
+        converter() {
+            const resultado = ConverterProjetoUseCase.executar(this.estado.documento);
+
+            if (!resultado.sucesso) {
+                this.estado.mensagem = {
+                    tipo: "erro",
+                    texto: this.formatarErros(resultado.erros)
+                };
+                this.renderizar();
+                return resultado;
+            }
+
+            this.estado.conversao = resultado.conversao;
+            this.estado.mensagem = {
+                tipo: "sucesso",
+                texto: `Projeto Executivo criado: ${resultado.projeto.numero || resultado.projeto.id}.`
+            };
+            this.renderizar();
+            return resultado;
+        },
+
+        renderizar() {
+            const root = document.getElementById(this.rootId);
+
+            if (!root) {
+                return false;
+            }
+
+            const status = this.obterStatusComercial();
+            const documentoTexto = this.estado.documento
+                ? this.obterDocumentoTitulo()
+                : "Nenhum Documento Comercial carregado.";
+            const podeConverter = this.podeConverter();
+
+            root.innerHTML = [
+                `<section class="conversao-shell" aria-labelledby="converterProjetoTitulo">`,
+                `<header class="conversao-header">`,
+                `<p class="conversao-eyebrow">Conversao em Projeto</p>`,
+                `<h1 id="converterProjetoTitulo">Converter em Projeto</h1>`,
+                `</header>`,
+                `<div class="conversao-body">`,
+                `<div class="conversao-flow">`,
+                `<div class="conversao-step">`,
+                `<strong>Documento aprovado</strong>`,
+                `<span>${this.escapar(documentoTexto)} | Status: ${this.escapar(this.rotuloStatus(status))}</span>`,
+                `</div>`,
+                `<div class="conversao-arrow" aria-hidden="true">&#8595;</div>`,
+                `<button type="button" class="conversao-button" data-action="converter"${podeConverter ? "" : " disabled"}>Converter em Projeto</button>`,
+                `<div class="conversao-arrow" aria-hidden="true">&#8595;</div>`,
+                this.renderizarMensagem(),
+                `</div>`,
+                `</div>`,
+                `</section>`
+            ].join("");
+
+            const botao = root.querySelector("[data-action='converter']");
+
+            if (botao) {
+                botao.addEventListener("click", () => this.converter());
+            }
+
+            return true;
+        },
+
+        renderizarMensagem() {
+            const mensagem = this.estado.mensagem || {
+                tipo: "neutro",
+                texto: this.podeConverter()
+                    ? "Documento pronto para conversao."
+                    : "A conversao exige Documento Comercial aprovado e ainda nao convertido."
+            };
+
+            return [
+                `<div class="conversao-message" data-tipo="${this.escapar(mensagem.tipo)}" aria-live="polite">`,
+                `<p>${this.escapar(mensagem.texto)}</p>`,
+                `</div>`
+            ].join("");
+        },
+
+        podeConverter() {
+            if (!this.estado.documento || this.obterStatusComercial() !== "APROVADO") {
+                return false;
+            }
+
+            const documentoOrigem = ConversaoModel.criarDocumentoOrigem(this.estado.documento);
+            const conversao = this.estado.conversao || {};
+            const origemAtual = conversao.documentoOrigem || {};
+
+            return !(conversao.convertido && origemAtual.id === documentoOrigem.id);
+        },
+
+        obterDocumentoAtual() {
+            if (typeof AppStateService === "undefined" || typeof AppStateService.getItem !== "function") {
+                return null;
+            }
+
+            return AppStateService.getItem("documentoAtual");
+        },
+
+        obterStatusComercial() {
+            return this.estado.comercial?.statusComercial || "RASCUNHO";
+        },
+
+        obterDocumentoTitulo() {
+            const dados = this.estado.documento?.dados || {};
+            const cliente = dados.cliente?.nome || "Cliente";
+            const projeto = dados.projeto?.nome || dados.projeto?.numero || dados.projeto?.id || "Projeto";
+
+            return `${cliente} - ${projeto}`;
+        },
+
+        rotuloStatus(status = "RASCUNHO") {
+            const rotulos = {
+                RASCUNHO: "Rascunho",
+                EM_REVISAO: "Em revisao",
+                APROVADO: "Aprovado",
+                REPROVADO: "Reprovado"
+            };
+
+            return rotulos[status] || status;
+        },
+
+        formatarErros(erros = []) {
+            if (!Array.isArray(erros) || !erros.length) {
+                return "Nao foi possivel converter o Documento Comercial.";
+            }
+
+            return [...new Set(erros.filter(Boolean))].join(" ");
+        },
+
+        escapar(valor) {
+            return String(valor === undefined || valor === null ? "" : valor)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        ConverterProjetoPage.iniciar();
+    });
+</script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+</body>
+</html>

@@ -225,6 +225,16 @@ eventos `documento.em_revisao`, `documento.aprovado` e `documento.reprovado`
 quando o EventBus esta disponivel. Esta sprint nao converte em Projeto e nao
 altera Workflow, EventBus, AppState, Export Service, Renderer ou PDF Adapter.
 
+Na Sprint 4.7, a aprovacao comercial passa a habilitar a Conversao em Projeto.
+O modulo `js/conversao/` converte somente Documento Comercial `APROVADO` em
+Projeto Executivo por meio do `ProjetoService`, preservando cliente, servico,
+produtos, totais, observacoes e referencia ao Documento Comercial de origem. A
+conversao registra `projetoSelecionado` e `configuracoes.conversao` no AppState,
+usa Workflow para historico e dispara `projeto.criado` e `projeto.convertido`
+quando o EventBus esta disponivel. Esta sprint nao acessa Firestore, nao chama
+repository diretamente e nao altera ProjetoService, Workflow, AppState,
+Document Pipeline, Export Service ou Motor de Calculo.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -349,6 +359,11 @@ estados comerciais, validacoes, use cases e tela propria. A aprovacao passa a
 ser o marco de entrada para a futura Conversao em Projeto, mantendo a sprint
 sem persistencia definitiva, sem Firestore e sem alterar os modulos centrais ja
 estabilizados.
+
+Sprint 4.7 cria a Conversao em Projeto Executivo a partir de Documento Comercial
+aprovado. A conversao reaproveita `ProjetoService`, `ComercialService`,
+AppState, Workflow e EventBus, deixando Producao preparada para consumir o
+Projeto gerado como entrada operacional futura.
 
 ### v0.4.0 - Operacional
 

@@ -1,6 +1,13 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.7: Criada a Conversao em Projeto a partir de Documento Comercial aprovado.
+- Adicionado modulo `js/conversao/` com model, validator, service e README.
+- Adicionado `ConverterProjetoUseCase` em `js/usecases/conversao/`.
+- Adicionada tela `paginas/converter-projeto.html` com fluxo simples de Documento aprovado -> Converter em Projeto -> mensagem de sucesso.
+- Conversao cria Projeto Executivo por `ProjetoService.criarManual`, preserva cliente, servico, produtos, totais, observacoes e referencia ao Documento Comercial de origem.
+- AppState registra `projetoSelecionado` e `configuracoes.conversao` com `projetoAtual`, `documentoOrigem` e `dataConversao`, sem alterar o AppState.
+- Fluxo emite `projeto.criado` e `projeto.convertido` quando EventBus estiver disponivel, sem Firestore, sem repository direto e sem alterar ProjetoService, Workflow, Document Pipeline, Export Service ou Motor de Calculo.
 - Sprint 4.6: Criado o fluxo de Aprovacao Comercial do Documento Comercial.
 - Adicionado modulo `js/comercial/` com model, validator, service, controller e README.
 - Adicionados use cases `AprovarDocumentoUseCase` e `ReprovarDocumentoUseCase` em `js/usecases/comercial/`.
