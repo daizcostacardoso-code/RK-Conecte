@@ -1,6 +1,7 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Release Review v0.3.0 Comercial: criada auditoria de release em `docs/releases/v0.3.0-comercial.md`, com resumo da versao, fluxo comercial, arquitetura atual, pontos fortes, riscos, checklist de qualidade, nota 8.1/10 e recomendacao de nao taguear ainda como release pronta ate resolver o risco de publicacao do `pdf-lib` e a decisao de persistencia da conversao.
 - Sprint 4.8: Criado o Dashboard Comercial como tela de leitura da Formalizacao Comercial.
 - Adicionada pagina `paginas/dashboard-comercial.html` com Resumo Comercial, Valor em Negociacao, Ultimos Orcamentos, Ultimas Atividades e Proximas Acoes.
 - Adicionado modulo `js/dashboard-comercial/` com controller, UI e README.
