@@ -1,6 +1,11 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- Sprint 4.3: Criada a infraestrutura de Export Service e adapters de exportacao.
+- Adicionado modulo `js/export/` com model, validator, service, README e adapters para PDF e impressao.
+- Adicionado `ExportarDocumentoUseCase` em `js/usecases/export/` para conectar Documento Comercial, renderizacao HTML e adapter escolhido.
+- `PdfAdapter` e `PrintAdapter` retornam apenas estruturas simuladas, sem biblioteca externa, sem download, sem PDF real e sem `window.print`.
+- Arquitetura preparada para biblioteca PDF real futura, mantendo Document Pipeline, Renderer e adapters desacoplados.
 - Sprint 4.1.5: Criado o App State Manager como infraestrutura central de estado em memoria.
 - Adicionados `AppState`, `AppStateService` e `AppStateEvents` em `js/core/`.
 - Estado central preparado para usuario, empresa, cliente, projeto, orcamento, servico, produtos, documento, configuracoes, loading e erros.

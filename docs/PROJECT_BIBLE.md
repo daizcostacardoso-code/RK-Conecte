@@ -190,6 +190,14 @@ futura sem executar impressao. O renderizador recebe apenas o Documento
 Comercial ja montado, nao conhece `OrcamentoOrchestrator`, nao acessa Firestore
 e nao altera telas existentes.
 
+Na Sprint 4.3, nasce a infraestrutura de exportacao em `js/export/`. O
+`ExportService` recebe Documento Comercial pronto, usa o HTML renderizado pelo
+`DocumentHtmlRenderer`, valida a solicitacao e seleciona um adapter
+independente. `PdfAdapter` e `PrintAdapter` retornam apenas estruturas
+simuladas, sem biblioteca externa, sem download, sem PDF real, sem
+`window.print` e sem acesso a Firestore. A biblioteca PDF definitiva deve ficar
+encapsulada no adapter em sprint futura.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -293,6 +301,11 @@ dados e sem acessar Firebase ou Firestore.
 Sprint 4.2 cria a renderizacao visual do Documento Comercial, gerando HTML
 organizado por use case a partir do documento ja montado. Essa camada prepara a
 proxima sprint de PDF real sem duplicar dados do Orcamento Inteligente.
+
+Sprint 4.3 cria o Export Service e os adapters de PDF/impressao como
+infraestrutura desacoplada. O fluxo passa a ser Documento Comercial ->
+Renderer HTML -> Export Service -> Adapter escolhido, ainda sem gerar arquivo
+real, sem download e sem impressao automatica.
 
 ### v0.4.0 - Operacional
 
