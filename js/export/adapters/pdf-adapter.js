@@ -266,17 +266,17 @@ const PdfAdapter = {
 
     obterCaminhoPdfLib() {
         if (typeof document === "undefined") {
-            return "node_modules/pdf-lib/dist/pdf-lib.min.js";
+            return "js/vendor/pdf-lib.min.js";
         }
 
         const scripts = Array.from(document.querySelectorAll("script[src]"));
         const atual = scripts.find(script => script.src.includes("js/export/adapters/pdf-adapter.js"));
 
         if (atual) {
-            return new URL("../../../node_modules/pdf-lib/dist/pdf-lib.min.js", atual.src).toString();
+            return new URL("../../vendor/pdf-lib.min.js", atual.src).toString();
         }
 
-        return "../node_modules/pdf-lib/dist/pdf-lib.min.js";
+        return "../js/vendor/pdf-lib.min.js";
     },
 
     normalizarEntrada(entrada = {}) {

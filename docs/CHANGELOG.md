@@ -1,6 +1,8 @@
 # Changelog
 
 ## v0.3.0 - Formalizacao Comercial
+- RC1 v0.3.0 Comercial: fechado o risco de publicacao do `pdf-lib` ao versionar o artefato browser em `js/vendor/pdf-lib.min.js` e atualizar o fallback do `PdfAdapter` para caminho estatico publicado.
+- RC1 tambem documenta em `docs/releases/RC1_v0.3.0.md` que a Conversao em Projeto da v0.3.0 cria Projeto Executivo em memoria/AppState, enquanto a persistencia definitiva fica para a v0.4 Producao via componente apropriado.
 - Release Review v0.3.0 Comercial: criada auditoria de release em `docs/releases/v0.3.0-comercial.md`, com resumo da versao, fluxo comercial, arquitetura atual, pontos fortes, riscos, checklist de qualidade, nota 8.1/10 e recomendacao de nao taguear ainda como release pronta ate resolver o risco de publicacao do `pdf-lib` e a decisao de persistencia da conversao.
 - Sprint 4.8: Criado o Dashboard Comercial como tela de leitura da Formalizacao Comercial.
 - Adicionada pagina `paginas/dashboard-comercial.html` com Resumo Comercial, Valor em Negociacao, Ultimos Orcamentos, Ultimas Atividades e Proximas Acoes.
