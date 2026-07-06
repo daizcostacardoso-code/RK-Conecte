@@ -1,0 +1,5 @@
+[33mc27cb72[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/v040-producao[m[33m)[m fix(orcamento): consolida configurador inteligente e preview comercial
+[33m2fbd196[m[33m ([m[1;31morigin/feature/v040-producao[m[33m)[m feat(producao): implementa domínio Produção
+[33m5b6bee0[m[33m ([m[1;33mtag: [m[1;33mv0.3.0-comercial[m[33m, [m[1;31morigin/feature/v030-formalizacao-comercial[m[33m, [m[1;32mfeature/v030-formalizacao-comercial[m[33m)[m chore(release): valida RC1 da v0.3.0 Comercial
+[33m28d05e9[m docs(release): adiciona Review da v0.3.0 Comercial
+[33mc8e8db2[m feat(dashboard): implementa Dashboard Comercial

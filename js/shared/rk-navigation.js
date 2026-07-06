@@ -26,6 +26,8 @@ const RKNavigation = {
             return true;
         }
 
+        this.prepararTelaInterna(lista);
+
         if (!this.usuarioAutenticado()) {
             this.protegerLinksInternos(lista);
             return false;
@@ -38,6 +40,99 @@ const RKNavigation = {
         this.protegerLinksInternos(lista);
 
         return true;
+    },
+
+    prepararTelaInterna(lista) {
+        document.body.classList.add("rk-app-interna");
+        this.prepararMenuMobile(lista);
+        this.carregarVersao(() => this.renderizarAssinaturaVersao());
+    },
+
+    prepararMenuMobile(lista) {
+        const nav = lista?.closest("nav");
+
+        if (!nav || nav.dataset.rkMenuPreparado === "true") {
+            return;
+        }
+
+        nav.dataset.rkMenuPreparado = "true";
+        nav.classList.add("rk-nav-shell");
+
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "rk-nav-mobile-toggle";
+        botao.setAttribute("aria-expanded", "false");
+        botao.setAttribute("aria-controls", "rkNavPrincipal");
+        botao.textContent = "Menu do sistema";
+
+        if (!lista.id) {
+            lista.id = "rkNavPrincipal";
+        }
+
+        nav.insertBefore(botao, lista);
+
+        const fechar = () => {
+            nav.classList.remove("rk-nav-mobile-aberto");
+            botao.setAttribute("aria-expanded", "false");
+        };
+
+        botao.addEventListener("click", () => {
+            const aberto = nav.classList.toggle("rk-nav-mobile-aberto");
+            botao.setAttribute("aria-expanded", String(aberto));
+        });
+
+        lista.addEventListener("click", event => {
+            if (event.target.closest("a")) {
+                fechar();
+            }
+        });
+
+        document.addEventListener("click", event => {
+            if (!nav.contains(event.target)) {
+                fechar();
+            }
+        });
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                fechar();
+            }
+        });
+    },
+
+    carregarVersao(callback) {
+        if (window.RK_VERSION || document.querySelector("script[data-rk-version]")) {
+            callback();
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=5.2.3`;
+        script.dataset.rkVersion = "true";
+        script.onload = callback;
+        script.onerror = callback;
+        document.head.appendChild(script);
+    },
+
+    renderizarAssinaturaVersao() {
+        if (document.querySelector(".rk-version-signature")) {
+            return;
+        }
+
+        const footer = document.querySelector("body > footer:last-of-type");
+
+        if (!footer || footer.classList.contains("public-footer") || footer.classList.contains("rodape-sistema-discreto")) {
+            return;
+        }
+
+        const assinatura = document.createElement("div");
+        assinatura.className = "rk-version-signature";
+        assinatura.textContent = `RK Conecte \u2022 ${this.obterVersao()}`;
+        footer.insertAdjacentElement("afterend", assinatura);
+    },
+
+    obterVersao() {
+        return String(window.RK_VERSION || "v0.4.0-producao");
     },
 
     renderizarLink(link) {

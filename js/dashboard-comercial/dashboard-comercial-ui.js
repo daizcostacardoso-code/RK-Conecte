@@ -16,6 +16,7 @@ const DashboardComercialUI = {
             `<div>`,
             `<p class="dashboard-comercial-eyebrow">Dashboard Comercial</p>`,
             `<h1 id="dashboardComercialTitulo">Dashboard Comercial</h1>`,
+            `<p class="dashboard-comercial-subtitle">Acompanhamento do funil comercial, aprovacoes e conversoes recentes.</p>`,
             `</div>`,
             `<button type="button" class="dashboard-comercial-refresh" data-dashboard-action="atualizar">Atualizar</button>`,
             `</header>`,
