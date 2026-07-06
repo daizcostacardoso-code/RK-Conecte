@@ -21,26 +21,67 @@ const ProducaoValidator = {
             erros.push("Status da ordem de producao invalido.");
         }
 
-        if (!this.dataValida(ordem.dataCriacao)) {
+        if (!this.prioridadeValida(ordem.prioridade)) {
+            erros.push("Prioridade da ordem de producao invalida.");
+        }
+
+        if (!this.dataValida(ordem.criadoEm || ordem.dataCriacao)) {
             erros.push("Data de criacao da ordem de producao invalida.");
-        }
-
-        if (!String(ordem.responsavel || "").trim()) {
-            erros.push("Responsavel da ordem de producao e obrigatorio.");
-        }
-
-        if (!String(ordem.prioridade || "").trim()) {
-            erros.push("Prioridade da ordem de producao e obrigatoria.");
         }
 
         if (ordem.historico && !Array.isArray(ordem.historico)) {
             erros.push("Historico da ordem de producao invalido.");
         }
 
+        if (!Array.isArray(ordem.checklist)) {
+            erros.push("Checklist da ordem de producao invalido.");
+        } else {
+            this.validarChecklist(ordem.checklist).forEach(erro => erros.push(erro));
+        }
+
         return {
             valido: erros.length === 0,
             erros
         };
+    },
+
+    validarPlanejamento(ordem = {}) {
+        const erros = [];
+
+        if (!String(ordem.responsavel || "").trim()) {
+            erros.push("Responsavel da ordem de producao e obrigatorio para liberar.");
+        }
+
+        if (!String(ordem.previsaoEntrega || "").trim()) {
+            erros.push("Previsao de entrega da ordem de producao e obrigatoria para liberar.");
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros
+        };
+    },
+
+    validarChecklist(checklist = []) {
+        return checklist.reduce((erros, item, indice) => {
+            if (!String(item.id || "").trim()) {
+                erros.push(`Item ${indice + 1} do checklist precisa de id.`);
+            }
+
+            if (!String(item.titulo || "").trim()) {
+                erros.push(`Item ${indice + 1} do checklist precisa de titulo.`);
+            }
+
+            if (typeof item.concluido !== "boolean") {
+                erros.push(`Item ${indice + 1} do checklist precisa informar se foi concluido.`);
+            }
+
+            if (!this.dataValida(item.atualizadoEm)) {
+                erros.push(`Item ${indice + 1} do checklist possui data invalida.`);
+            }
+
+            return erros;
+        }, []);
     },
 
     validarTransicao(statusAtual, novoStatus) {
@@ -63,7 +104,15 @@ const ProducaoValidator = {
             return ProducaoModel.statusValido(status);
         }
 
-        return ["PENDENTE", "PLANEJADA", "EM_PRODUCAO", "FINALIZADA"].includes(String(status || "").trim());
+        return ["PENDENTE", "PLANEJADA", "LIBERADA", "EM_PRODUCAO", "FINALIZADA"].includes(String(status || "").trim());
+    },
+
+    prioridadeValida(prioridade) {
+        if (typeof ProducaoModel !== "undefined" && typeof ProducaoModel.prioridadeValida === "function") {
+            return ProducaoModel.prioridadeValida(prioridade);
+        }
+
+        return ["BAIXA", "NORMAL", "ALTA", "URGENTE"].includes(String(prioridade || "").trim());
     },
 
     normalizarStatus(status) {

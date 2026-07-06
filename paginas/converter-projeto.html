@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.0" data-rk-auth="protected"></script>
     <title>Converter em Projeto - RK Vidra&ccedil;aria</title>
 
     <link rel="stylesheet" href="../css/style.css?v=4.7.0">
@@ -220,6 +221,7 @@
 <script src="../js/conversao/conversao-validator.js?v=4.7.0"></script>
 <script src="../js/conversao/conversao-service.js?v=4.7.0"></script>
 <script src="../js/usecases/conversao/converter-projeto-usecase.js?v=4.7.0"></script>
+<script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
 <script>
     const ConverterProjetoPage = {
         rootId: "converterProjetoRoot",
@@ -262,8 +264,30 @@
                 tipo: "sucesso",
                 texto: `Projeto Executivo criado: ${resultado.projeto.numero || resultado.projeto.id}.`
             };
+            this.salvarFluxoDemo(resultado);
             this.renderizar();
             return resultado;
+        },
+
+        salvarFluxoDemo(resultado = {}) {
+            if (typeof RKE2EDemoState === "undefined" || typeof RKE2EDemoState.salvarFluxo !== "function") {
+                return false;
+            }
+
+            return RKE2EDemoState.salvarFluxo({
+                projetoSelecionado: resultado.projeto,
+                projetoAtual: resultado.projeto,
+                documentoAtual: resultado.documento,
+                statusComercial: "APROVADO",
+                configuracoes: {
+                    conversao: resultado.conversao,
+                    comercial: {
+                        statusComercial: "APROVADO",
+                        dataAprovacao: resultado.dataConversao,
+                        ultimaAcaoComercial: "Documento Comercial aprovado para demonstracao E2E."
+                    }
+                }
+            });
         },
 
         renderizar() {
@@ -295,6 +319,7 @@
                 `<button type="button" class="conversao-button" data-action="converter"${podeConverter ? "" : " disabled"}>Converter em Projeto</button>`,
                 `<div class="conversao-arrow" aria-hidden="true">&#8595;</div>`,
                 this.renderizarMensagem(),
+                this.renderizarProducao(),
                 `</div>`,
                 `</div>`,
                 `</section>`
@@ -320,6 +345,20 @@
             return [
                 `<div class="conversao-message" data-tipo="${this.escapar(mensagem.tipo)}" aria-live="polite">`,
                 `<p>${this.escapar(mensagem.texto)}</p>`,
+                `</div>`
+            ].join("");
+        },
+
+        renderizarProducao() {
+            const convertido = !!(this.estado.conversao && this.estado.conversao.convertido);
+
+            if (!convertido) {
+                return "";
+            }
+
+            return [
+                `<div class="rk-fluxo-acoes">`,
+                `<a class="botao" href="producao.html">Seguir para Producao</a>`,
                 `</div>`
             ].join("");
         },
@@ -389,6 +428,7 @@
         ConverterProjetoPage.iniciar();
     });
 </script>
+<script src="../js/shared/rk-navigation.js?v=5.2.0"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>
 </html>

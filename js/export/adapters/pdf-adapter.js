@@ -167,7 +167,7 @@ const PdfAdapter = {
             this.desenharEmpresa(estado, dados.empresa);
             this.desenharCliente(estado, dados.cliente);
             this.desenharProjeto(estado, dados.projeto);
-            this.desenharServico(estado, dados.servico);
+            this.desenharServico(estado, dados.servico, dados.servicos);
             this.desenharProdutos(estado, dados.produtos, dados.totais);
             this.desenharResumoFinanceiro(estado, dados);
             this.desenharObservacoes(estado, dados.observacoes);
@@ -335,7 +335,7 @@ const PdfAdapter = {
     },
 
     novaPagina(estado) {
-        estado.pagina = estado.pdfDoc.addPage();
+        estado.pagina = estado.pdfDoc.addPage([841.89, 595.28]);
         const tamanho = estado.pagina.getSize();
         estado.largura = tamanho.width;
         estado.altura = tamanho.height;
@@ -351,6 +351,8 @@ const PdfAdapter = {
     desenharCabecalho(estado, dados = {}) {
         const empresa = dados.empresa || {};
         const logoTexto = empresa.logo?.texto || "RK";
+        const projeto = dados.projeto || {};
+        const metadados = dados.metadados || {};
 
         estado.pagina.drawRectangle({
             x: estado.margem,
@@ -386,21 +388,20 @@ const PdfAdapter = {
             color: estado.corSuave
         });
 
-        estado.pagina.drawText("QR Code futuro", {
-            x: estado.largura - estado.margem - 82,
-            y: estado.y - 18,
+        estado.pagina.drawText(this.limparTextoPdf(`Numero: ${projeto.numero || projeto.id || "Proposta comercial"}`), {
+            x: estado.largura - estado.margem - 150,
+            y: estado.y - 16,
             size: 8,
             font: estado.fonte,
             color: estado.corSuave
         });
 
-        estado.pagina.drawRectangle({
-            x: estado.largura - estado.margem - 54,
-            y: estado.y - 58,
-            width: 54,
-            height: 54,
-            borderColor: estado.corLinha,
-            borderWidth: 1
+        estado.pagina.drawText(this.limparTextoPdf(`Data: ${this.formatarData(metadados.geradoEm || new Date().toISOString())}`), {
+            x: estado.largura - estado.margem - 150,
+            y: estado.y - 32,
+            size: 8,
+            font: estado.fonte,
+            color: estado.corSuave
         });
 
         estado.y -= 82;
@@ -439,12 +440,16 @@ const PdfAdapter = {
         ]);
     },
 
-    desenharServico(estado, servico = {}) {
-        this.desenharSecao(estado, "Servicos");
+    desenharServico(estado, servico = {}, servicos = []) {
+        const servicosTexto = Array.isArray(servicos) && servicos.length
+            ? servicos.map(item => item.nome).filter(Boolean).join(", ")
+            : servico?.nome;
+
+        this.desenharSecao(estado, "Servico");
         this.desenharCampos(estado, [
-            ["Servico", servico?.nome],
+            ["Tipos de servico", servicosTexto],
             ["Categoria", servico?.categoria],
-            ["Tipo de calculo", servico?.tipoCalculo],
+            ["Tipo de calculo", this.rotuloTipoCalculo(servico?.tipoCalculo)],
             ["Unidade de venda", servico?.unidadeVenda],
             ["Descricao", servico?.descricao]
         ]);
@@ -454,11 +459,16 @@ const PdfAdapter = {
         this.desenharSecao(estado, "Produtos");
 
         const colunas = [
-            { titulo: "Item", x: estado.margem, largura: 32 },
-            { titulo: "Produto", x: estado.margem + 40, largura: 206 },
-            { titulo: "Qtd", x: estado.margem + 254, largura: 44 },
-            { titulo: "Un", x: estado.margem + 306, largura: 44 },
-            { titulo: "Total", x: estado.margem + 358, largura: 130 }
+            { titulo: "Item", x: estado.margem, largura: 30 },
+            { titulo: "Tipo", x: estado.margem + 34, largura: 100 },
+            { titulo: "Subtipo", x: estado.margem + 138, largura: 78 },
+            { titulo: "Descricao", x: estado.margem + 220, largura: 130 },
+            { titulo: "Medidas", x: estado.margem + 354, largura: 74 },
+            { titulo: "Area", x: estado.margem + 432, largura: 58 },
+            { titulo: "Qtd", x: estado.margem + 494, largura: 38 },
+            { titulo: "Valor", x: estado.margem + 536, largura: 74 },
+            { titulo: "Eng.", x: estado.margem + 614, largura: 70 },
+            { titulo: "Subtotal", x: estado.margem + 688, largura: 70 }
         ];
 
         this.desenharLinhaTabela(estado, colunas.map(coluna => coluna.titulo), colunas, true);
@@ -467,10 +477,15 @@ const PdfAdapter = {
             this.garantirEspaco(estado, 42);
             this.desenharLinhaTabela(estado, [
                 produto.item,
-                produto.nome,
-                produto.quantidade,
-                produto.unidade,
-                this.formatarMoeda(produto.valorTotal, totais?.moeda)
+                produto.tipoItemNome || produto.nome,
+                produto.subtipoItem,
+                produto.descricao || produto.nome,
+                this.formatarMedidas(produto),
+                `${this.formatarArea(produto.areaM2)} m2`,
+                this.formatarNumero(produto.quantidade),
+                this.formatarMoeda(produto.valorUnitario, totais?.moeda),
+                Number(produto.valorAdicionalEngenharia || 0) > 0 ? this.formatarMoeda(produto.valorAdicionalEngenharia, totais?.moeda) : "",
+                this.formatarMoeda(produto.subtotal ?? produto.valorTotal, totais?.moeda)
             ], colunas, false);
         });
 
@@ -484,17 +499,18 @@ const PdfAdapter = {
 
         this.desenharSecao(estado, "Resumo Financeiro");
         this.desenharCampos(estado, [
-            ["Quantidade de produtos", resumo.quantidadeProdutos],
             ["Subtotal", this.formatarMoeda(totais.subtotal, moeda)],
-            ["Desconto", this.formatarMoeda(totais.desconto, moeda)],
-            ["Acrescimo", this.formatarMoeda(totais.acrescimo, moeda)],
-            ["Total geral", this.formatarMoeda(totais.totalGeral, moeda)],
-            ["Tipo de calculo", resumo.tipoCalculo],
-            ["Status", resumo.status]
-        ]);
+            Number(totais.desconto || 0) > 0 ? ["Desconto", this.formatarMoeda(totais.desconto, moeda)] : null,
+            Number(totais.acrescimo || 0) > 0 ? ["Acrescimo", this.formatarMoeda(totais.acrescimo, moeda)] : null,
+            ["Total geral", this.formatarMoeda(totais.totalGeral, moeda)]
+        ].filter(Boolean));
     },
 
     desenharObservacoes(estado, observacoes = {}) {
+        if (!this.temValor(observacoes?.livre) && !this.temValor(observacoes?.comerciais) && !this.temValor(observacoes?.tecnicas)) {
+            return;
+        }
+
         this.desenharSecao(estado, "Observacoes");
         this.desenharCampos(estado, [
             ["Livre", observacoes?.livre],
@@ -504,12 +520,19 @@ const PdfAdapter = {
     },
 
     desenharCondicoes(estado, condicoes = {}, validade = {}) {
+        const pagamento = this.comporComplemento(condicoes?.formaPagamento, condicoes?.formaPagamentoComplemento);
+        const prazo = this.comporComplemento(condicoes?.prazoEntrega, condicoes?.prazoEntregaComplemento);
+        const validadeTexto = validade?.descricao || condicoes?.validadeProposta;
+
+        if (!this.temValor(pagamento) && !this.temValor(prazo) && !this.temValor(validadeTexto)) {
+            return;
+        }
+
         this.desenharSecao(estado, "Condicoes Comerciais");
         this.desenharCampos(estado, [
-            ["Forma de pagamento", condicoes?.formaPagamento],
-            ["Prazo de entrega", condicoes?.prazoEntrega],
-            ["Validade da proposta", validade?.descricao || condicoes?.validadeProposta],
-            ["Data de validade", validade?.data]
+            ["Forma de pagamento", pagamento],
+            ["Prazo de entrega", prazo],
+            ["Validade da proposta", validadeTexto]
         ]);
     },
 
@@ -548,26 +571,16 @@ const PdfAdapter = {
             color: estado.corSuave
         });
 
-        estado.pagina.drawText("Assinatura digital futura", {
-            x: estado.margem,
-            y: yLinha - 34,
-            size: 8,
-            font: estado.fonte,
-            color: estado.corSuave
-        });
-
-        estado.y = yLinha - 52;
+        estado.y = yLinha - 36;
     },
 
     desenharRodape(estado, dados = {}) {
         this.garantirEspaco(estado, 56);
 
-        const metadados = dados.metadados || {};
         const texto = [
-            "Documento Comercial preparado pelo RK-Conecte.",
-            `Origem: ${metadados.origem || "ORCAMENTO_INTELIGENTE"}`,
-            `Status: ${metadados.status || "PREPARADO"}`
-        ].join(" | ");
+            "Obrigado pela preferencia. Esta proposta foi preparada para conferencia e aprovacao comercial.",
+            `Gerado em ${this.formatarDataHora(dados.metadados?.geradoEm || new Date().toISOString())}`
+        ].join(" ");
 
         this.desenharTextoQuebrado(estado, texto, estado.margem, estado.y, {
             largura: estado.largura - (estado.margem * 2),
@@ -580,6 +593,9 @@ const PdfAdapter = {
 
     desenharSecao(estado, titulo) {
         this.garantirEspaco(estado, 56);
+        const xInicio = Number(estado.margem);
+        const xFim = Number(estado.largura) - Number(estado.margem);
+        const yLinha = Number(estado.y) - 7;
 
         estado.pagina.drawText(titulo, {
             x: estado.margem,
@@ -590,8 +606,8 @@ const PdfAdapter = {
         });
 
         estado.pagina.drawLine({
-            start: { x: estado.margem, y: estado.y - 7 },
-            end: { x: estado.largura - estado.margem, y: estado.y - 7 },
+            start: { x: xInicio, y: yLinha },
+            end: { x: xFim, y: yLinha },
             thickness: 1,
             color: estado.corLinha
         });
@@ -651,7 +667,9 @@ const PdfAdapter = {
                 return;
             }
 
-            estado.pagina.drawText(this.limparTextoPdf(valor), {
+            const texto = this.limitarTextoParaLargura(estado.fonte, this.limparTextoPdf(valor), cabecalho ? 8 : 8, coluna.largura || 80);
+
+            estado.pagina.drawText(texto, {
                 x: coluna.x,
                 y: yBase,
                 size: cabecalho ? 8 : 8,
@@ -673,7 +691,7 @@ const PdfAdapter = {
 
         linhas.forEach(linha => {
             this.garantirEspaco(estado, 24);
-            estado.pagina.drawText(linha || "-", {
+            estado.pagina.drawText(linha || "", {
                 x,
                 y: yAtual,
                 size: tamanho,
@@ -688,7 +706,7 @@ const PdfAdapter = {
     },
 
     quebrarLinhas(fonte, texto, tamanho, largura) {
-        const palavras = String(texto || "-").split(/\s+/);
+        const palavras = String(texto || "").split(/\s+/).filter(Boolean);
         const linhas = [];
         let linhaAtual = "";
 
@@ -709,7 +727,7 @@ const PdfAdapter = {
             linhas.push(linhaAtual);
         }
 
-        return linhas.length ? linhas : ["-"];
+        return linhas.length ? linhas : [""];
     },
 
     montarNomeArquivo(documento = {}) {
@@ -742,10 +760,112 @@ const PdfAdapter = {
         }).format(numero);
     },
 
+    formatarNumero(valor, casas = 2) {
+        const numero = Number(valor);
+
+        if (!Number.isFinite(numero)) {
+            return "0,00";
+        }
+
+        return numero.toLocaleString("pt-BR", {
+            minimumFractionDigits: casas,
+            maximumFractionDigits: casas
+        });
+    },
+
+    formatarArea(valor) {
+        const numero = Number(valor);
+
+        if (!Number.isFinite(numero)) {
+            return "0,00";
+        }
+
+        return numero.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 4
+        });
+    },
+
+    formatarMedidas(produto = {}) {
+        return `${this.formatarNumero(produto.larguraCm || 0)} x ${this.formatarNumero(produto.alturaCm || 0)} cm`;
+    },
+
+    formatarData(valor) {
+        const data = new Date(valor);
+
+        if (Number.isNaN(data.getTime())) {
+            return "";
+        }
+
+        return data.toLocaleDateString("pt-BR");
+    },
+
+    formatarDataHora(valor) {
+        const data = new Date(valor);
+
+        if (Number.isNaN(data.getTime())) {
+            return "";
+        }
+
+        return data.toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    },
+
+    rotuloTipoCalculo(tipoCalculo) {
+        const valor = String(tipoCalculo || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "");
+        const rotulos = {
+            area_m2: "\u00c1rea (m\u00b2)",
+            m2: "\u00c1rea (m\u00b2)",
+            linear_m: "Linear (m)",
+            unidade: "Unidade",
+            orcamento_itens: "Itens da proposta"
+        };
+
+        return rotulos[valor] || tipoCalculo || "";
+    },
+
+    comporComplemento(valor, complemento) {
+        if (!this.temValor(valor)) {
+            return "";
+        }
+
+        return this.temValor(complemento) ? `${valor} - ${complemento}` : valor;
+    },
+
+    temValor(valor) {
+        return valor !== undefined && valor !== null && String(valor).trim() !== "";
+    },
+
+    limitarTextoParaLargura(fonte, texto, tamanho, largura) {
+        const limpo = this.limparTextoPdf(texto);
+
+        if (!limpo || fonte.widthOfTextAtSize(limpo, tamanho) <= largura) {
+            return limpo;
+        }
+
+        let cortado = limpo;
+
+        while (cortado.length > 3 && fonte.widthOfTextAtSize(`${cortado}...`, tamanho) > largura) {
+            cortado = cortado.slice(0, -1);
+        }
+
+        return `${cortado}...`;
+    },
+
     limparTextoPdf(valor) {
         return String(valor === undefined || valor === null ? "" : valor)
             .replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\u00FF]/g, "")
-            .trim() || "-";
+            .trim();
     },
 
     errosUnicos(erros = []) {

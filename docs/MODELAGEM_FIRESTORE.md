@@ -166,3 +166,12 @@ allow read, write: if true;
 ```
 
 Isso deve ser substituido por autenticacao antes de uso com dados sensiveis em producao madura.
+## Caixa
+
+### `caixa_empresa/{lancamentoId}`
+
+Colecao atual dos lancamentos financeiros do caixa. Deve permanecer ativa ate existir migracao formal para SQL.
+
+Campos padronizados pelo modulo `js/caixa/`: `idLocal`, `idFirestore`, `descricao`, `categoria`, `tipo`, `valor`, `data`, `formaPagamento`, `origem`, `observacao`, `responsavel`, `status`, `mesReferencia`, `anoReferencia`, `diaReferencia`, `clienteId`, `orcamentoId`, `usuarioId`, `criadoEm`, `criadoEmISO`, `atualizadoEmISO` e `schemaVersion`.
+
+O merge local/nuvem identifica registros por `idFirestore`, `idLocal`, `criadoEmISO` e fallback gerado, nessa ordem.

@@ -1,0 +1,20 @@
+* [33m2fbd196[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/v040-producao[m[33m, [m[1;31morigin/feature/v040-producao[m[33m)[m feat(producao): implementa domínio Produção
+* [33m5b6bee0[m[33m ([m[1;33mtag: [m[1;33mv0.3.0-comercial[m[33m, [m[1;31morigin/feature/v030-formalizacao-comercial[m[33m, [m[1;32mfeature/v030-formalizacao-comercial[m[33m)[m chore(release): valida RC1 da v0.3.0 Comercial
+* [33m28d05e9[m docs(release): adiciona Review da v0.3.0 Comercial
+* [33mc8e8db2[m feat(dashboard): implementa Dashboard Comercial
+* [33m1f80a99[m feat(conversao): implementa Conversão em Projeto
+* [33m04ca5db[m feat(comercial): implementa fluxo de Aprovação Comercial
+* [33mcb48403[m feat(export): implementa geração de PDF com PdfAdapter
+* [33m0a1e679[m feat(documentos): implementa Central de Compartilhamento
+* [33md37d2e3[m feat(export): implementa Export Service e adapters
+* [33m2e37083[m feat(core): implementa App State Manager
+* [33m1d008a7[m feat(documentos): implementa Document Pipeline
+* [33mb652aa3[m docs(v0.2.0): adiciona auditoria geral da arquitetura
+* [33mb66a6ec[m[33m ([m[1;33mtag: [m[1;33mv0.2.0[m[33m, [m[1;31morigin/feature/v020-comercial[m[33m, [m[1;32mfeature/v020-comercial[m[33m)[m feat(orcamentos): implementa fluxo guiado do Orçamento Inteligente
+* [33ma711c24[m feat(orcamentos): cria estrutura do Orçamento Inteligente
+* [33mcf95bc3[m feat(orcamentos): implementa Orquestrador do Orçamento
+* [33m170bd50[m feat(calculos): implementa Motor de Cálculo Comercial
+* [33mae63e9a[m feat(produtos): implementa domínio Produtos
+* [33m972972c[m feat(servicos): implementa Catálogo Comercial de Serviços
+* [33m3f74169[m feat(servicos): implementa domínio Serviços
+* [33m657cb68[m feat(clientes): evolui Centro Comercial de Clientes

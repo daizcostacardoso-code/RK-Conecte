@@ -189,7 +189,16 @@ const ClienteUI = {
                 <span>${this.escapar(rotulo)}</span>
                 <strong>${this.escapar(valor)}</strong>
             </div>
-        `).join("");
+        `).join("") + (cliente ? this.renderizarAcoesFluxo(cliente) : "");
+    },
+
+    renderizarAcoesFluxo(cliente = {}) {
+        return `
+            <div class="cliente-fluxo-acoes secao-inteira">
+                <a class="botao" href="projetos.html">Criar/selecionar projeto</a>
+                <a class="botao botao-claro" href="orcamento-inteligente.html">Seguir para orcamento</a>
+            </div>
+        `;
     },
 
     renderizarIndicadores(cliente) {

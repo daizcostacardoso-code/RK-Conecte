@@ -65,7 +65,11 @@ const ClienteController = {
             return;
         }
 
-        ClienteUI.renderizarLista(resultado.clientes || []);
+        const clientes = resultado.clientes && resultado.clientes.length
+            ? resultado.clientes
+            : this.criarClientesDemo();
+
+        ClienteUI.renderizarLista(clientes);
     },
 
     async selecionarCliente(id) {
@@ -76,6 +80,7 @@ const ClienteController = {
             return;
         }
 
+        this.salvarClienteAtual(resultado.cliente);
         ClienteUI.renderizarDetalhe(resultado.cliente);
     },
 
@@ -109,14 +114,55 @@ const ClienteController = {
 
     async executarBusca(id) {
         if (typeof BuscarClienteUseCase !== "undefined") {
-            return BuscarClienteUseCase.executar(id, ClienteService);
+            const resultado = await BuscarClienteUseCase.executar(id, ClienteService);
+            return resultado.sucesso ? resultado : this.buscarClienteDemo(id, resultado);
         }
 
         if (typeof ClienteService !== "undefined") {
-            return ClienteService.buscarCliente(id);
+            const resultado = await ClienteService.buscarCliente(id);
+            return resultado.sucesso ? resultado : this.buscarClienteDemo(id, resultado);
         }
 
-        return this.respostaCamadaIndisponivel("buscar");
+        return this.buscarClienteDemo(id, this.respostaCamadaIndisponivel("buscar"));
+    },
+
+    criarClientesDemo() {
+        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.obterOuCriar === "function") {
+            const estado = RKE2EDemoState.obterOuCriar();
+            return estado.clienteSelecionado ? [estado.clienteSelecionado] : [];
+        }
+
+        return [];
+    },
+
+    buscarClienteDemo(id, resultadoOriginal = null) {
+        const cliente = this.criarClientesDemo().find(item => item.id === id);
+
+        if (cliente) {
+            return {
+                sucesso: true,
+                cliente,
+                erros: []
+            };
+        }
+
+        return resultadoOriginal || this.respostaCamadaIndisponivel("buscar");
+    },
+
+    salvarClienteAtual(cliente = {}) {
+        const appState = typeof AppStateService !== "undefined" ? AppStateService : null;
+
+        if (appState && typeof appState.setState === "function") {
+            appState.setState("clienteSelecionado", cliente);
+        }
+
+        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.salvarFluxo === "function") {
+            RKE2EDemoState.salvarFluxo({
+                clienteSelecionado: cliente
+            });
+        }
+
+        return true;
     },
 
     obterTermoBusca() {

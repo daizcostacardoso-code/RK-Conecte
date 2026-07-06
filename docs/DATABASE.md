@@ -83,3 +83,14 @@ Coleção usada pelo formulário público de solicitação de orçamento.
 ## Observação de segurança
 
 Custos internos podem ser salvos no rascunho interno, mas não devem ser renderizados no PDF do cliente.
+## Caixa
+
+### LocalStorage
+
+- `vidracaria_caixa_empresa`: cache local dos lancamentos do caixa, normalizado pelo modulo `js/caixa/`.
+
+### Firestore
+
+- `caixa_empresa`: colecao atual do caixa da empresa. Nao deve ser renomeada sem migracao.
+
+O modulo `js/caixa/` mescla `vidracaria_caixa_empresa` com `caixa_empresa`, normaliza os lancamentos para `schemaVersion: 1` e preserva ids locais e ids do Firestore para uma futura migracao SQL.

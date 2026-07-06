@@ -70,6 +70,14 @@ Mostra dados, coleta entradas do usuario e chama servicos de aplicacao.
 
 A interface nao deve acessar Firestore diretamente nem concentrar regras de negocio sensiveis.
 
+### Site publico x painel interno
+
+O site publico deve apresentar apenas paginas institucionais simples, voltadas a visitantes e clientes. Produtos e Servicos publicos vivem em `paginas/produtos-publico.html` e `paginas/servicos-publico.html` e nao devem carregar modulos internos como Services, Use Cases, Repositories, AppState ou Workflow.
+
+O painel interno continua usando as rotas protegidas `paginas/produtos.html` e `paginas/servicos.html`. Links internos do RK-Conecte devem permanecer apontando para essas rotas para preservar os modulos comerciais existentes.
+
+O botao Login do header deve usar classes explicitas, como `.login` ou `.nav-login-button`, evitando seletores genericos por `href` que possam alterar links publicos indevidamente. O Service Worker deve ter o cache incrementado a cada hotfix visual ou de roteamento publicado.
+
 ## Fluxo geral
 
 ```text
@@ -245,6 +253,18 @@ novas regras de negocio, nao acessa Firestore diretamente e nao modifica Core,
 Workflow, EventBus, ProjetoService, ComercialService, DocumentService ou
 ExportService.
 
+Na Sprint 5.1A, a experiencia visual do fluxo comercial-operacional e
+integrada de ponta a ponta. A navegacao principal passa a conectar Dashboard
+Comercial, Clientes, Projetos, Servicos, Produtos, Orcamento Inteligente,
+Documento, Aprovacao, Conversao e Producao. O login direciona para o Dashboard
+Comercial, a tela de Projetos permite selecionar um Projeto para o Orcamento
+Inteligente, o Orcamento gera Documento Comercial pelo Document Pipeline, o
+Compartilhamento aciona ExportService/PdfAdapter, a Aprovacao grava o status
+comercial no AppState, a Conversao grava o Projeto Executivo e a Producao cria
+Ordem de Producao demo a partir do Projeto convertido. Dados demo ficam
+isolados em `js/shared/rk-e2e-demo-state.js`, usando `sessionStorage` e origem
+`DEMO_E2E`, sem Firestore e sem regras definitivas.
+
 ### Operacional
 
 Producao, materiais, instalacao, agenda, fotos, arquivos e conclusao.
@@ -259,6 +279,41 @@ disponivel, grava `ordemAtual` no AppState e registra historico operacional no
 Workflow sem alterar as regras globais de Projeto. Esta sprint nao cria tela,
 nao acessa Firestore e nao altera Comercial, ProjetoService, Documentos,
 Export, Dashboard Comercial, Workflow, EventBus ou Repository global.
+
+Na Sprint 5.2, a Ordem de Producao passa a suportar Planejamento da Producao
+antes da execucao. O dominio centraliza status em `PRODUCAO_STATUS`
+(`PENDENTE`, `PLANEJADA`, `LIBERADA`, `EM_PRODUCAO`, `FINALIZADA`) e
+prioridades em `PRODUCAO_PRIORIDADE` (`BAIXA`, `NORMAL`, `ALTA`, `URGENTE`).
+A entidade passa a carregar `clienteId`, `numero`, `previsaoInicio`,
+`previsaoEntrega`, `tempoEstimado`, `descricao`, `observacoes`, checklist
+operacional padrao e historico de planejamento. A tela `paginas/producao.html`
+lista ordens, exibe indicadores, permite selecionar uma ordem, planejar,
+alterar responsavel/prioridade, marcar checklist, liberar producao e consultar
+historico. O fluxo segue Interface -> Controller -> Use Case -> Service ->
+Repository -> Adapter, preservando AppState, Workflow e EventBus, sem iniciar
+estoque, compras, agenda, instalacao, financeiro, SQL, login real ou Firestore
+definitivo.
+
+Na Sprint 5.2.1, o Orcamento Inteligente e refinado antes de avancar para
+Materiais/Insumos. O fluxo interno passa a permitir cadastro rapido de novo
+Cliente via Use Case/ClienteService, itens independentes com medidas em
+centimetros convertidas para area em m2, subtotal por item, desconto e
+acrescimo em tempo real e condicoes comerciais guiadas. O calculo fica
+centralizado em `CalculoService`/`CalculoEngine`, o orquestrador prepara os
+totais e o Documento Comercial/PDF consomem somente o documento/totais ja
+preparados, sem duplicar regras na renderizacao e sem alterar o pedido publico
+de orcamento.
+
+Na Sprint 5.2.2, o Orcamento Inteligente passa a atuar como configurador
+comercial de vidracaria antes de qualquer avanco para Materiais, Estoque,
+Agenda, Financeiro ou Instalacao. A etapa de servico aceita multiplos tipos no
+mesmo orcamento e `js/orcamentos/orcamento-item-config.js` centraliza tipos,
+subtipos, tamanhos padrao e dependencias demonstrativas. Cada item mantem
+grupo de servico, tipo, subtipo, medidas em centimetros, area m2, tamanho
+padrao ou engenharia/personalizado, percentual de engenharia e subtotal final.
+O calculo continua em `CalculoService`/`CalculoEngine`; o orquestrador prepara
+um unico contexto final para resumo, Documento Comercial, preview e PDF,
+evitando regra duplicada em HTML, preview ou adapter.
 
 ### Financeiro
 
@@ -402,6 +457,19 @@ ProjetoService, Workflow, EventBus, Repository Pattern e AppState. O
 Planejamento deve consumir essa camada criando ordens por `projetoId`, definindo
 responsavel/prioridade e conduzindo a ordem ate o inicio da producao sem acessar
 Repository ou Firestore diretamente.
+
+Sprint 5.1A conecta visualmente essa fundacao operacional ao fluxo online. A
+pagina `paginas/producao.html` consome o dominio Producao existente e permite
+criar uma Ordem de Producao de demonstracao a partir do Projeto convertido,
+mantendo a execucao real, materiais e agenda para sprints futuras.
+
+Sprint 5.2 adiciona o Planejamento da Producao sobre a Ordem de Producao. A
+ordem agora possui responsavel, prioridade, previsoes, tempo estimado,
+descricao, observacoes, checklist operacional, historico e status `LIBERADA`.
+A tela de Producao apresenta indicadores simples, lista de ordens, painel de
+detalhes, formulario de planejamento, checklist marcavel e historico, sempre
+consumindo use cases/services e mantendo MemoryAdapter/sessionStorage demo como
+persistencia temporaria da sprint.
 
 ### v0.5.0 - Financeiro
 

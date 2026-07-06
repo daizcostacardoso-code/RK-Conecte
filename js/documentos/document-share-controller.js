@@ -59,7 +59,7 @@ const DocumentShareController = {
         return this.registrarMensagem("Documento Comercial renderizado para visualizacao.", "sucesso");
     },
 
-    exportarPdf() {
+    async exportarPdf() {
         const validacao = this.validarDocumentoAtual();
 
         if (!validacao.valido) {
@@ -78,8 +78,38 @@ const DocumentShareController = {
         }
 
         this.estado.previewHtml = resultado.html || this.estado.previewHtml;
-        this.registrarAcao("PDF preparado pelo adapter simulado.");
-        return this.registrarMensagem("PDF preparado para geracao futura. Nenhum arquivo foi baixado.", "sucesso");
+        this.registrarAcao("PDF solicitado pelo adapter.");
+
+        if (resultado.arquivo && typeof resultado.arquivo.gerar === "function") {
+            this.registrarMensagem("PDF em geracao. O download sera iniciado se o navegador permitir.", "sucesso");
+            const pdf = await resultado.arquivo.gerar();
+
+            if (pdf?.sucesso && pdf.bytes) {
+                this.baixarArquivo(pdf.bytes, pdf.nomeArquivo || resultado.arquivo.nomeArquivo, pdf.mimeType || resultado.arquivo.mimeType);
+                return this.registrarMensagem("PDF gerado e download iniciado.", "sucesso");
+            }
+
+            return this.registrarMensagem(this.formatarErros(pdf?.erros || ["Nao foi possivel gerar o PDF para download."]), "erro");
+        }
+
+        return this.registrarMensagem("PDF preparado, mas download indisponivel neste ambiente.", "sucesso");
+    },
+
+    baixarArquivo(bytes, nomeArquivo = "documento-comercial.pdf", mimeType = "application/pdf") {
+        if (typeof Blob === "undefined" || typeof URL === "undefined" || typeof document === "undefined") {
+            return false;
+        }
+
+        const blob = new Blob([bytes], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = nomeArquivo || "documento-comercial.pdf";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return true;
     },
 
     imprimir() {

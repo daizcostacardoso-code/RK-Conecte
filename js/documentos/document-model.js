@@ -18,11 +18,13 @@ const DocumentModel = {
             cliente: this.normalizarCliente(dados.cliente),
             projeto: this.normalizarProjeto(dados.projeto),
             servico: this.normalizarServico(dados.servico),
+            servicos: this.normalizarServicos(dados.servicos || dados.servicosSelecionados || []),
             produtos,
             totais,
             resumoFinanceiro: this.normalizarResumoFinanceiro(dados.resumoFinanceiro, totais, produtos),
             observacoes: this.normalizarObservacoes(dados.observacoes),
             condicoesComerciais,
+            ajustesFinanceiros: dados.ajustesFinanceiros || {},
             validade: this.normalizarValidade(dados.validade, condicoesComerciais),
             metadados: this.normalizarMetadados(dados.metadados)
         };
@@ -42,14 +44,14 @@ const DocumentModel = {
     normalizarLogo(logo = {}) {
         if (logo && typeof logo === "object") {
             return {
-                tipo: this.texto(logo.tipo || "placeholder"),
-                texto: this.texto(logo.texto || logo.descricao || "Logo")
+                tipo: this.texto(logo.tipo || "marca"),
+                texto: this.texto(logo.texto || logo.descricao || "RK")
             };
         }
 
         return {
-            tipo: "placeholder",
-            texto: "Logo"
+            tipo: "marca",
+            texto: "RK"
         };
     },
 
@@ -87,6 +89,11 @@ const DocumentModel = {
         };
     },
 
+    normalizarServicos(servicos = []) {
+        const lista = Array.isArray(servicos) ? servicos : [];
+        return lista.map(servico => this.normalizarServico(servico));
+    },
+
     normalizarProdutos(produtos = []) {
         return Array.isArray(produtos)
             ? produtos.map((produto, indice) => this.normalizarProduto(produto, indice))
@@ -95,32 +102,57 @@ const DocumentModel = {
 
     normalizarProduto(produto = {}, indice = 0) {
         const valorUnitario = produto.valorUnitario ?? produto.precoVenda ?? produto.valorVenda;
-        const valorTotal = produto.valorTotal ?? produto.total ?? produto.totalGeral ?? valorUnitario;
+        const valorTotal = produto.subtotal ?? produto.valorTotal ?? produto.total ?? produto.totalGeral ?? valorUnitario;
+        const larguraCm = this.numero(produto.larguraCm ?? produto.largura, 0);
+        const alturaCm = this.numero(produto.alturaCm ?? produto.altura, 0);
+        const areaM2 = this.numero(produto.areaM2, larguraCm > 0 && alturaCm > 0 ? (larguraCm * alturaCm) / 10000 : 0);
 
         return {
             item: indice + 1,
             id: this.texto(produto.id),
-            nome: this.texto(produto.nome || produto.descricao || "Produto"),
+            produtoId: this.texto(produto.produtoId || produto.id),
+            nome: this.texto(produto.nome || produto.descricao || "Item"),
             descricao: this.texto(produto.descricao),
             categoria: this.texto(produto.categoria),
             subcategoria: this.texto(produto.subcategoria),
+            grupoServico: this.texto(produto.grupoServico || produto.categoria),
+            grupoServicoNome: this.texto(produto.grupoServicoNome),
+            tipoItem: this.texto(produto.tipoItem || produto.subcategoria),
+            tipoItemNome: this.texto(produto.tipoItemNome || produto.nome),
+            subtipoItem: this.texto(produto.subtipoItem),
+            dependencias: this.lista(produto.dependencias, []),
+            tipoDimensao: this.texto(produto.tipoDimensao),
+            tamanhoPadraoSelecionado: this.texto(produto.tamanhoPadraoSelecionado),
+            tamanhoPadraoNome: this.texto(produto.tamanhoPadraoNome),
             unidade: this.texto(produto.unidade || produto.unidadeVenda),
             quantidade: this.numero(produto.quantidade, 1),
+            larguraCm,
+            alturaCm,
+            areaM2: this.arredondar(areaM2, 4),
             valorUnitario: this.numero(valorUnitario, 0),
+            percentualEngenharia: this.numero(produto.percentualEngenharia, 0),
+            valorAdicionalEngenharia: this.numero(produto.valorAdicionalEngenharia || produto.adicionalEngenharia, 0),
+            subtotalBase: this.numero(produto.subtotalBase, 0),
+            subtotalFinal: this.numero(produto.subtotalFinal || valorTotal, 0),
             valorTotal: this.numero(valorTotal, 0),
-            observacoes: this.texto(produto.observacoes)
+            subtotal: this.numero(valorTotal, 0),
+            observacoes: this.texto(produto.observacoes || produto.observacao)
         };
     },
 
     normalizarTotais(totais = {}) {
-        const totalOrigem = totais.totalGeral ?? totais.valorTotal ?? totais.totalFinal;
+        const subtotal = this.numero(totais.subtotal, 0);
+        const desconto = this.numero(totais.desconto, 0);
+        const acrescimo = this.numero(totais.acrescimo, 0);
+        const totalOrigem = totais.totalGeral ?? totais.valorTotal ?? totais.totalFinal ?? Math.max(0, subtotal - desconto + acrescimo);
 
         return {
-            subtotal: this.numero(totais.subtotal, 0),
-            desconto: this.numero(totais.desconto, 0),
-            acrescimo: this.numero(totais.acrescimo, 0),
+            subtotal,
+            desconto,
+            acrescimo,
             totalGeral: this.numero(totalOrigem, null),
             totalInformado: this.valorInformado(totalOrigem),
+            areaTotalM2: this.numero(totais.areaTotalM2, 0),
             moeda: this.texto(totais.moeda || "BRL")
         };
     },
@@ -132,6 +164,7 @@ const DocumentModel = {
             desconto: this.numero(resumoFinanceiro.desconto, totais.desconto || 0),
             acrescimo: this.numero(resumoFinanceiro.acrescimo, totais.acrescimo || 0),
             totalGeral: this.numero(resumoFinanceiro.totalGeral, totais.totalGeral),
+            areaTotalM2: this.numero(resumoFinanceiro.areaTotalM2, totais.areaTotalM2 || 0),
             tipoCalculo: this.texto(resumoFinanceiro.tipoCalculo),
             status: this.texto(resumoFinanceiro.status),
             moeda: this.texto(resumoFinanceiro.moeda || totais.moeda || "BRL")
@@ -149,7 +182,9 @@ const DocumentModel = {
     normalizarCondicoes(condicoes = {}) {
         return {
             formaPagamento: this.texto(condicoes.formaPagamento),
+            formaPagamentoComplemento: this.texto(condicoes.formaPagamentoComplemento),
             prazoEntrega: this.texto(condicoes.prazoEntrega),
+            prazoEntregaComplemento: this.texto(condicoes.prazoEntregaComplemento),
             validadeProposta: this.texto(condicoes.validadeProposta)
         };
     },
@@ -217,6 +252,11 @@ const DocumentModel = {
 
         const numero = Number(String(valor).replace(",", "."));
         return Number.isFinite(numero) ? numero : padrao;
+    },
+
+    arredondar(valor, casas = 2) {
+        const fator = 10 ** casas;
+        return Math.round((this.numero(valor, 0) + Number.EPSILON) * fator) / fator;
     },
 
     valorInformado(valor) {

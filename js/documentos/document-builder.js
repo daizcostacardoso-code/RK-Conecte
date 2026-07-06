@@ -57,12 +57,15 @@ const DocumentBuilder = {
             titulo: "Produtos",
             colunas: [
                 "item",
-                "nome",
-                "categoria",
+                "tipo",
+                "subtipo",
+                "descricao",
+                "medidasCm",
+                "areaM2",
                 "quantidade",
-                "unidade",
                 "valorUnitario",
-                "valorTotal"
+                "adicionalEngenharia",
+                "subtotal"
             ],
             linhas: Array.isArray(documento.produtos) ? documento.produtos : []
         };

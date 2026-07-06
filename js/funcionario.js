@@ -29,7 +29,7 @@ const Funcionario = {
     },
 
     async iniciar() {
-        this.verificarSessao();
+        if (!this.verificarSessao()) return;
         this.carregarPerfilUsuario();
         this.prepararAbas();
         this.carregarConfiguracoesNaTela();
@@ -85,45 +85,35 @@ const Funcionario = {
 
 
     async carregarCaixa() {
-        let locais = Storage.carregar(this.chaveCaixa, []);
-        if (!Array.isArray(locais)) locais = [];
-        locais = this.normalizarListaCaixa(locais);
-
-        try {
-            if (typeof db !== "undefined" && db) {
-                const snap = await db.collection("caixa_empresa")
-                    .limit(200)
-                    .get();
-
-                const nuvem = [];
-                snap.forEach(doc => nuvem.push({ idFirestore: doc.id, ...doc.data() }));
-
-                const mapa = new Map();
-                [...locais, ...nuvem].forEach((mov, indice) => {
-                    const chave = mov.idFirestore || mov.idLocal || mov.criadoEmISO || `caixa_${indice}`;
-                    mapa.set(chave, mov);
-                });
-
-                this.caixa = this.ordenarMovimentosCaixa(this.normalizarListaCaixa(Array.from(mapa.values())));
-
-                Storage.salvar(this.chaveCaixa, this.caixa);
-                return;
-            }
-        } catch (erro) {
-            console.error("Erro ao carregar caixa da nuvem:", erro);
+        if (window.CaixaService) {
+            CaixaService.configurar({
+                chaveLocal: this.chaveCaixa,
+                colecaoFirestore: "caixa_empresa"
+            });
+            this.caixa = await CaixaService.listar();
+            return;
         }
 
-        this.caixa = this.ordenarMovimentosCaixa(locais);
+        const locais = Storage.carregar(this.chaveCaixa, []);
+        this.caixa = this.ordenarMovimentosCaixa(this.normalizarListaCaixa(locais));
         Storage.salvar(this.chaveCaixa, this.caixa);
     },
 
     normalizarListaCaixa(lista) {
+        if (window.CaixaService) {
+            return CaixaService.normalizarLista(lista);
+        }
+
         return (Array.isArray(lista) ? lista : [])
             .map((mov, indice) => this.normalizarMovimentoCaixa(mov, indice))
             .filter(Boolean);
     },
 
     normalizarMovimentoCaixa(mov = {}, indice = 0) {
+        if (window.CaixaService) {
+            return CaixaService.normalizarMovimento(mov, indice);
+        }
+
         const agoraISO = new Date().toISOString();
         const criadoEmISO = mov.criadoEmISO || agoraISO;
         const data = this.normalizarDataCaixa(mov.data, criadoEmISO);
@@ -154,6 +144,10 @@ const Funcionario = {
     },
 
     normalizarDataCaixa(data, fallbackISO = "") {
+        if (window.CaixaModel) {
+            return CaixaModel.normalizarData(data, fallbackISO);
+        }
+
         const texto = String(data || "").slice(0, 10);
         if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) return texto;
 
@@ -164,6 +158,10 @@ const Funcionario = {
     },
 
     obterReferenciasDataCaixa(data) {
+        if (window.CaixaModel) {
+            return CaixaModel.obterReferencia(data);
+        }
+
         const normalizada = this.normalizarDataCaixa(data);
         const [ano, mes, dia] = normalizada.split("-");
         return {
@@ -174,6 +172,10 @@ const Funcionario = {
     },
 
     normalizarStatusCaixa(status) {
+        if (window.CaixaModel) {
+            return CaixaModel.normalizarStatus(status);
+        }
+
         const valor = String(status || "confirmado").toLowerCase();
         if (valor.includes("pend")) return "pendente";
         if (valor.includes("cancel")) return "cancelado";
@@ -181,6 +183,10 @@ const Funcionario = {
     },
 
     ordenarMovimentosCaixa(lista) {
+        if (window.CaixaService) {
+            return CaixaService.ordenar(lista);
+        }
+
         return (Array.isArray(lista) ? lista : []).sort((a, b) => {
             const dataA = `${a.data || ""} ${a.criadoEmISO || ""}`;
             const dataB = `${b.data || ""} ${b.criadoEmISO || ""}`;
@@ -476,13 +482,11 @@ const Funcionario = {
         if (!valor || valor <= 0) return this.mensagemCaixa("Informe um valor maior que zero.", true);
 
         const tipo = categoria === "entrada" ? "entrada" : "saida";
-        const agoraISO = new Date().toISOString();
-        const referencia = this.obterReferenciasDataCaixa(data);
 
         // Base pronta para integrações futuras: entradas de orçamentos aprovados,
         // serviços/produtos, despesas de compras, pagamentos de funcionários e
         // relatórios mensais usando mesReferencia.
-        const movimento = this.normalizarMovimentoCaixa({
+        const movimento = {
             idLocal: `caixa_${Date.now()}`,
             idFirestore: "",
             descricao,
@@ -494,29 +498,24 @@ const Funcionario = {
             origem,
             observacao,
             responsavel,
-            status,
-            mesReferencia: referencia.mesReferencia,
-            anoReferencia: referencia.anoReferencia,
-            diaReferencia: referencia.diaReferencia,
-            criadoEm: Util.agora(),
-            criadoEmISO: agoraISO,
-            atualizadoEmISO: agoraISO
-        });
+            status
+        };
 
-        this.caixa.unshift(movimento);
-        Storage.salvar(this.chaveCaixa, this.caixa);
-
-        try {
-            if (typeof db !== "undefined" && db) {
-                // A coleção caixa_empresa permanece a mesma. As regras atuais estão abertas
-                // e futuramente devem exigir autenticação para leitura e gravação.
-                const ref = await db.collection("caixa_empresa").add(movimento);
-                movimento.idFirestore = ref.id;
-                await ref.set({ idFirestore: ref.id }, { merge: true });
-                Storage.salvar(this.chaveCaixa, this.caixa);
+        if (window.CaixaService) {
+            CaixaService.configurar({
+                chaveLocal: this.chaveCaixa,
+                colecaoFirestore: "caixa_empresa"
+            });
+            const resultado = await CaixaService.salvar(movimento);
+            if (!resultado.sucesso) {
+                return this.mensagemCaixa(resultado.erros.join(" "), true);
             }
-        } catch (erro) {
-            console.error("Erro ao salvar movimento do caixa na nuvem:", erro);
+
+            this.caixa = resultado.lista || await CaixaService.listar();
+        } else {
+            const normalizado = this.normalizarMovimentoCaixa(movimento);
+            this.caixa.unshift(normalizado);
+            Storage.salvar(this.chaveCaixa, this.caixa);
         }
 
         const form = Util.$("formCaixa");
@@ -769,10 +768,15 @@ const Funcionario = {
         if (!mov || mov.status === "cancelado") return;
         if (!confirm("Cancelar este lançamento? Ele continuará no histórico, mas não entrará no saldo confirmado.")) return;
 
-        mov.status = "cancelado";
-        mov.atualizadoEmISO = new Date().toISOString();
-        Storage.salvar(this.chaveCaixa, this.caixa);
-        await this.sincronizarMovimentoCaixaNaNuvem(mov, { status: mov.status, atualizadoEmISO: mov.atualizadoEmISO });
+        if (window.CaixaService) {
+            const resultado = await CaixaService.cancelar(chave);
+            this.caixa = resultado.lista || await CaixaService.listar();
+        } else {
+            mov.status = "cancelado";
+            mov.atualizadoEmISO = new Date().toISOString();
+            Storage.salvar(this.chaveCaixa, this.caixa);
+            await this.sincronizarMovimentoCaixaNaNuvem(mov, { status: mov.status, atualizadoEmISO: mov.atualizadoEmISO });
+        }
 
         this.atualizarCaixa();
         this.atualizarIndicadores();
@@ -784,23 +788,30 @@ const Funcionario = {
         if (!ativos.length) return this.mensagemCaixa("Não há lançamentos ativos para cancelar.", true);
         if (!confirm("Cancelar todos os lançamentos do caixa? Eles continuarão no histórico como cancelados.")) return;
 
-        const atualizadoEmISO = new Date().toISOString();
-        this.caixa = this.caixa.map(mov => ({ ...mov, status: "cancelado", atualizadoEmISO }));
-        Storage.salvar(this.chaveCaixa, this.caixa);
-
-        try {
-            if (typeof db !== "undefined" && db) {
-                const batch = db.batch();
-                let temOperacao = false;
-                ativos.forEach(mov => {
-                    if (!mov.idFirestore) return;
-                    batch.set(db.collection("caixa_empresa").doc(mov.idFirestore), { status: "cancelado", atualizadoEmISO }, { merge: true });
-                    temOperacao = true;
-                });
-                if (temOperacao) await batch.commit();
+        if (window.CaixaService) {
+            for (const mov of ativos) {
+                await CaixaService.cancelar(this.chaveMovimentoCaixa(mov, this.caixa.indexOf(mov)));
             }
-        } catch (erro) {
-            console.error("Erro ao cancelar lançamentos na nuvem:", erro);
+            this.caixa = await CaixaService.listar();
+        } else {
+            const atualizadoEmISO = new Date().toISOString();
+            this.caixa = this.caixa.map(mov => ({ ...mov, status: "cancelado", atualizadoEmISO }));
+            Storage.salvar(this.chaveCaixa, this.caixa);
+
+            try {
+                if (typeof db !== "undefined" && db) {
+                    const batch = db.batch();
+                    let temOperacao = false;
+                    ativos.forEach(mov => {
+                        if (!mov.idFirestore) return;
+                        batch.set(db.collection("caixa_empresa").doc(mov.idFirestore), { status: "cancelado", atualizadoEmISO }, { merge: true });
+                        temOperacao = true;
+                    });
+                    if (temOperacao) await batch.commit();
+                }
+            } catch (erro) {
+                console.error("Erro ao cancelar lançamentos na nuvem:", erro);
+            }
         }
 
         this.atualizarCaixa();
@@ -817,15 +828,20 @@ const Funcionario = {
         const confirmacao = prompt("Exclusão definitiva remove o lançamento do histórico e da nuvem. Digite EXCLUIR para confirmar.");
         if (confirmacao !== "EXCLUIR") return;
 
-        this.caixa.splice(indice, 1);
-        Storage.salvar(this.chaveCaixa, this.caixa);
+        if (window.CaixaService) {
+            const resultado = await CaixaService.excluir(chave);
+            this.caixa = resultado.lista || await CaixaService.listar();
+        } else {
+            this.caixa.splice(indice, 1);
+            Storage.salvar(this.chaveCaixa, this.caixa);
 
-        try {
-            if (typeof db !== "undefined" && db && mov.idFirestore) {
-                await db.collection("caixa_empresa").doc(mov.idFirestore).delete();
+            try {
+                if (typeof db !== "undefined" && db && mov.idFirestore) {
+                    await db.collection("caixa_empresa").doc(mov.idFirestore).delete();
+                }
+            } catch (erro) {
+                console.error("Erro ao excluir movimento da nuvem:", erro);
             }
-        } catch (erro) {
-            console.error("Erro ao excluir movimento da nuvem:", erro);
         }
 
         this.atualizarCaixa();
@@ -840,6 +856,11 @@ const Funcionario = {
     },
 
     async sincronizarMovimentoCaixaNaNuvem(mov, dados) {
+        if (window.CaixaService) {
+            await CaixaService.atualizar(this.chaveMovimentoCaixa(mov), dados);
+            return;
+        }
+
         try {
             if (typeof db !== "undefined" && db && mov.idFirestore) {
                 await db.collection("caixa_empresa").doc(mov.idFirestore).set(dados, { merge: true });
@@ -901,12 +922,17 @@ const Funcionario = {
         this.mensagemCaixa("CSV exportado com os lançamentos filtrados.", false);
     },
 
-    exportarCaixaJSON() {
+    async exportarCaixaJSON() {
         const lista = this.obterLancamentosCaixaFiltrados();
         if (!lista.length) return this.mensagemCaixa("Não há lançamentos para exportar.", true);
 
-        const conteudo = JSON.stringify(this.normalizarListaCaixa(lista), null, 2);
-        this.baixarArquivoCaixa(`caixa_empresa_${new Date().toISOString().slice(0, 10)}.json`, conteudo, "application/json;charset=utf-8");
+        if (window.CaixaService) {
+            CaixaExport.baixar(lista);
+        } else {
+            const conteudo = JSON.stringify(this.normalizarListaCaixa(lista), null, 2);
+            this.baixarArquivoCaixa(`caixa_empresa_${new Date().toISOString().slice(0, 10)}.json`, conteudo, "application/json;charset=utf-8");
+        }
+
         this.mensagemCaixa("JSON exportado com os lançamentos filtrados.", false);
     },
 
@@ -928,6 +954,10 @@ const Funcionario = {
     },
 
     chaveMovimentoCaixa(mov, indice = 0) {
+        if (window.CaixaService) {
+            return CaixaService.chave(mov, indice);
+        }
+
         return String(mov?.idFirestore || mov?.idLocal || mov?.criadoEmISO || `caixa_${indice}`);
     },
 
@@ -991,18 +1021,28 @@ const Funcionario = {
 
 
     verificarSessao() {
-        const sessao = Storage.carregar(this.chaveSessao, null);
+        const sessao = window.RKAuth ? RKAuth.obterSessao() : Storage.carregar(this.chaveSessao, null);
         if (!sessao || !sessao.logado) {
-            // Mantém compatibilidade para testes locais: se a página for aberta direto pelo arquivo,
-            // não bloqueia completamente, mas recomenda login quando publicada.
-            if (location.protocol !== "file:") {
-                window.location.href = "login.html";
+            if (window.RKAuth) {
+                RKAuth.redirecionarLogin();
+            } else {
+                window.location.replace("login.html");
             }
+            return null;
         }
+
+        return sessao;
     },
 
     sair() {
+        if (window.RKAuth) {
+            RKAuth.sair();
+            return;
+        }
+
         Storage.remover(this.chaveSessao);
+        localStorage.removeItem("usuarioLogado");
+        sessionStorage.removeItem("usuarioLogado");
         window.location.href = "login.html";
     },
 

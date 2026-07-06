@@ -250,6 +250,8 @@ const ComercialService = {
             appStateService.setState("documentoAtual", registro.documento);
         }
 
+        appStateService.setState("statusComercial", registro.statusComercial);
+
         return appStateService.setState("configuracoes", {
             ...configuracoes,
             comercial

@@ -74,7 +74,27 @@ const ComercialController = {
             exportacao: resultado.exportacao
         };
 
+        this.salvarFluxoDemo(resultado);
         return this.registrarMensagem(resultado.ultimaAcaoComercial, "sucesso");
+    },
+
+    salvarFluxoDemo(resultado = {}) {
+        if (typeof RKE2EDemoState === "undefined" || typeof RKE2EDemoState.salvarFluxo !== "function") {
+            return false;
+        }
+
+        return RKE2EDemoState.salvarFluxo({
+            documentoAtual: resultado.documento,
+            statusComercial: resultado.statusComercial,
+            configuracoes: {
+                comercial: {
+                    ...(resultado.comercial || {}),
+                    statusComercial: resultado.statusComercial,
+                    dataAprovacao: resultado.dataAprovacao,
+                    ultimaAcaoComercial: resultado.ultimaAcaoComercial
+                }
+            }
+        });
     },
 
     obterDocumentoAtual() {

@@ -1,5 +1,61 @@
 # Changelog
 
+## v0.4.0 - Sprint 5.2.2 Orcamento Inteligente + Preview/PDF
+- Orcamento Inteligente passa a selecionar multiplos tipos de servico no mesmo contexto: Porta, Janela, Box, Espelho, Vidro fixo, Fachada, Guarda-corpo e Outros.
+- Criado `js/orcamentos/orcamento-item-config.js` para centralizar tipos, subtipos, tamanhos padrao e dependencias demonstrativas dos itens de vidracaria.
+- Itens do projeto passam a carregar grupo de servico, tipo, subtipo, dependencias, tamanho padrao ou engenharia/personalizado, medidas em cm, area m2, percentual e valor de adicional de engenharia.
+- `CalculoService`/`CalculoEngine` passam a aplicar adicional de engenharia por item somente em engenharia/personalizado, preservando tamanho padrao com adicional zerado.
+- Resumo, Documento Comercial e PDF passam a consumir os itens/totais finais do contexto preparado, incluindo desconto/acrescimo em tempo real e ocultando ajustes/observacoes vazios no preview/PDF.
+- Preview e PDF receberam tabela comercial com tipo, subtipo, medidas, area, quantidade, valor unitario, adicional de engenharia e subtotal, com largura minima segura para evitar quebra letra por letra.
+
+## v0.4.0 - Sprint 5.2.1 Orcamento Inteligente Comercial
+- Orcamento Inteligente passa a permitir cadastro rapido de novo cliente via Use Case/ClienteService, sem acesso direto a Firestore pela interface.
+- Itens do orcamento agora sao independentes, com produto relacionado, descricao, largura/altura em centimetros, quantidade, unidade, valor unitario, area em m2 e subtotal por item.
+- Calculo de itens foi centralizado em `CalculoService`/`CalculoEngine`, convertendo cm para m2 e aplicando desconto/acrescimo em tempo real.
+- Resumo comercial ganhou campos guiados para desconto, acrescimo, forma de pagamento, prazo de entrega e validade da proposta.
+- Documento Comercial e PDF passam a consumir os itens/totais preparados pelo Orcamento Inteligente, escondendo observacoes vazias e evitando placeholders no preview final.
+- Preview do Documento Comercial recebeu layout de proposta com cabecalho, cliente/projeto, tabela de itens, resumo financeiro, condicoes comerciais, assinaturas e rodape profissional.
+
+## v0.4.0 - Sprint 5.2 Planejamento da Producao
+- Ordem de Producao expandida para planejamento operacional com `clienteId`, `numero`, `previsaoInicio`, `previsaoEntrega`, `tempoEstimado`, `descricao`, `observacoes`, `checklist`, `historico`, `criadoEm` e `atualizadoEm`.
+- Status de Producao centralizados em `PRODUCAO_STATUS`: `PENDENTE`, `PLANEJADA`, `LIBERADA`, `EM_PRODUCAO` e `FINALIZADA`.
+- Prioridades centralizadas em `PRODUCAO_PRIORIDADE`: `BAIXA`, `NORMAL`, `ALTA` e `URGENTE`; valor legado `MEDIA` passa a ser normalizado para `NORMAL`.
+- Checklist operacional padrao criado para toda Ordem: Projeto conferido, Medidas conferidas, Material definido, Ferragens definidas e Producao autorizada.
+- `ProducaoService` passa a planejar ordem, alterar responsavel, alterar prioridade, atualizar checklist, liberar producao e calcular indicadores sem acesso direto a Firestore.
+- Adicionados use cases de listagem, indicadores, planejamento, responsavel, prioridade, checklist e liberacao em `js/usecases/producao/`.
+- `paginas/producao.html` evoluida para listar cards de ordens, selecionar ordem, editar planejamento, marcar checklist, liberar producao, ver historico e exibir indicadores.
+- Eventos novos disparados quando disponivel: `ordem.planejada`, `ordem.liberada`, `ordem.responsavel`, `ordem.prioridade` e `ordem.checklist_atualizado`.
+- Mantido MemoryAdapter/sessionStorage/demo state como persistencia temporaria; sem estoque, compras, agenda, instalacao, financeiro, SQL, login real ou Firestore definitivo.
+
+## v0.4.0 - Sprint Caixa Seguro
+- Criado modulo `js/caixa/` com model, validator, repository, service, export e README.
+- Caixa passa a normalizar lancamentos em `schemaVersion: 1`, preenchendo campos novos sem descartar registros legados.
+- Repository do caixa preserva compatibilidade com localStorage `vidracaria_caixa_empresa` e Firestore `caixa_empresa`.
+- Listagem do caixa passa a mesclar localStorage e Firestore por `idFirestore`, `idLocal`, `criadoEmISO` e fallback gerado, evitando duplicidade.
+- `Funcionario.carregarCaixa`, `registrarMovimentoCaixa`, `cancelarMovimentoCaixa` e exclusao definitiva passam a chamar `CaixaService` internamente, mantendo a tela atual.
+- Exportacao JSON do caixa passa a gerar backup no formato `rk-caixa-backup-AAAA-MM-DD.json`.
+- Criado `docs/MIGRACAO_CAIXA_SQL.md` com tabela SQL futura e mapeamento Firestore/localStorage -> SQL.
+- Atualizado cache do Service Worker para `rk-vidracaria-v4.0.2`.
+
+## v0.4.0 - Hotfix 5.1B
+- Separado o site publico do painel interno para Produtos e Servicos.
+- Criadas as paginas publicas `paginas/produtos-publico.html` e `paginas/servicos-publico.html` com conteudo institucional simples.
+- Menus publicos de `index.html`, `paginas/contato.html` e `paginas/orcamento.html` passam a apontar para as paginas publicas.
+- Mantidas `paginas/produtos.html` e `paginas/servicos.html` como rotas internas protegidas do painel.
+- Ajustado o visual do botao Login no header removendo seletor generico `a[href*="login"]` e usando classes especificas.
+- Atualizado o cache do Service Worker para `rk-vidracaria-v4.0.1` para evitar cache antigo no site publicado.
+
+## v0.4.0 - Integracao Visual E2E
+- Sprint 5.1A: Integrado fluxo visual end-to-end do RK-Conecte no site online.
+- Adicionada navegacao principal compartilhada em `js/shared/rk-navigation.js` para Dashboard Comercial, Clientes, Projetos, Servicos, Produtos, Orcamento Inteligente, Documento, Aprovacao, Conversao e Producao.
+- Adicionado estado demo local em `js/shared/rk-e2e-demo-state.js`, usando `sessionStorage` e AppState para testar o fluxo sem banco externo.
+- Login e loading passam a direcionar para `paginas/dashboard-comercial.html`.
+- Criada pagina `paginas/projetos.html` com `js/projetos/projeto-ui.js` e `js/projetos/projeto-controller.js` para selecao visual de Projeto.
+- Orcamento Inteligente passa a oferecer `Gerar Documento Comercial`, alimentando Document Pipeline e AppState.
+- Compartilhamento passa a tentar download de PDF quando o `PdfAdapter` real entrega bytes; quando nao for possivel, exibe mensagem clara.
+- Criada pagina `paginas/producao.html` com `js/producao/producao-ui.js` e `js/producao/producao-controller.js`, permitindo criar Ordem de Producao demo a partir do Projeto convertido.
+- Criado `docs/INTEGRACAO_VISUAL_E2E.md` com fluxo, paginas, modulos, dados demo, limitacoes e roteiro de teste.
+
 ## v0.4.0 - Operacional
 - Sprint 5.1: Criado o Centro de Producao como dominio operacional inicial.
 - Adicionado modulo `js/producao/` com model, validator, repository, service e README para Ordem de Producao.

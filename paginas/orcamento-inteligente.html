@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.0" data-rk-auth="protected"></script>
     <title>Or&ccedil;amento Inteligente - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=3.9.2">
+    <link rel="stylesheet" href="../css/style.css?v=5.2.2">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -44,7 +45,7 @@
             <div>
                 <span class="orcamento-inteligente-label">Centro Comercial</span>
                 <h1 id="orcamentoInteligenteTitulo">Or&ccedil;amento Inteligente</h1>
-                <p>Crie or&ccedil;amentos guiados por servi&ccedil;o</p>
+                <p>Crie propostas comerciais com m&uacute;ltiplos servi&ccedil;os e itens sob medida.</p>
             </div>
 
             <button type="button" id="btnNovoOrcamentoInteligente" class="botao orcamento-inteligente-btn-principal">
@@ -87,8 +88,8 @@
                 <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoServicoTitulo">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
-                            <span class="orcamento-inteligente-label">Servi&ccedil;o</span>
-                            <h2 id="orcamentoServicoTitulo">Sele&ccedil;&atilde;o de servi&ccedil;o</h2>
+                            <span class="orcamento-inteligente-label">Servi&ccedil;os</span>
+                            <h2 id="orcamentoServicoTitulo">Tipos de servi&ccedil;o</h2>
                         </div>
                     </div>
                     <div id="orcamentoInteligenteServico" class="orcamento-inteligente-placeholder"></div>
@@ -97,8 +98,8 @@
                 <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProdutosTitulo">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
-                            <span class="orcamento-inteligente-label">Produtos</span>
-                            <h2 id="orcamentoProdutosTitulo">Produtos do or&ccedil;amento</h2>
+                            <span class="orcamento-inteligente-label">Itens</span>
+                            <h2 id="orcamentoProdutosTitulo">Itens do projeto</h2>
                         </div>
                     </div>
                     <div id="orcamentoInteligenteProdutos" class="orcamento-inteligente-placeholder"></div>
@@ -138,6 +139,11 @@
 <script src="../js/util.js?v=3.9.1"></script>
 <script src="../js/storage/storage-adapter.js?v=3.9.1"></script>
 <script src="../js/storage/memory-adapter.js?v=3.9.1"></script>
+<script src="../js/core/event-types.js?v=5.1A"></script>
+<script src="../js/core/event-bus.js?v=5.1A"></script>
+<script src="../js/core/app-state-events.js?v=5.1A"></script>
+<script src="../js/core/app-state.js?v=5.1A"></script>
+<script src="../js/core/app-state-service.js?v=5.1A"></script>
 <script src="../js/workflow/workflow-state.js?v=3.9.1"></script>
 <script src="../js/workflow/workflow-validator.js?v=3.9.1"></script>
 <script src="../js/workflow/workflow-events.js?v=3.9.1"></script>
@@ -147,6 +153,7 @@
 <script src="../js/clientes/cliente-validator.js?v=3.9.1"></script>
 <script src="../js/clientes/cliente-repository.js?v=3.9.1"></script>
 <script src="../js/clientes/cliente-service.js?v=3.9.1"></script>
+<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=5.2.1"></script>
 <script src="../js/projetos/projeto-status.js?v=3.9.1"></script>
 <script src="../js/projetos/projeto-historico.js?v=3.9.1"></script>
 <script src="../js/projetos/projeto-model.js?v=3.9.1"></script>
@@ -164,17 +171,24 @@
 <script src="../js/produtos/produto-service.js?v=3.9.1"></script>
 <script src="../js/calculos/calculo-model.js?v=3.9.1"></script>
 <script src="../js/calculos/calculo-validator.js?v=3.9.1"></script>
-<script src="../js/calculos/calculo-engine.js?v=3.9.1"></script>
-<script src="../js/calculos/calculo-service.js?v=3.9.1"></script>
+<script src="../js/calculos/calculo-engine.js?v=5.2.2"></script>
+<script src="../js/calculos/calculo-service.js?v=5.2.2"></script>
 <script src="../js/orcamentos/orcamento-state.js?v=3.9.1"></script>
-<script src="../js/orcamentos/orcamento-context.js?v=3.9.2"></script>
+<script src="../js/orcamentos/orcamento-context.js?v=5.2.2"></script>
 <script src="../js/orcamentos/orcamento-factory.js?v=3.9.1"></script>
-<script src="../js/orcamentos/orcamento-orchestrator.js?v=3.9.2"></script>
+<script src="../js/orcamentos/orcamento-item-config.js?v=5.2.2"></script>
+<script src="../js/orcamentos/orcamento-orchestrator.js?v=5.2.2"></script>
 <script src="../js/usecases/orcamentos/criar-orcamento-usecase.js?v=3.9.1"></script>
 <script src="../js/usecases/orcamentos/calcular-orcamento-usecase.js?v=3.9.1"></script>
 <script src="../js/usecases/orcamentos/validar-orcamento-usecase.js?v=3.9.1"></script>
-<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=3.9.2"></script>
-<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=3.9.2"></script>
+<script src="../js/documentos/document-model.js?v=5.2.2"></script>
+<script src="../js/documentos/document-builder.js?v=5.2.2"></script>
+<script src="../js/documentos/document-validator.js?v=5.1A"></script>
+<script src="../js/documentos/document-service.js?v=5.2.2"></script>
+<script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
+<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=5.2.2"></script>
+<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=5.2.2"></script>
+<script src="../js/shared/rk-navigation.js?v=5.2.0"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>
 </html>

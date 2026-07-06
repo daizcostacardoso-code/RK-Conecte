@@ -58,11 +58,13 @@ const DocumentService = {
             cliente: origem.cliente || contexto.cliente || resumo.cliente || {},
             projeto: origem.projeto || contexto.projeto || resumo.projeto || {},
             servico: origem.servico || contexto.servico || resumo.servico || {},
+            servicos: origem.servicos || origem.servicosSelecionados || contexto.servicosSelecionados || resumo.servicos || [],
             produtos: origem.produtos || contexto.produtos || [],
             totais,
             resumoFinanceiro: this.montarResumoFinanceiro(origem, resumo, totais, contexto, deps),
             observacoes: origem.observacoes || contexto.observacoes || resumo.observacoes || {},
             condicoesComerciais,
+            ajustesFinanceiros: origem.ajustesFinanceiros || contexto.ajustesFinanceiros || resumo.ajustesFinanceiros || {},
             validade: origem.validade || {
                 descricao: condicoesComerciais.validadeProposta || ""
             },
@@ -80,6 +82,7 @@ const DocumentService = {
             desconto: totais.desconto,
             acrescimo: totais.acrescimo,
             totalGeral: totais.totalGeral,
+            areaTotalM2: totais.areaTotalM2,
             tipoCalculo: resumo.tipoCalculo || calculo.tipoCalculo || origem.servico?.tipoCalculo || contexto.servico?.tipoCalculo || "",
             status: resumo.status || origem.status || contexto.status || "",
             moeda: totais.moeda || "BRL",

@@ -23,14 +23,27 @@ const Login = {
         const config = this.obterConfiguracoes();
 
         if (usuario === config.usuario && senha === config.senha) {
-            localStorage.setItem("vidracaria_sessao_funcionario", JSON.stringify({
-                logado: true,
+            const sessao = {
                 usuario: config.usuario,
                 nomeUsuario: config.nomeUsuario,
                 fotoUsuario: config.fotoUsuario,
                 entradaEm: new Date().toISOString()
-            }));
-            window.location.href = "loading.html";
+            };
+
+            if (window.RKAuth) {
+                RKAuth.salvarSessao(sessao);
+            } else {
+                localStorage.setItem("vidracaria_sessao_funcionario", JSON.stringify({
+                    logado: true,
+                    ...sessao
+                }));
+                localStorage.setItem("usuarioLogado", JSON.stringify({
+                    logado: true,
+                    ...sessao
+                }));
+            }
+
+            window.location.href = "dashboard-comercial.html";
             return;
         }
 

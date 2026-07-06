@@ -112,6 +112,7 @@ const ConversaoService = {
         };
 
         appStateService.setState("projetoSelecionado", projeto);
+        appStateService.setState("projetoAtual", projeto);
 
         return appStateService.setState("configuracoes", {
             ...configuracoes,

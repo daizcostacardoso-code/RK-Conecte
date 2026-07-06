@@ -27,6 +27,7 @@ const DashboardComercialUI = {
             `</div>`,
             this.renderizarCards(estado.kpis || {}),
             `</section>`,
+            this.renderizarAtalhos(),
             `<section class="dashboard-comercial-section dashboard-comercial-grid">`,
             this.renderizarValorNegociacao(estado.valorNegociacao || {}),
             this.renderizarAcoes(estado.acoes || []),
@@ -49,6 +50,27 @@ const DashboardComercialUI = {
 
         this.registrarEventos(root);
         return true;
+    },
+
+    renderizarAtalhos() {
+        const atalhos = [
+            { rotulo: "Novo Cliente", href: "clientes.html" },
+            { rotulo: "Novo Orcamento", href: "orcamento-inteligente.html" },
+            { rotulo: "Ver Aprovacoes", href: "aprovacao-comercial.html" },
+            { rotulo: "Producao", href: "producao.html" }
+        ];
+
+        return [
+            `<section class="dashboard-comercial-section" aria-labelledby="atalhosComerciaisTitulo">`,
+            `<div class="dashboard-comercial-section-top">`,
+            `<h2 id="atalhosComerciaisTitulo">Atalhos</h2>`,
+            `<span>Fluxo visual E2E</span>`,
+            `</div>`,
+            `<div class="dashboard-comercial-shortcuts">`,
+            ...atalhos.map(atalho => `<a class="botao" href="${this.escaparAtributo(atalho.href)}">${this.escapar(atalho.rotulo)}</a>`),
+            `</div>`,
+            `</section>`
+        ].join("");
     },
 
     renderizarCards(kpis = {}) {
@@ -240,5 +262,9 @@ const DashboardComercialUI = {
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+    },
+
+    escaparAtributo(valor) {
+        return this.escapar(valor).replace(/`/g, "&#096;");
     }
 };
