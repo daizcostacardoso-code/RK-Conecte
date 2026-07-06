@@ -64,12 +64,35 @@ const ExportModel = {
             return this.texto(nomeArquivo);
         }
 
-        const dados = documento?.dados || {};
-        const projeto = dados.projeto?.numero || dados.projeto?.id || dados.projeto?.nome || "documento";
-        const cliente = dados.cliente?.nome || "cliente";
+        const numero = this.obterNumeroOrcamento(documento);
         const extensao = formato === EXPORT_FORMATS.PRINT ? "html" : "pdf";
 
-        return `proposta-comercial-${this.slug(projeto)}-${this.slug(cliente)}.${extensao}`;
+        return `RK-Vidracaria-${this.nomeArquivoSeguro(numero)}.${extensao}`;
+    },
+
+    obterNumeroOrcamento(documento = {}) {
+        const dados = documento?.dados || documento || {};
+        const metadados = dados.metadados || documento?.metadados || {};
+        const projeto = dados.projeto || {};
+
+        return this.texto(
+            metadados.numeroOrcamento
+            || metadados.orcamentoNumero
+            || dados.numero
+            || dados.orcamentoNumero
+            || projeto.numero
+            || projeto.id
+            || projeto.nome
+            || "documento"
+        );
+    },
+
+    nomeArquivoSeguro(valor) {
+        return this.texto(valor)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9_-]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "documento";
     },
 
     slug(valor) {

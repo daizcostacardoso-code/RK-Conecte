@@ -11,9 +11,30 @@ const OrcamentoInteligenteController = {
     },
 
     async iniciarTela() {
+        this.configurarClienteService();
         OrcamentoInteligenteUI.iniciar();
         this.vincularEventos();
         await this.novoOrcamento();
+    },
+
+    configurarClienteService() {
+        if (
+            typeof ClienteRepository !== "undefined" &&
+            typeof criarMemoryAdapter === "function" &&
+            !ClienteRepository.adapter
+        ) {
+            ClienteRepository.configurar(criarMemoryAdapter());
+        }
+
+        if (
+            typeof ClienteRepository !== "undefined" &&
+            typeof ClienteService !== "undefined" &&
+            typeof ClienteService.configurar === "function"
+        ) {
+            ClienteService.configurar(ClienteRepository);
+        }
+
+        return true;
     },
 
     vincularEventos() {
@@ -186,9 +207,10 @@ const OrcamentoInteligenteController = {
             };
         }
 
+        const novoCliente = this.prepararDadosNovoCliente(dadosCliente);
         const resultado = typeof CriarClienteUseCase !== "undefined" && typeof CriarClienteUseCase.executar === "function"
-            ? await CriarClienteUseCase.executar(dadosCliente)
-            : await ClienteService.criarCliente(dadosCliente);
+            ? await CriarClienteUseCase.executar(novoCliente)
+            : await ClienteService.criarCliente(novoCliente);
 
         if (!resultado.sucesso) {
             this.mostrarAviso(resultado.erros.join(" "), "erro");
@@ -199,8 +221,9 @@ const OrcamentoInteligenteController = {
         const jaExiste = this.dados.clientes.some(item => item.id === cliente.id);
 
         this.dados.clientes = jaExiste
-            ? this.dados.clientes.map(item => item.id === cliente.id ? cliente : item)
+            ? [cliente, ...this.dados.clientes.filter(item => item.id !== cliente.id)]
             : [cliente, ...this.dados.clientes];
+        this.persistirClientesFluxo(cliente);
 
         await this.selecionarCliente(cliente.id);
         this.mostrarAviso("Novo cliente cadastrado e selecionado.", "info");
@@ -378,6 +401,7 @@ const OrcamentoInteligenteController = {
     async finalizarOrcamento() {
         await this.atualizarItensDaTela({ renderizar: false, silencioso: true });
         await this.atualizarComplementos(this.coletarComplementosDaTela(), { silencioso: true });
+        this.garantirNumeroOrcamento();
 
         const validacao = await this.validarOrcamento();
         if (!validacao.sucesso) {
@@ -420,6 +444,9 @@ const OrcamentoInteligenteController = {
             };
         }
 
+        const numero = this.garantirNumeroOrcamento();
+        this.sincronizarNumeroPreparado(numero);
+
         const resultado = DocumentService.prepararExportacao(this.contexto);
 
         if (!resultado.sucesso) {
@@ -441,6 +468,7 @@ const OrcamentoInteligenteController = {
             });
         }
 
+        await this.persistirDocumentoGerado(resultado.documento);
         this.mostrarAviso("Documento Comercial gerado e enviado para compartilhamento.", "info");
         return resultado;
     },
@@ -513,6 +541,118 @@ const OrcamentoInteligenteController = {
         OrcamentoInteligenteUI.mostrarAviso(mensagem, tipo);
     },
 
+    prepararDadosNovoCliente(dadosCliente = {}) {
+        const agora = new Date().toISOString();
+        const id = this.gerarIdNovoCliente();
+
+        return {
+            ...dadosCliente,
+            id,
+            status: "ativo",
+            dataCadastro: agora,
+            ultimaAtualizacao: agora,
+            projetos: [],
+            orcamentos: [],
+            historico: [],
+            timeline: []
+        };
+    },
+
+    gerarIdNovoCliente() {
+        if (typeof ClienteModel !== "undefined" && typeof ClienteModel.criarId === "function") {
+            return ClienteModel.criarId("cli");
+        }
+
+        if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+            return `cli_${crypto.randomUUID()}`;
+        }
+
+        return `cli_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    },
+
+    garantirNumeroOrcamento() {
+        const existente = this.normalizarNumeroOrcamento(
+            this.contexto?.numero
+            || this.contexto?.orcamentoNumero
+            || this.contexto?.orcamentoPreparado?.numero
+            || this.contexto?.orcamentoPreparado?.orcamentoNumero
+        );
+
+        if (existente) {
+            return existente;
+        }
+
+        const numero = this.gerarNumeroOrcamento();
+        this.contexto = typeof OrcamentoContext !== "undefined" && typeof OrcamentoContext.atualizar === "function"
+            ? OrcamentoContext.atualizar(this.contexto || {}, { numero })
+            : {
+                ...(this.contexto || {}),
+                numero
+            };
+
+        return numero;
+    },
+
+    gerarNumeroOrcamento() {
+        const chave = typeof Config !== "undefined" ? Config.storage?.numeroOrcamento : "";
+        let numero = 1;
+
+        if (chave && typeof Storage !== "undefined" && typeof Storage.carregar === "function") {
+            numero = Number(Storage.carregar(chave, 1));
+        }
+
+        if (!Number.isFinite(numero) || numero < 1) {
+            numero = 1;
+        }
+
+        if (chave && typeof Storage !== "undefined" && typeof Storage.salvar === "function") {
+            Storage.salvar(chave, numero + 1);
+        }
+
+        return String(numero).padStart(6, "0");
+    },
+
+    sincronizarNumeroPreparado(numero = "") {
+        const numeroNormalizado = this.normalizarNumeroOrcamento(numero);
+
+        if (!numeroNormalizado || !this.contexto?.orcamentoPreparado) {
+            return false;
+        }
+
+        this.contexto = OrcamentoContext.atualizar(this.contexto || {}, {
+            numero: numeroNormalizado,
+            orcamentoPreparado: {
+                ...this.contexto.orcamentoPreparado,
+                numero: numeroNormalizado,
+                orcamentoNumero: numeroNormalizado
+            }
+        });
+
+        return true;
+    },
+
+    async persistirDocumentoGerado(documento = null) {
+        if (!documento || typeof DocumentPdfRepository === "undefined" || !DocumentPdfRepository) {
+            return null;
+        }
+
+        const numero = this.normalizarNumeroOrcamento(
+            this.contexto?.numero
+            || documento?.dados?.metadados?.numeroOrcamento
+            || documento?.metadados?.numeroOrcamento
+        );
+
+        try {
+            return await DocumentPdfRepository.salvar(documento, {
+                numero,
+                origem: "ORCAMENTO_INTELIGENTE"
+            });
+        } catch (erro) {
+            console.error("Erro ao salvar documento comercial gerado:", erro);
+            return null;
+        }
+    },
+
     async atualizarComplementos(complementos = {}, opcoes = {}) {
         const resultado = await OrcamentoOrchestrator.atualizarComplementos(this.contexto || {}, complementos);
         this.contexto = resultado.contexto;
@@ -564,6 +704,7 @@ const OrcamentoInteligenteController = {
 
         if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.salvarFluxo === "function") {
             RKE2EDemoState.salvarFluxo({
+                clientes: this.obterClientesParaPersistir(contexto.cliente),
                 clienteSelecionado: contexto.cliente || null,
                 projetoSelecionado: contexto.projeto || null,
                 projetoAtual: contexto.projeto || null,
@@ -598,20 +739,21 @@ const OrcamentoInteligenteController = {
     },
 
     async listarClientes() {
+        const clientesDemo = this.obterClientesDemo();
+
         try {
             if (typeof ClienteService !== "undefined" && typeof ClienteService.listarClientes === "function") {
                 const resultado = await ClienteService.listarClientes({ status: "ativo" });
                 if (resultado.sucesso && resultado.clientes.length) {
-                    return resultado.clientes;
+                    return this.unirClientes(resultado.clientes, clientesDemo);
                 }
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Clientes para o fluxo guiado.", erro);
         }
 
-        const demo = this.obterEstadoDemo();
-        if (demo?.clienteSelecionado) {
-            return [demo.clienteSelecionado];
+        if (clientesDemo.length) {
+            return clientesDemo;
         }
 
         return this.criarClientesApoio();
@@ -677,6 +819,44 @@ const OrcamentoInteligenteController = {
         }
 
         return null;
+    },
+
+    obterClientesDemo() {
+        const demo = this.obterEstadoDemo();
+        const clientes = Array.isArray(demo?.clientes) ? demo.clientes : [];
+        return this.unirClientes(clientes, demo?.clienteSelecionado ? [demo.clienteSelecionado] : []);
+    },
+
+    persistirClientesFluxo(clienteAtual = null) {
+        if (typeof RKE2EDemoState === "undefined" || typeof RKE2EDemoState.salvarFluxo !== "function") {
+            return false;
+        }
+
+        RKE2EDemoState.salvarFluxo({
+            clientes: this.obterClientesParaPersistir(clienteAtual),
+            clienteSelecionado: clienteAtual || this.contexto?.cliente || null
+        });
+
+        return true;
+    },
+
+    obterClientesParaPersistir(clienteAtual = null) {
+        const atual = clienteAtual ? [clienteAtual] : [];
+        return this.unirClientes(atual, this.dados.clientes || [], this.obterClientesDemo());
+    },
+
+    unirClientes(...listas) {
+        const mapa = new Map();
+
+        listas.flat().filter(Boolean).forEach(cliente => {
+            const id = cliente.id || this.gerarIdNovoCliente();
+            mapa.set(id, {
+                ...cliente,
+                id
+            });
+        });
+
+        return Array.from(mapa.values());
     },
 
     obterAppStateService() {
@@ -942,26 +1122,37 @@ const OrcamentoInteligenteController = {
     },
 
     extrairComplementos(dados) {
-        return {
-            ajustesFinanceiros: {
+        const possui = (...campos) => campos.some(campo => dados.has(campo));
+        const complementos = {};
+
+        if (possui("descontoTipo", "descontoValor", "acrescimoTipo", "acrescimoValor")) {
+            complementos.ajustesFinanceiros = {
                 descontoTipo: dados.get("descontoTipo"),
                 descontoValor: this.numero(dados.get("descontoValor"), 0),
                 acrescimoTipo: dados.get("acrescimoTipo"),
                 acrescimoValor: this.numero(dados.get("acrescimoValor"), 0)
-            },
-            observacoes: {
+            };
+        }
+
+        if (possui("observacaoLivre", "observacoesComerciais", "observacoesTecnicas")) {
+            complementos.observacoes = {
                 livre: dados.get("observacaoLivre"),
                 comerciais: dados.get("observacoesComerciais"),
                 tecnicas: dados.get("observacoesTecnicas")
-            },
-            condicoesComerciais: {
+            };
+        }
+
+        if (possui("formaPagamento", "formaPagamentoComplemento", "prazoEntrega", "prazoEntregaComplemento", "validadeProposta")) {
+            complementos.condicoesComerciais = {
                 formaPagamento: dados.get("formaPagamento"),
                 formaPagamentoComplemento: dados.get("formaPagamentoComplemento"),
                 prazoEntrega: dados.get("prazoEntrega"),
                 prazoEntregaComplemento: dados.get("prazoEntregaComplemento"),
                 validadeProposta: dados.get("validadeProposta")
-            }
-        };
+            };
+        }
+
+        return complementos;
     },
 
     coletarItensDaTela() {
@@ -1045,6 +1236,10 @@ const OrcamentoInteligenteController = {
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "_")
             .replace(/^_+|_+$/g, "");
+    },
+
+    normalizarNumeroOrcamento(valor) {
+        return String(valor || "").trim();
     },
 
     criarClientesApoio() {

@@ -4,6 +4,7 @@ const OrcamentoContext = {
 
         return this.normalizar({
             cliente: null,
+            numero: "",
             projeto: null,
             servico: null,
             servicosSelecionados: [],
@@ -29,6 +30,7 @@ const OrcamentoContext = {
 
         return {
             cliente: dados.cliente || null,
+            numero: String(dados.numero || dados.orcamentoNumero || "").trim(),
             projeto: dados.projeto || null,
             servico: dados.servico || null,
             servicosSelecionados: this.normalizarServicosSelecionados(dados.servicosSelecionados || dados.servicos || dados.tiposServico),

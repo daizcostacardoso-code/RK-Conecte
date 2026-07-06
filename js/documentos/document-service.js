@@ -50,7 +50,8 @@ const DocumentService = {
         const deps = this.obterDependencias(dependencias);
         const origem = this.obterOrigem(contexto);
         const resumo = origem.resumo || contexto.resumo || this.montarResumoPorOrquestrador(contexto, deps) || {};
-        const totais = origem.totais || resumo.totais || {};
+        const produtosCalculados = this.obterItensCalculados(origem, contexto);
+        const totais = origem.totais || resumo.totais || this.obterTotaisCalculados(origem, contexto) || {};
         const condicoesComerciais = origem.condicoesComerciais || contexto.condicoesComerciais || resumo.condicoesComerciais || {};
 
         return {
@@ -59,7 +60,7 @@ const DocumentService = {
             projeto: origem.projeto || contexto.projeto || resumo.projeto || {},
             servico: origem.servico || contexto.servico || resumo.servico || {},
             servicos: origem.servicos || origem.servicosSelecionados || contexto.servicosSelecionados || resumo.servicos || [],
-            produtos: origem.produtos || contexto.produtos || [],
+            produtos: produtosCalculados || origem.produtos || contexto.produtos || [],
             totais,
             resumoFinanceiro: this.montarResumoFinanceiro(origem, resumo, totais, contexto, deps),
             observacoes: origem.observacoes || contexto.observacoes || resumo.observacoes || {},
@@ -91,8 +92,19 @@ const DocumentService = {
     },
 
     montarMetadados(origem = {}, contexto = {}, deps = {}) {
+        const numeroOrcamento = String(
+            origem.numero
+            || origem.orcamentoNumero
+            || contexto.numero
+            || contexto.orcamentoNumero
+            || contexto.resumo?.numero
+            || ""
+        ).trim();
+
         return {
             origem: "ORCAMENTO_INTELIGENTE",
+            numeroOrcamento,
+            orcamentoNumero: numeroOrcamento,
             preparadoPara: ["PDF", "IMPRESSAO", "WHATSAPP", "EMAIL", "WEB"],
             status: "PREPARADO",
             versaoOrigem: origem.versao || "",
@@ -107,6 +119,26 @@ const DocumentService = {
                 CalculoService: !!deps.calculoService
             }
         };
+    },
+
+    obterItensCalculados(origem = {}, contexto = {}) {
+        const candidatos = [
+            origem.resultado?.detalhes?.itens,
+            contexto.resultado?.detalhes?.itens,
+            origem.calculo?.itens,
+            contexto.calculo?.itens
+        ];
+
+        return candidatos.find(lista => Array.isArray(lista) && lista.length) || null;
+    },
+
+    obterTotaisCalculados(origem = {}, contexto = {}) {
+        const candidatos = [
+            origem.resultado?.detalhes?.totais,
+            contexto.resultado?.detalhes?.totais
+        ];
+
+        return candidatos.find(totais => totais && typeof totais === "object") || null;
     },
 
     obterOrigem(contexto = {}) {

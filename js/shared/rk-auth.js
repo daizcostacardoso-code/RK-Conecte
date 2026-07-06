@@ -79,6 +79,14 @@ const RKAuth = {
         return sessao;
     },
 
+    prepararEstiloInterno() {
+        const modo = this.obterModoAtual();
+
+        if (modo === "protected" && this.paginaAtualProtegida()) {
+            document.documentElement.classList.add("rk-app-interna-preload");
+        }
+    },
+
     sair(event) {
         if (event && typeof event.preventDefault === "function") {
             event.preventDefault();
@@ -162,4 +170,5 @@ window.esconderTelaLogin = () => {};
 window.mostrarAreaInterna = () => {};
 window.esconderAreaInterna = () => {};
 
+RKAuth.prepararEstiloInterno();
 RKAuth.verificarAutenticacao();

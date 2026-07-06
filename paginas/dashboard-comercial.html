@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <script src="../js/shared/rk-auth.js?v=5.3.0" data-rk-auth="protected"></script>
-    <title>Dashboard Comercial - RK Vidra&ccedil;aria</title>
+    <script src="../js/shared/rk-auth.js?v=5.3.1" data-rk-auth="protected"></script>
+    <title>&Aacute;rea de trabalho - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.2.3">
+    <link rel="stylesheet" href="../css/style.css?v=5.2.4">
 
     <meta name="theme-color" content="#0f766e">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -99,6 +99,11 @@
             outline: none;
         }
 
+        .dashboard-comercial-refresh:focus-visible {
+            outline: 2px solid #99d6ce;
+            outline-offset: 2px;
+        }
+
         .dashboard-comercial-content {
             display: grid;
             gap: 20px;
@@ -165,6 +170,10 @@
             color: #13201d;
             font-size: 2rem;
             line-height: 1;
+        }
+
+        .dashboard-comercial-compact-kpis {
+            display: none;
         }
 
         .dashboard-comercial-grid {
@@ -286,6 +295,20 @@
             text-align: center;
         }
 
+        .dashboard-comercial-shortcuts .botao {
+            gap: 8px;
+        }
+
+        .dashboard-comercial-shortcut-icon,
+        .dashboard-comercial-shortcut-desc {
+            display: none;
+        }
+
+        .dashboard-comercial-shortcut-title {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
         @media (max-width: 980px) {
             .dashboard-comercial-cards,
             .dashboard-comercial-grid {
@@ -294,16 +317,74 @@
         }
 
         @media (max-width: 680px) {
+            body.dashboard-comercial-page .rk-demo-banner {
+                display: none !important;
+            }
+
             .dashboard-comercial-main {
-                padding: 18px 0 32px;
+                padding: 8px 0 22px;
+            }
+
+            .dashboard-comercial-shell {
+                border-radius: 8px;
+                box-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
             }
 
             .dashboard-comercial-header,
             .dashboard-comercial-content {
-                padding: 18px;
+                padding: 10px 12px;
             }
 
-            .dashboard-comercial-header,
+            .dashboard-comercial-header {
+                align-items: center;
+                flex-direction: row;
+                gap: 12px;
+            }
+
+            .dashboard-comercial-header > div {
+                flex: 1 1 auto;
+            }
+
+            .dashboard-comercial-eyebrow {
+                display: none;
+            }
+
+            .dashboard-comercial-header h1 {
+                font-size: 1.05rem;
+                line-height: 1.1;
+            }
+
+            .dashboard-comercial-subtitle {
+                display: none;
+            }
+
+            .dashboard-comercial-refresh {
+                width: auto;
+                min-height: 28px;
+                margin-left: auto;
+                border-color: #c7dafa;
+                background: #ffffff;
+                color: #0b48b6;
+                font-size: 0.72rem;
+                padding: 4px 8px;
+            }
+
+            .dashboard-comercial-refresh:hover,
+            .dashboard-comercial-refresh:focus-visible {
+                background: #eff7ff;
+            }
+
+            .dashboard-comercial-content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .dashboard-comercial-section,
+            .dashboard-comercial-panel {
+                padding: 10px 12px;
+            }
+
             .dashboard-comercial-section-top,
             .dashboard-comercial-value,
             .dashboard-comercial-value-list div,
@@ -312,13 +393,167 @@
                 flex-direction: column;
             }
 
+            .dashboard-comercial-section-top {
+                gap: 5px;
+                margin-bottom: 8px;
+            }
+
+            .dashboard-comercial-section-top h2 {
+                font-size: 0.78rem;
+            }
+
+            .dashboard-comercial-resumo .dashboard-comercial-section-top {
+                align-items: center;
+                flex-direction: row;
+                margin-bottom: 4px;
+            }
+
+            .dashboard-comercial-resumo .dashboard-comercial-section-top span {
+                display: none;
+            }
+
+            .dashboard-comercial-atalhos {
+                order: 1;
+            }
+
+            .dashboard-comercial-resumo {
+                order: 2;
+            }
+
+            .dashboard-comercial-atividades {
+                order: 3;
+            }
+
+            .dashboard-comercial-negociacao-acoes {
+                display: contents;
+            }
+
+            .dashboard-comercial-panel-acoes {
+                order: 4;
+            }
+
+            .dashboard-comercial-panel-valor {
+                order: 5;
+            }
+
+            .dashboard-comercial-orcamentos {
+                order: 6;
+            }
+
+            .dashboard-comercial-atalhos .dashboard-comercial-section-top span {
+                display: none;
+            }
+
             .dashboard-comercial-cards,
             .dashboard-comercial-grid {
                 grid-template-columns: 1fr;
             }
 
-            .dashboard-comercial-refresh {
-                width: 100%;
+            .dashboard-comercial-resumo .dashboard-comercial-cards {
+                display: none;
+            }
+
+            .dashboard-comercial-compact-kpis {
+                display: grid;
+                gap: 0;
+                margin: 0;
+            }
+
+            .dashboard-comercial-compact-kpis div {
+                min-height: 29px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                border-bottom: 1px solid #edf2f7;
+                padding: 5px 0;
+            }
+
+            .dashboard-comercial-compact-kpis div:last-child {
+                border-bottom: 0;
+            }
+
+            .dashboard-comercial-compact-kpis dt {
+                color: #4d5f6f;
+                font-size: 0.82rem;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+
+            .dashboard-comercial-compact-kpis dd {
+                margin: 0;
+                color: #0b48b6;
+                font-size: 0.86rem;
+                font-weight: 800;
+                line-height: 1.2;
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            body.dashboard-comercial-page .dashboard-comercial-shortcuts {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 8px;
+            }
+
+            body.dashboard-comercial-page .dashboard-comercial-shortcuts .botao {
+                width: auto !important;
+                min-height: 62px;
+                display: grid;
+                grid-template-columns: 24px minmax(0, 1fr);
+                align-items: center;
+                align-content: center;
+                justify-items: stretch;
+                gap: 8px;
+                border: 1px solid #d7e8f5;
+                border-radius: 7px;
+                background: #fbfdff;
+                box-shadow: none;
+                color: #17201f;
+                line-height: 1.2;
+                padding: 8px;
+                text-align: left;
+                transform: none;
+            }
+
+            .dashboard-comercial-shortcuts .botao:hover,
+            .dashboard-comercial-shortcuts .botao:focus-visible {
+                background: #eff7ff;
+                transform: none;
+            }
+
+            .dashboard-comercial-shortcut-icon {
+                width: 22px;
+                height: 22px;
+                border: 1px solid #bddaf4;
+                border-radius: 6px;
+                background: #e9faff;
+                color: #0b48b6;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.62rem;
+                font-weight: 800;
+            }
+
+            .dashboard-comercial-shortcut-copy {
+                min-width: 0;
+                display: grid;
+                gap: 2px;
+            }
+
+            .dashboard-comercial-shortcut-title {
+                display: block;
+                color: #17201f;
+                font-size: 0.79rem;
+                line-height: 1.12;
+            }
+
+            .dashboard-comercial-shortcut-desc {
+                display: block;
+                color: #647487;
+                font-size: 0.66rem;
+                font-weight: 600;
+                line-height: 1.15;
             }
 
             .dashboard-comercial-action strong,
@@ -384,7 +619,7 @@
 <script src="../js/comercial/comercial-validator.js?v=4.8.0"></script>
 <script src="../js/comercial/comercial-service.js?v=4.8.0"></script>
 <script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
-<script src="../js/dashboard-comercial/dashboard-comercial-ui.js?v=5.2.3"></script>
+<script src="../js/dashboard-comercial/dashboard-comercial-ui.js?v=5.2.5"></script>
 <script src="../js/dashboard-comercial/dashboard-comercial-controller.js?v=4.8.0"></script>
 <script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>

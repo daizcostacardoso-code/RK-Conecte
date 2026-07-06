@@ -14,32 +14,31 @@ const DashboardComercialUI = {
             `<section class="dashboard-comercial-shell" aria-labelledby="dashboardComercialTitulo">`,
             `<header class="dashboard-comercial-header">`,
             `<div>`,
-            `<p class="dashboard-comercial-eyebrow">Dashboard Comercial</p>`,
-            `<h1 id="dashboardComercialTitulo">Dashboard Comercial</h1>`,
+            `<h1 id="dashboardComercialTitulo">&Aacute;rea de trabalho</h1>`,
             `<p class="dashboard-comercial-subtitle">Acompanhamento do funil comercial, aprovacoes e conversoes recentes.</p>`,
             `</div>`,
             `<button type="button" class="dashboard-comercial-refresh" data-dashboard-action="atualizar">Atualizar</button>`,
             `</header>`,
             `<div class="dashboard-comercial-content">`,
-            `<section class="dashboard-comercial-section" aria-labelledby="resumoComercialTitulo">`,
+            this.renderizarAtalhos(),
+            `<section class="dashboard-comercial-section dashboard-comercial-resumo" aria-labelledby="resumoComercialTitulo">`,
             `<div class="dashboard-comercial-section-top">`,
-            `<h2 id="resumoComercialTitulo">Resumo Comercial</h2>`,
+            `<h2 id="resumoComercialTitulo">HOJE</h2>`,
             `<span>${this.escapar(this.formatarData(estado.carregadoEm))}</span>`,
             `</div>`,
-            this.renderizarCards(estado.kpis || {}),
+            this.renderizarCards(estado.kpis || {}, estado.valorNegociacao || {}),
             `</section>`,
-            this.renderizarAtalhos(),
-            `<section class="dashboard-comercial-section dashboard-comercial-grid">`,
+            `<section class="dashboard-comercial-section dashboard-comercial-grid dashboard-comercial-negociacao-acoes">`,
             this.renderizarValorNegociacao(estado.valorNegociacao || {}),
             this.renderizarAcoes(estado.acoes || []),
             `</section>`,
-            `<section class="dashboard-comercial-section" aria-labelledby="ultimosOrcamentosTitulo">`,
+            `<section class="dashboard-comercial-section dashboard-comercial-orcamentos" aria-labelledby="ultimosOrcamentosTitulo">`,
             `<div class="dashboard-comercial-section-top">`,
             `<h2 id="ultimosOrcamentosTitulo">Ultimos Orcamentos</h2>`,
             `</div>`,
             this.renderizarTabela(estado.orcamentos || []),
             `</section>`,
-            `<section class="dashboard-comercial-section" aria-labelledby="ultimasAtividadesTitulo">`,
+            `<section class="dashboard-comercial-section dashboard-comercial-atividades" aria-labelledby="ultimasAtividadesTitulo">`,
             `<div class="dashboard-comercial-section-top">`,
             `<h2 id="ultimasAtividadesTitulo">Ultimas Atividades</h2>`,
             `</div>`,
@@ -55,26 +54,58 @@ const DashboardComercialUI = {
 
     renderizarAtalhos() {
         const atalhos = [
-            { rotulo: "Novo Cliente", href: "clientes.html" },
-            { rotulo: "Novo Orcamento", href: "orcamento-inteligente.html" },
-            { rotulo: "Ver Aprovacoes", href: "aprovacao-comercial.html" },
-            { rotulo: "Producao", href: "producao.html" }
+            {
+                rotulo: "Novo Cliente",
+                rotuloHtml: "Novo Cliente",
+                descricaoHtml: "Cadastro",
+                icone: "C+",
+                href: "clientes.html"
+            },
+            {
+                rotulo: "Novo Orcamento",
+                rotuloHtml: "Novo Or&ccedil;amento",
+                descricaoHtml: "Proposta",
+                icone: "R$",
+                href: "orcamento-inteligente.html"
+            },
+            {
+                rotulo: "Ver Aprovacoes",
+                rotuloHtml: "Ver Aprova&ccedil;&otilde;es",
+                descricaoHtml: "Revis&atilde;o",
+                icone: "OK",
+                href: "aprovacao-comercial.html"
+            },
+            {
+                rotulo: "Producao",
+                rotuloHtml: "Produ&ccedil;&atilde;o",
+                descricaoHtml: "OPs",
+                icone: "OP",
+                href: "producao.html"
+            }
         ];
 
         return [
-            `<section class="dashboard-comercial-section" aria-labelledby="atalhosComerciaisTitulo">`,
+            `<section class="dashboard-comercial-section dashboard-comercial-atalhos" aria-labelledby="atalhosComerciaisTitulo">`,
             `<div class="dashboard-comercial-section-top">`,
             `<h2 id="atalhosComerciaisTitulo">Atalhos</h2>`,
             `<span>Fluxo visual E2E</span>`,
             `</div>`,
             `<div class="dashboard-comercial-shortcuts">`,
-            ...atalhos.map(atalho => `<a class="botao" href="${this.escaparAtributo(atalho.href)}">${this.escapar(atalho.rotulo)}</a>`),
+            ...atalhos.map(atalho => [
+                `<a class="botao dashboard-comercial-shortcut" href="${this.escaparAtributo(atalho.href)}" aria-label="${this.escaparAtributo(atalho.rotulo)}">`,
+                `<span class="dashboard-comercial-shortcut-icon" aria-hidden="true">${this.escapar(atalho.icone)}</span>`,
+                `<span class="dashboard-comercial-shortcut-copy">`,
+                `<strong class="dashboard-comercial-shortcut-title">${atalho.rotuloHtml}</strong>`,
+                `<small class="dashboard-comercial-shortcut-desc">${atalho.descricaoHtml}</small>`,
+                `</span>`,
+                `</a>`
+            ].join("")),
             `</div>`,
             `</section>`
         ].join("");
     },
 
-    renderizarCards(kpis = {}) {
+    renderizarCards(kpis = {}, valorNegociacao = {}) {
         const cards = [
             {
                 titulo: "Total de Orcamentos",
@@ -97,6 +128,24 @@ const DashboardComercialUI = {
                 detalhe: "Convertidos / aprovados"
             }
         ];
+        const indicadoresCompactos = [
+            {
+                rotuloHtml: "Or&ccedil;amentos",
+                valor: this.formatarNumero(kpis.totalOrcamentos)
+            },
+            {
+                rotuloHtml: "Em negocia&ccedil;&atilde;o",
+                valor: this.formatarMoeda(valorNegociacao.total)
+            },
+            {
+                rotuloHtml: "Aprova&ccedil;&otilde;es",
+                valor: this.formatarNumero(kpis.totalDocumentosAprovados)
+            },
+            {
+                rotuloHtml: "Produ&ccedil;&atilde;o",
+                valor: this.formatarNumero(kpis.totalProjetosConvertidos)
+            }
+        ];
 
         return [
             `<div class="dashboard-comercial-cards">`,
@@ -107,7 +156,15 @@ const DashboardComercialUI = {
                 `<small>${this.escapar(card.detalhe)}</small>`,
                 `</article>`
             ].join("")),
-            `</div>`
+            `</div>`,
+            `<dl class="dashboard-comercial-compact-kpis">`,
+            ...indicadoresCompactos.map(indicador => [
+                `<div>`,
+                `<dt>${indicador.rotuloHtml}</dt>`,
+                `<dd>${this.escapar(indicador.valor)}</dd>`,
+                `</div>`
+            ].join("")),
+            `</dl>`
         ].join("");
     },
 
@@ -172,7 +229,7 @@ const DashboardComercialUI = {
 
     renderizarAcoes(acoes = []) {
         return [
-            `<article class="dashboard-comercial-panel" aria-labelledby="proximasAcoesTitulo">`,
+            `<article class="dashboard-comercial-panel dashboard-comercial-panel-acoes" aria-labelledby="proximasAcoesTitulo">`,
             `<div class="dashboard-comercial-section-top">`,
             `<h2 id="proximasAcoesTitulo">Proximas Acoes</h2>`,
             `</div>`,
@@ -192,7 +249,7 @@ const DashboardComercialUI = {
         const itens = Array.isArray(valorNegociacao.itens) ? valorNegociacao.itens : [];
 
         return [
-            `<article class="dashboard-comercial-panel" aria-labelledby="valorNegociacaoTitulo">`,
+            `<article class="dashboard-comercial-panel dashboard-comercial-panel-valor" aria-labelledby="valorNegociacaoTitulo">`,
             `<div class="dashboard-comercial-section-top">`,
             `<h2 id="valorNegociacaoTitulo">Valor em Negociacao</h2>`,
             `</div>`,

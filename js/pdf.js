@@ -74,7 +74,7 @@ const PDF = {
 
         this.salvarOrcamentoEmitido(numero, dadosPublicos, empresa);
 
-        doc.save(`orcamento_${numero}.pdf`);
+        doc.save(this.montarNomeArquivo(numero));
     },
 
     salvarOrcamentoEmitido(numero, dadosOrcamento, empresa) {
@@ -86,8 +86,19 @@ const PDF = {
             criadoEmISO: new Date().toISOString()
         };
 
+        if (typeof DocumentPdfRepository !== "undefined" && DocumentPdfRepository) {
+            DocumentPdfRepository.salvar(dados, {
+                numero,
+                origem: "NOVO_ORCAMENTO",
+                nomeArquivo: this.montarNomeArquivo(numero)
+            });
+            return;
+        }
+
+        const historico = Storage.carregar(Config.storage.historicoOrcamentos, []) || [];
+        const semDuplicidade = historico.filter(item => String(item.numero || "") !== String(numero));
         Storage.salvar(Config.storage.historicoOrcamentos, [
-            ...(Storage.carregar(Config.storage.historicoOrcamentos, []) || []),
+            ...semDuplicidade,
             dados
         ]);
 
@@ -122,10 +133,22 @@ const PDF = {
         return String(numero).padStart(6, "0");
     },
 
+    montarNomeArquivo(numero) {
+        return `RK-Vidracaria-${this.nomeArquivoSeguro(numero)}.pdf`;
+    },
+
+    nomeArquivoSeguro(valor) {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9_-]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "documento";
+    },
+
     obterEmpresa() {
         return {
             nome: Util.$("empresa")?.value || "RK VIDRAÇARIA",
-            cnpj: Util.$("cnpj")?.value || "00.000.000/0000-00",
+            cnpj: Util.$("cnpj")?.value || Config.empresa.cnpj || "60.332.101/0001-91",
             endereco: Util.$("endEmpresa")?.value || "Endereço da empresa",
             telefone: Util.$("foneEmpresa")?.value || "(00) 00000-0000",
             email: Util.$("emailEmpresa")?.value || "contato@email.com"
@@ -226,13 +249,13 @@ const PDF = {
 
             doc.rect(15, y - 5, 180, 8);
 
-            const medidas = `${item.largura || ""}x${item.altura || ""}`;
+            const medidas = this.formatarMedidasItem(item);
             const categoria = typeof OrcamentoModel !== "undefined"
                 ? OrcamentoModel.rotuloCategoria(item.categoria)
                 : item.categoria;
             const produto = `${item.descricao || categoria || item.tipoVidro || ""}`.trim();
             const vidro = `${item.tipoVidro || ""} ${item.espessura || ""}mm ${item.cor || ""}`.trim();
-            const area = item.areaM2 ?? item.area ?? 0;
+            const area = this.obterAreaItem(item);
 
             doc.text(String(index + 1), 18, y);
             doc.text(doc.splitTextToSize(produto, 45)[0] || "", 26, y);
@@ -240,7 +263,7 @@ const PDF = {
             doc.text(medidas, 112, y);
             doc.text(String(item.quantidade || ""), 136, y);
             doc.text(`${Util.decimal(area || 0)} m²`, 148, y);
-            doc.text(Util.moeda(item.total || 0), 194, y, { align: "right" });
+            doc.text(Util.moeda(this.obterTotalItem(item)), 194, y, { align: "right" });
 
             y += 8;
         });
@@ -353,6 +376,58 @@ const PDF = {
             doc.text("Obrigado pela preferência!", 105, 286, { align: "center" });
             doc.text(`Página ${i} de ${totalPaginas}`, 195, 286, { align: "right" });
         }
+    },
+
+    formatarMedidasItem(item = {}) {
+        const largura = this.primeiroNumero(item, ["larguraCm", "largura"], 0);
+        const altura = this.primeiroNumero(item, ["alturaCm", "altura"], 0);
+        return `${this.formatarMedidaNumero(largura)} x ${this.formatarMedidaNumero(altura)} cm`;
+    },
+
+    formatarMedidaNumero(valor) {
+        const numero = Number(valor || 0);
+
+        if (!Number.isFinite(numero)) {
+            return "0";
+        }
+
+        if (Number.isInteger(numero)) {
+            return String(numero);
+        }
+
+        return numero.toLocaleString("pt-BR", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    },
+
+    obterAreaItem(item = {}) {
+        const largura = this.primeiroNumero(item, ["larguraCm", "largura"], 0);
+        const altura = this.primeiroNumero(item, ["alturaCm", "altura"], 0);
+
+        if (largura > 0 && altura > 0) {
+            return (largura * altura) / 10000;
+        }
+
+        return this.primeiroNumero(item, ["areaM2", "area"], 0);
+    },
+
+    obterTotalItem(item = {}) {
+        return this.primeiroNumero(item, ["subtotalFinal", "valorTotal", "total", "totalGeral", "subtotal"], 0);
+    },
+
+    primeiroNumero(objeto = {}, chaves = [], padrao = 0) {
+        const chave = chaves.find(nome => {
+            const valor = objeto[nome];
+            return valor !== undefined && valor !== null && valor !== "";
+        });
+
+        if (!chave) {
+            return padrao;
+        }
+
+        const numero = Util.numero(objeto[chave]);
+        return Number.isFinite(numero) ? numero : padrao;
     },
 
     formatarData(valor) {

@@ -483,6 +483,7 @@ const OrcamentoOrchestrator = {
         const servicoResumo = servicosSelecionados.length ? this.montarServicoAgregado(servicosSelecionados) : (atual.servico || {});
 
         return {
+            numero: atual.numero || "",
             cliente: {
                 id: atual.cliente?.id || "",
                 nome: atual.cliente?.nome || atual.cliente?.nomeFantasia || ""
@@ -530,8 +531,11 @@ const OrcamentoOrchestrator = {
     montarOrcamentoPreparado(contexto = {}, resumo = null) {
         const atual = OrcamentoContext.normalizar(contexto);
         const resumoFinal = resumo || this.montarResumo(atual);
+        const numero = atual.numero || resumoFinal.numero || "";
 
         return {
+            numero,
+            orcamentoNumero: numero,
             preparadoPara: "PDF_COMERCIAL",
             versao: "5.2.1",
             status: atual.status,
@@ -700,9 +704,9 @@ const OrcamentoOrchestrator = {
             valorAdicionalEngenharia: tipoDimensao === "engenharia" ? this.numero(origem.valorAdicionalEngenharia ?? origem.adicionalEngenharia, 0) : 0,
             areaM2: this.numero(origem.areaM2, 0),
             subtotalBase: this.numero(origem.subtotalBase, 0),
-            subtotalFinal: this.numero(origem.subtotalFinal ?? origem.subtotal ?? origem.valorTotal, 0),
-            subtotal: this.numero(origem.subtotal ?? origem.subtotalFinal ?? origem.valorTotal, 0),
-            valorTotal: this.numero(origem.valorTotal ?? origem.subtotalFinal ?? origem.subtotal, 0),
+            subtotalFinal: this.numero(origem.subtotalFinal ?? origem.valorTotal ?? origem.total ?? origem.totalGeral ?? origem.subtotal, 0),
+            subtotal: this.numero(origem.subtotalFinal ?? origem.valorTotal ?? origem.total ?? origem.totalGeral ?? origem.subtotal, 0),
+            valorTotal: this.numero(origem.subtotalFinal ?? origem.valorTotal ?? origem.total ?? origem.totalGeral ?? origem.subtotal, 0),
             observacoes: this.texto(origem.observacoes || origem.observacao),
             observacao: this.texto(origem.observacao || origem.observacoes),
             permiteTamanhoPadrao: permitePadrao

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <script src="../js/shared/rk-auth.js?v=5.3.0" data-rk-auth="protected"></script>
+    <script src="../js/shared/rk-auth.js?v=5.3.1" data-rk-auth="protected"></script>
     <title>Compartilhar Documento - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.2.3">
+    <link rel="stylesheet" href="../css/style.css?v=5.2.5">
 
     <meta name="theme-color" content="#0f766e">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -114,6 +114,105 @@
             gap: 10px;
         }
 
+        .document-share-filter-form {
+            display: grid;
+            gap: 8px;
+        }
+
+        .document-share-filter-form label {
+            color: #394844;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .document-share-filter-form input {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid #cbd8d3;
+            border-radius: 6px;
+            padding: 9px 11px;
+            color: #17201f;
+            font: inherit;
+        }
+
+        .document-share-filter-form input:focus {
+            border-color: #0f766e;
+            outline: 2px solid rgba(15, 118, 110, 0.14);
+        }
+
+        .document-share-filter-actions {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: 1fr 1fr;
+            margin-top: 4px;
+        }
+
+        .document-share-results {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .document-share-results p {
+            margin: 0;
+            color: #5d6966;
+            font-size: 0.86rem;
+        }
+
+        .document-share-results-empty {
+            border: 1px dashed #cbd8d3;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .document-share-result {
+            border: 1px solid #dfe8e5;
+            border-radius: 6px;
+            display: grid;
+            gap: 6px;
+            padding: 10px;
+            background: #ffffff;
+        }
+
+        .document-share-result-selected {
+            border-color: #0f766e;
+            background: #f1fbf7;
+        }
+
+        .document-share-result strong {
+            color: #17201f;
+            font-size: 0.94rem;
+        }
+
+        .document-share-result span {
+            color: #52605d;
+            font-size: 0.82rem;
+        }
+
+        .document-share-result-actions {
+            display: grid;
+            gap: 6px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .document-share-result-button {
+            min-height: 34px;
+            border: 1px solid #cbd8d3;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #16211f;
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.78rem;
+        }
+
+        .document-share-result-button:hover,
+        .document-share-result-button:focus-visible {
+            border-color: #0f766e;
+            background: #eef8f6;
+            outline: none;
+        }
+
         .document-share-button {
             width: 100%;
             min-height: 46px;
@@ -209,6 +308,40 @@
             padding: 18px;
         }
 
+        .document-share-preview-pdf {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .document-share-pdf-toolbar {
+            min-height: 48px;
+            border-bottom: 1px solid #e5ece9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+        }
+
+        .document-share-pdf-toolbar strong,
+        .document-share-pdf-toolbar span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .document-share-pdf-toolbar span {
+            color: #52605d;
+            font-size: 0.82rem;
+        }
+
+        .document-share-preview-pdf iframe {
+            width: 100%;
+            min-height: 620px;
+            border: 0;
+            display: block;
+            background: #f4f6f5;
+        }
+
         .document-share-preview-empty {
             min-height: 360px;
             display: grid;
@@ -227,6 +360,13 @@
             text-align: center;
         }
 
+        body.document-share-page .rk-demo-banner,
+        .document-share-header,
+        .document-share-history,
+        .document-share-message[data-tipo="neutro"] {
+            display: none !important;
+        }
+
         @media (max-width: 860px) {
             .document-share-grid {
                 grid-template-columns: 1fr;
@@ -240,7 +380,7 @@
 
         @media (max-width: 560px) {
             .document-share-main {
-                padding: 18px 0 32px;
+                padding: 8px 0 28px;
             }
 
             .document-share-header,
@@ -257,6 +397,16 @@
             .document-share-footer .document-share-button {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .document-share-filter-actions,
+            .document-share-result-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .document-share-pdf-toolbar {
+                align-items: flex-start;
+                flex-direction: column;
             }
         }
     </style>
@@ -295,25 +445,31 @@
     <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=2.2.0"></script>
+<script src="../js/config.js?v=2.5.0"></script>
+<script src="../js/storage.js?v=2.5.0"></script>
 <script src="../js/core/event-types.js?v=4.4.0"></script>
 <script src="../js/core/event-bus.js?v=4.4.0"></script>
 <script src="../js/core/app-state-events.js?v=4.4.0"></script>
 <script src="../js/core/app-state.js?v=4.4.0"></script>
 <script src="../js/core/app-state-service.js?v=4.4.0"></script>
-<script src="../js/documentos/document-model.js?v=5.2.2"></script>
+<script src="../js/documentos/document-model.js?v=5.3.0"></script>
 <script src="../js/documentos/document-builder.js?v=5.2.2"></script>
 <script src="../js/documentos/document-validator.js?v=4.4.0"></script>
-<script src="../js/documentos/document-service.js?v=5.2.2"></script>
+<script src="../js/documentos/document-service.js?v=5.3.0"></script>
 <script src="../js/documentos/document-renderer.js?v=4.4.0"></script>
-<script src="../js/documentos/document-html-renderer.js?v=5.2.2"></script>
-<script src="../js/export/export-model.js?v=4.4.0"></script>
+<script src="../js/documentos/document-html-renderer.js?v=5.3.0"></script>
+<script src="../js/export/export-model.js?v=5.3.0"></script>
 <script src="../js/export/export-validator.js?v=4.4.0"></script>
-<script src="../js/export/adapters/pdf-adapter.js?v=5.2.2"></script>
+<script src="../js/export/adapters/pdf-adapter.js?v=5.3.0"></script>
 <script src="../js/export/adapters/print-adapter.js?v=4.4.0"></script>
 <script src="../js/export/export-service.js?v=4.4.0"></script>
+<script src="../js/documentos/document-pdf-repository.js?v=5.3.1"></script>
 <script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
-<script src="../js/documentos/document-share-ui.js?v=4.4.0"></script>
-<script src="../js/documentos/document-share-controller.js?v=4.4.0"></script>
+<script src="../js/documentos/document-share-ui.js?v=5.3.0"></script>
+<script src="../js/documentos/document-share-controller.js?v=5.3.2"></script>
 <script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>

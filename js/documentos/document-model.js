@@ -1,6 +1,21 @@
 const DocumentModel = {
     tipo: "DOCUMENTO_COMERCIAL",
     versao: "4.1",
+    empresaPadrao: {
+        nome: "RK Vidra\u00e7aria",
+        documento: "60.332.101/0001-91",
+        cnpj: "60.332.101/0001-91",
+        lema: "Agilidade e exelencia",
+        telefone: "(73) 9981-9768",
+        email: "",
+        endereco: "Rua Guimar\u00e3es, 336 - Nilo Fraga, Porto Seguro",
+        logo: {
+            tipo: "imagem",
+            texto: "RK",
+            url: "../imagens/logo.jpeg",
+            caminho: "../imagens/logo.jpeg"
+        }
+    },
 
     criar(dados = {}) {
         return this.normalizar(dados);
@@ -31,13 +46,20 @@ const DocumentModel = {
     },
 
     normalizarEmpresa(empresa = {}) {
+        const padrao = this.empresaPadrao;
+        const logo = empresa.logo && typeof empresa.logo === "object"
+            ? { ...padrao.logo, ...empresa.logo }
+            : padrao.logo;
+
         return {
-            nome: this.texto(empresa.nome || empresa.razaoSocial || "RK Vidracaria"),
-            documento: this.texto(empresa.documento || empresa.cnpj),
-            telefone: this.texto(empresa.telefone),
-            email: this.texto(empresa.email),
-            endereco: this.texto(empresa.endereco),
-            logo: this.normalizarLogo(empresa.logo)
+            nome: this.texto(empresa.nome || empresa.razaoSocial || padrao.nome),
+            documento: this.texto(empresa.documento || empresa.cnpj || padrao.documento),
+            cnpj: this.texto(empresa.cnpj || empresa.documento || padrao.cnpj),
+            lema: this.texto(empresa.lema || padrao.lema),
+            telefone: this.texto(empresa.telefone || padrao.telefone),
+            email: this.texto(empresa.email || padrao.email),
+            endereco: this.texto(empresa.endereco || padrao.endereco),
+            logo: this.normalizarLogo(logo)
         };
     },
 
@@ -45,13 +67,17 @@ const DocumentModel = {
         if (logo && typeof logo === "object") {
             return {
                 tipo: this.texto(logo.tipo || "marca"),
-                texto: this.texto(logo.texto || logo.descricao || "RK")
+                texto: this.texto(logo.texto || logo.descricao || "RK"),
+                url: this.texto(logo.url || logo.src || logo.caminho),
+                caminho: this.texto(logo.caminho || logo.url || logo.src)
             };
         }
 
         return {
             tipo: "marca",
-            texto: "RK"
+            texto: "RK",
+            url: "",
+            caminho: ""
         };
     },
 
@@ -101,11 +127,16 @@ const DocumentModel = {
     },
 
     normalizarProduto(produto = {}, indice = 0) {
-        const valorUnitario = produto.valorUnitario ?? produto.precoVenda ?? produto.valorVenda;
-        const valorTotal = produto.subtotal ?? produto.valorTotal ?? produto.total ?? produto.totalGeral ?? valorUnitario;
-        const larguraCm = this.numero(produto.larguraCm ?? produto.largura, 0);
-        const alturaCm = this.numero(produto.alturaCm ?? produto.altura, 0);
-        const areaM2 = this.numero(produto.areaM2, larguraCm > 0 && alturaCm > 0 ? (larguraCm * alturaCm) / 10000 : 0);
+        const valorUnitario = this.primeiroNumero(produto, ["valorUnitario", "precoVenda", "valorVenda"], 0);
+        const valorTotal = this.primeiroNumero(
+            produto,
+            ["subtotalFinal", "valorTotal", "total", "totalGeral", "subtotal"],
+            valorUnitario
+        );
+        const larguraCm = this.primeiroNumero(produto, ["larguraCm", "largura"], 0);
+        const alturaCm = this.primeiroNumero(produto, ["alturaCm", "altura"], 0);
+        const areaCalculada = larguraCm > 0 && alturaCm > 0 ? (larguraCm * alturaCm) / 10000 : null;
+        const areaM2 = areaCalculada ?? this.primeiroNumero(produto, ["areaM2", "area"], 0);
 
         return {
             item: indice + 1,
@@ -129,13 +160,13 @@ const DocumentModel = {
             larguraCm,
             alturaCm,
             areaM2: this.arredondar(areaM2, 4),
-            valorUnitario: this.numero(valorUnitario, 0),
+            valorUnitario,
             percentualEngenharia: this.numero(produto.percentualEngenharia, 0),
-            valorAdicionalEngenharia: this.numero(produto.valorAdicionalEngenharia || produto.adicionalEngenharia, 0),
+            valorAdicionalEngenharia: this.primeiroNumero(produto, ["valorAdicionalEngenharia", "adicionalEngenharia"], 0),
             subtotalBase: this.numero(produto.subtotalBase, 0),
-            subtotalFinal: this.numero(produto.subtotalFinal || valorTotal, 0),
-            valorTotal: this.numero(valorTotal, 0),
-            subtotal: this.numero(valorTotal, 0),
+            subtotalFinal: this.primeiroNumero(produto, ["subtotalFinal", "valorTotal", "total", "totalGeral", "subtotal"], valorTotal),
+            valorTotal,
+            subtotal: valorTotal,
             observacoes: this.texto(produto.observacoes || produto.observacao)
         };
     },
@@ -144,7 +175,7 @@ const DocumentModel = {
         const subtotal = this.numero(totais.subtotal, 0);
         const desconto = this.numero(totais.desconto, 0);
         const acrescimo = this.numero(totais.acrescimo, 0);
-        const totalOrigem = totais.totalGeral ?? totais.valorTotal ?? totais.totalFinal ?? Math.max(0, subtotal - desconto + acrescimo);
+        const totalOrigem = totais.totalGeral ?? totais.valorTotal ?? totais.totalFinal ?? totais.total ?? Math.max(0, subtotal - desconto + acrescimo);
 
         return {
             subtotal,
@@ -205,9 +236,12 @@ const DocumentModel = {
 
     normalizarMetadados(metadados = {}) {
         const agora = this.agoraISO();
+        const numeroOrcamento = this.texto(metadados.numeroOrcamento || metadados.orcamentoNumero || metadados.numero);
 
         return {
             origem: this.texto(metadados.origem || "ORCAMENTO_INTELIGENTE"),
+            numeroOrcamento,
+            orcamentoNumero: numeroOrcamento,
             preparadoPara: this.lista(metadados.preparadoPara, ["PDF", "IMPRESSAO", "WHATSAPP", "EMAIL", "WEB"]),
             status: this.texto(metadados.status || "PREPARADO"),
             versaoOrigem: this.texto(metadados.versaoOrigem),
@@ -252,6 +286,15 @@ const DocumentModel = {
 
         const numero = Number(String(valor).replace(",", "."));
         return Number.isFinite(numero) ? numero : padrao;
+    },
+
+    primeiroNumero(objeto = {}, chaves = [], padrao = 0) {
+        const chave = chaves.find(nome => {
+            const valor = objeto[nome];
+            return valor !== undefined && valor !== null && valor !== "";
+        });
+
+        return chave ? this.numero(objeto[chave], padrao) : padrao;
     },
 
     arredondar(valor, casas = 2) {

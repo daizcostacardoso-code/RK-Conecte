@@ -3,6 +3,17 @@ const DocumentShareController = {
         aberto: false,
         documento: null,
         previewHtml: "",
+        pdfUrl: "",
+        pdfNomeArquivo: "",
+        filtros: {
+            numero: "",
+            cliente: "",
+            data: ""
+        },
+        resultadosBusca: [],
+        resultadoSelecionadoId: "",
+        fonteBusca: "",
+        buscando: false,
         mensagens: [],
         ultimaAcaoExportacao: "Nenhuma exportacao realizada."
     },
@@ -17,16 +28,25 @@ const DocumentShareController = {
 
     abrir(documento = null) {
         const documentoAtual = this.normalizarDocumento(documento || this.obterDocumentoAtual());
+        const registroAtual = this.normalizarRegistroAtual(documentoAtual);
+        this.revogarPdfUrl();
 
         this.estado = {
             ...this.estado,
             aberto: true,
             documento: documentoAtual,
             previewHtml: "",
+            pdfUrl: "",
+            pdfNomeArquivo: "",
+            filtros: this.montarFiltrosRegistro(registroAtual),
+            resultadosBusca: registroAtual ? [registroAtual] : [],
+            resultadoSelecionadoId: registroAtual ? registroAtual.id || registroAtual.numero : "",
+            fonteBusca: registroAtual ? "atual" : "",
             ultimaAcaoExportacao: this.obterUltimaAcao()
         };
 
         this.salvarDocumentoAtual(documentoAtual);
+        this.persistirDocumentoAtual("ABERTURA_CENTRAL");
         this.renderizar();
         return true;
     },
@@ -54,7 +74,10 @@ const DocumentShareController = {
             return this.registrarMensagem(this.formatarErros(resultado.erros), "erro");
         }
 
+        this.revogarPdfUrl();
         this.estado.previewHtml = resultado.html;
+        this.estado.pdfUrl = "";
+        this.estado.pdfNomeArquivo = "";
         this.registrarAcao("Documento visualizado.");
         return this.registrarMensagem("Documento Comercial renderizado para visualizacao.", "sucesso");
     },
@@ -66,6 +89,7 @@ const DocumentShareController = {
             return this.registrarMensagem(this.formatarErros(validacao.erros), "erro");
         }
 
+        await this.persistirDocumentoAtual("DOWNLOAD_PDF");
         const resultado = ExportService.exportar(this.estado.documento, {
             formato: "PDF",
             adapters: {
@@ -77,7 +101,9 @@ const DocumentShareController = {
             return this.registrarMensagem(this.formatarErros(resultado.erros), "erro");
         }
 
-        this.estado.previewHtml = resultado.html || this.estado.previewHtml;
+        this.revogarPdfUrl();
+        this.estado.pdfUrl = "";
+        this.estado.pdfNomeArquivo = "";
         this.registrarAcao("PDF solicitado pelo adapter.");
 
         if (resultado.arquivo && typeof resultado.arquivo.gerar === "function") {
@@ -95,6 +121,49 @@ const DocumentShareController = {
         return this.registrarMensagem("PDF preparado, mas download indisponivel neste ambiente.", "sucesso");
     },
 
+    async visualizarPdf() {
+        const validacao = this.validarDocumentoAtual();
+
+        if (!validacao.valido) {
+            return this.registrarMensagem(this.formatarErros(validacao.erros), "erro");
+        }
+
+        await this.persistirDocumentoAtual("PREVIEW_PDF");
+        const resultado = ExportService.exportar(this.estado.documento, {
+            formato: "PDF",
+            adapters: {
+                PDF: typeof PdfAdapter !== "undefined" ? PdfAdapter : null
+            }
+        });
+
+        if (!resultado.sucesso) {
+            return this.registrarMensagem(this.formatarErros(resultado.erros), "erro");
+        }
+
+        if (!resultado.arquivo || typeof resultado.arquivo.gerar !== "function") {
+            return this.registrarMensagem("PDF preparado, mas preview indisponivel neste ambiente.", "erro");
+        }
+
+        this.registrarMensagem("PDF em geracao para visualizacao.", "sucesso");
+        const pdf = await resultado.arquivo.gerar();
+
+        if (!pdf?.sucesso || !pdf.bytes) {
+            return this.registrarMensagem(this.formatarErros(pdf?.erros || ["Nao foi possivel gerar o PDF para visualizacao."]), "erro");
+        }
+
+        const url = this.criarUrlPdf(pdf.bytes, pdf.mimeType || resultado.arquivo.mimeType);
+
+        if (!url) {
+            return this.registrarMensagem("Navegador sem suporte para preview local do PDF.", "erro");
+        }
+
+        this.estado.previewHtml = resultado.html || this.estado.previewHtml;
+        this.estado.pdfUrl = url;
+        this.estado.pdfNomeArquivo = pdf.nomeArquivo || resultado.arquivo.nomeArquivo || "documento-comercial.pdf";
+        this.registrarAcao("PDF visualizado sem download.");
+        return this.registrarMensagem("PDF gerado para visualizacao. Nenhum download foi iniciado.", "sucesso");
+    },
+
     baixarArquivo(bytes, nomeArquivo = "documento-comercial.pdf", mimeType = "application/pdf") {
         if (typeof Blob === "undefined" || typeof URL === "undefined" || typeof document === "undefined") {
             return false;
@@ -110,6 +179,159 @@ const DocumentShareController = {
         link.remove();
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
         return true;
+    },
+
+    criarUrlPdf(bytes, mimeType = "application/pdf") {
+        if (typeof Blob === "undefined" || typeof URL === "undefined") {
+            return "";
+        }
+
+        this.revogarPdfUrl();
+        const blob = new Blob([bytes], { type: mimeType || "application/pdf" });
+        return URL.createObjectURL(blob);
+    },
+
+    revogarPdfUrl() {
+        if (this.estado.pdfUrl && typeof URL !== "undefined" && typeof URL.revokeObjectURL === "function") {
+            URL.revokeObjectURL(this.estado.pdfUrl);
+        }
+    },
+
+    async buscarPdfPorFiltros(filtros = null) {
+        const filtrosBusca = this.normalizarFiltrosBusca(filtros || this.obterFiltrosDaTela());
+
+        if (!this.filtrosTemBusca(filtrosBusca)) {
+            const registroAtual = this.normalizarRegistroAtual(this.estado.documento);
+
+            this.estado = {
+                ...this.estado,
+                filtros: filtrosBusca,
+                buscando: false,
+                fonteBusca: registroAtual ? "atual" : "",
+                resultadosBusca: registroAtual ? [registroAtual] : [],
+                resultadoSelecionadoId: registroAtual ? registroAtual.id || registroAtual.numero : ""
+            };
+            this.renderizar();
+
+            return this.registrarMensagem(
+                registroAtual
+                    ? "Filtro vazio manteve o orcamento atual carregado."
+                    : "Informe numero, cliente ou data para buscar PDFs.",
+                registroAtual ? "neutro" : "erro"
+            );
+        }
+
+        this.estado = {
+            ...this.estado,
+            filtros: filtrosBusca,
+            buscando: true,
+            fonteBusca: "",
+            resultadosBusca: []
+        };
+        this.renderizar();
+
+        if (typeof DocumentPdfRepository === "undefined" || !DocumentPdfRepository) {
+            this.estado.buscando = false;
+            return this.registrarMensagem("Repositorio de PDFs indisponivel para busca.", "erro");
+        }
+
+        const resultado = await DocumentPdfRepository.buscar(filtrosBusca);
+
+        this.estado.buscando = false;
+        this.estado.resultadosBusca = resultado.registros || [];
+        this.estado.fonteBusca = resultado.fonte || "";
+        this.registrarAcao(`Busca de PDF executada em ${resultado.fonte || "armazenamento"}.`);
+
+        if (!this.estado.resultadosBusca.length) {
+            return this.registrarMensagem("Nenhum PDF encontrado para os filtros informados.", "erro");
+        }
+
+        return this.registrarMensagem(`${this.estado.resultadosBusca.length} PDF(s) encontrado(s) em ${resultado.fonte === "firestore" ? "Firestore" : "armazenamento local"}.`, "sucesso");
+    },
+
+    limparFiltros() {
+        const registroAtual = this.normalizarRegistroAtual(this.estado.documento);
+
+        this.estado = {
+            ...this.estado,
+            filtros: {
+                numero: "",
+                cliente: "",
+                data: ""
+            },
+            resultadosBusca: registroAtual ? [registroAtual] : [],
+            resultadoSelecionadoId: registroAtual ? registroAtual.id || registroAtual.numero : "",
+            fonteBusca: registroAtual ? "atual" : ""
+        };
+
+        this.renderizar();
+        return true;
+    },
+
+    selecionarRegistro(registroId, opcoes = {}) {
+        const registro = this.encontrarRegistro(registroId);
+
+        if (!registro) {
+            return this.registrarMensagem("PDF selecionado nao encontrado na lista de resultados.", "erro");
+        }
+
+        if (typeof DocumentPdfRepository === "undefined" || !DocumentPdfRepository) {
+            return this.registrarMensagem("Repositorio de PDFs indisponivel para abrir o resultado.", "erro");
+        }
+
+        const documento = this.normalizarDocumento(DocumentPdfRepository.obterDocumento(registro));
+
+        if (!documento) {
+            return this.registrarMensagem("O resultado encontrado nao possui dados suficientes para visualizar ou baixar o PDF.", "erro");
+        }
+
+        this.revogarPdfUrl();
+        this.estado = {
+            ...this.estado,
+            documento,
+            previewHtml: "",
+            pdfUrl: "",
+            pdfNomeArquivo: "",
+            resultadoSelecionadoId: registro.id || registroId
+        };
+        this.salvarDocumentoAtual(documento);
+        this.registrarAcao(`PDF ${registro.numero || registro.id} carregado da busca.`);
+
+        if (opcoes.visualizarHtml === false) {
+            this.renderizar();
+            return {
+                sucesso: true,
+                documento,
+                registro
+            };
+        }
+
+        this.visualizar();
+        return {
+            sucesso: true,
+            documento,
+            registro
+        };
+    },
+
+    async visualizarPdfRegistro(registroId) {
+        const selecao = this.selecionarRegistro(registroId, { visualizarHtml: false });
+
+        if (!selecao?.sucesso) {
+            return selecao;
+        }
+
+        return this.visualizarPdf();
+    },
+
+    async baixarPdfRegistro(registroId) {
+        const selecao = this.selecionarRegistro(registroId, { visualizarHtml: false });
+
+        if (!selecao?.sucesso) {
+            return selecao;
+        }
+
+        return this.exportarPdf();
     },
 
     imprimir() {
@@ -199,6 +421,14 @@ const DocumentShareController = {
         return AppState.setState("documentoAtual", documento);
     },
 
+    async persistirDocumentoAtual(origem = "DOCUMENTO_COMERCIAL") {
+        if (!this.estado.documento || typeof DocumentPdfRepository === "undefined" || !DocumentPdfRepository) {
+            return null;
+        }
+
+        return DocumentPdfRepository.salvar(this.estado.documento, { origem });
+    },
+
     obterUltimaAcao() {
         if (typeof AppState === "undefined" || typeof AppState.getItem !== "function") {
             return this.estado.ultimaAcaoExportacao;
@@ -278,6 +508,53 @@ const DocumentShareController = {
 
     errosUnicos(erros = []) {
         return [...new Set(erros.filter(Boolean))];
+    },
+
+    obterFiltrosDaTela() {
+        if (typeof DocumentShareUI !== "undefined" && typeof DocumentShareUI.obterFiltros === "function") {
+            return this.normalizarFiltrosBusca(DocumentShareUI.obterFiltros());
+        }
+
+        return this.normalizarFiltrosBusca(this.estado.filtros || {});
+    },
+
+    normalizarFiltrosBusca(filtros = {}) {
+        return {
+            numero: String(filtros.numero || filtros.numeroOrcamento || "").trim(),
+            cliente: String(filtros.cliente || "").trim(),
+            data: filtros.data || ""
+        };
+    },
+
+    filtrosTemBusca(filtros = {}) {
+        return !!(filtros.numero || filtros.cliente || filtros.data);
+    },
+
+    normalizarRegistroAtual(documento = null) {
+        if (!documento || typeof DocumentPdfRepository === "undefined" || !DocumentPdfRepository) {
+            return null;
+        }
+
+        if (typeof DocumentPdfRepository.normalizarRegistro !== "function") {
+            return null;
+        }
+
+        return DocumentPdfRepository.normalizarRegistro(documento);
+    },
+
+    montarFiltrosRegistro(registro = null) {
+        return {
+            numero: registro?.numero || "",
+            cliente: "",
+            data: ""
+        };
+    },
+
+    encontrarRegistro(registroId) {
+        const id = String(registroId || "");
+        return (this.estado.resultadosBusca || []).find(registro => {
+            return String(registro.id || "") === id || String(registro.numero || "") === id;
+        }) || null;
     },
 
     agoraLegivel() {

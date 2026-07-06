@@ -35,7 +35,7 @@ const DocumentHtmlRenderer = {
         const empresa = dados.empresa || {};
         const projeto = dados.projeto || {};
         const metadados = dados.metadados || {};
-        const numero = projeto.numero || projeto.id || "Proposta comercial";
+        const numero = metadados.numeroOrcamento || metadados.orcamentoNumero || projeto.numero || projeto.id || "Proposta comercial";
         const data = this.formatarData(metadados.geradoEm || metadados.atualizadoEm || new Date().toISOString());
 
         return [
@@ -101,7 +101,7 @@ const DocumentHtmlRenderer = {
             `<td>${this.escapar(this.formatarNumero(produto.quantidade))}</td>`,
             `<td>${this.formatarMoeda(produto.valorUnitario, dados.totais?.moeda)}</td>`,
             `<td>${Number(produto.valorAdicionalEngenharia || 0) > 0 ? this.formatarMoeda(produto.valorAdicionalEngenharia, dados.totais?.moeda) : ""}</td>`,
-            `<td>${this.formatarMoeda(produto.subtotal ?? produto.valorTotal, dados.totais?.moeda)}</td>`,
+            `<td>${this.formatarMoeda(this.obterSubtotalProduto(produto), dados.totais?.moeda)}</td>`,
             `</tr>`
         ].join("")).join("");
 
@@ -240,9 +240,27 @@ const DocumentHtmlRenderer = {
     },
 
     formatarMedidas(produto = {}) {
-        const largura = this.formatarNumero(produto.larguraCm || 0);
-        const altura = this.formatarNumero(produto.alturaCm || 0);
+        const largura = this.formatarNumero(this.primeiroNumero(produto, ["larguraCm", "largura"], 0));
+        const altura = this.formatarNumero(this.primeiroNumero(produto, ["alturaCm", "altura"], 0));
         return `${largura} x ${altura} cm`;
+    },
+
+    obterSubtotalProduto(produto = {}) {
+        return this.primeiroNumero(produto, ["subtotalFinal", "valorTotal", "total", "totalGeral", "subtotal"], 0);
+    },
+
+    primeiroNumero(objeto = {}, chaves = [], padrao = 0) {
+        const chave = chaves.find(nome => {
+            const valor = objeto[nome];
+            return valor !== undefined && valor !== null && valor !== "";
+        });
+
+        if (!chave) {
+            return padrao;
+        }
+
+        const numero = Number(String(objeto[chave]).replace(",", "."));
+        return Number.isFinite(numero) ? numero : padrao;
     },
 
     formatarArea(valor) {
