@@ -64,6 +64,12 @@ Detalhes de infraestrutura nao devem vazar para a interface.
 
 Repositorios e adapters formam a ponte entre Aplicacao e Infraestrutura. O reposititorio fala com um adapter; o adapter decide se os dados ficam em memoria, LocalStorage, Firestore ou outra tecnologia futura.
 
+Na Sprint 5.3, a base tecnica para MySQL/API nasce de forma isolada em
+`api/`. Firebase e LocalStorage continuam sendo as fontes atuais. O MySQL sera
+ativado futuramente por modulo, sempre via API Node.js/Express e Repository
+Pattern. Nenhuma tela deve acessar MySQL diretamente ou conhecer credenciais de
+banco.
+
 ### Interface
 
 Mostra dados, coleta entradas do usuario e chama servicos de aplicacao.
@@ -113,8 +119,8 @@ diretamente e nao implementa cadastro, edicao ou inicio real de orcamento.
 Na Sprint 3.6, o dominio Produtos entra como estrutura de base do Bloco
 Comercial. Produtos segue o Core v1 com model, factory, validator, service,
 repository e use cases. Esta sprint prepara o futuro Catalogo de Produtos e o
-Orcamento Inteligente, com categorias, subcategorias de vidro, precificacao e
-atributos tecnicos, sem implementar tela, HTML, CSS, Firebase ou alteracoes no
+Orcamento Inteligente, com categorias, unidades de calculo, regras de consumo e
+custo unitario, sem implementar tela, HTML, CSS, Firebase ou alteracoes no
 Orcamento atual.
 
 Na Sprint 3.7, nasce o Motor de Calculo Comercial como modulo reutilizavel e
@@ -315,6 +321,30 @@ O calculo continua em `CalculoService`/`CalculoEngine`; o orquestrador prepara
 um unico contexto final para resumo, Documento Comercial, preview e PDF,
 evitando regra duplicada em HTML, preview ou adapter.
 
+Na Sprint de Cadastros Base para Orcamento Inteligente, Projetos, Produtos e
+Servicos passam a ter telas internas de cadastro, edicao, listagem, pesquisa e
+inativacao logica. Produtos registram materiais, insumos, acessorios, ferragens,
+vidros e mao de obra com unidade de calculo, regra de consumo/calculo, custo
+unitario, status e observacoes, sem margem, lucro, markup ou preco de venda
+nesta sprint. Servicos registram tipos/modelos
+de item, dependencias padrao e tamanhos padrao por modelo, incluindo a base
+inicial de Porta, Janela, Box, Espelho, Vidro fixo, Fachada, Guarda-corpo e
+Outros. Projetos mantem selecao para uso futuro no Orcamento Inteligente. A
+persistencia usa Repository Pattern com `LocalStorageAdapter`, sem API/MySQL e
+sem alterar calculo, PDF, preview, area publica, producao, dashboard ou fluxo
+atual do Orcamento Inteligente.
+
+Na Sprint de Cadastros Guiados para Orcamento Inteligente, a camada de
+cadastros passa a explicar a cadeia Cliente -> Projeto -> Servico -> Tipo de
+servico -> Dependencias/produtos -> Orcamento. `Projeto padrao` deve estar
+sempre disponivel para orcamentos rapidos e os Servicos internos passam a ser
+macro categorias como Instalacao, Manutencao, Limpeza, Medicao tecnica, Remocao
+e Outros. Dependencias de Servicos e Tipos de servico devem ser selecionadas
+somente de Produtos ativos cadastrados, armazenando `produtoId`, nome, categoria,
+unidade de calculo, regra de calculo, quantidade padrao, custo unitario, custo
+estimado, obrigatoriedade e observacao. Esta sprint nao altera calculo, PDF, preview, producao, aprovacao,
+conversao, area publica ou o fluxo visual atual do Orcamento Inteligente.
+
 ### Financeiro
 
 Recebimentos, pagamentos, custos, saldo, margem, comissoes e relatorios.
@@ -470,6 +500,13 @@ A tela de Producao apresenta indicadores simples, lista de ordens, painel de
 detalhes, formulario de planejamento, checklist marcavel e historico, sempre
 consumindo use cases/services e mantendo MemoryAdapter/sessionStorage demo como
 persistencia temporaria da sprint.
+
+Sprint 5.3 prepara a fundacao futura de API/MySQL sem trocar a persistencia
+atual. A estrutura `api/` contem Express, conexao MySQL por variaveis de
+ambiente, health checks, schema SQL inicial e camadas para controllers,
+services, repositories, models e migrations. O frontend recebe apenas
+`js/storage/api-adapter.js` como placeholder seguro, sem substituir Firebase,
+Firestore, localStorage ou adapters atuais.
 
 ### v0.5.0 - Financeiro
 

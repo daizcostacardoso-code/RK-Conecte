@@ -1,8 +1,15 @@
 const OrcamentoInteligenteController = {
     contexto: null,
     etapaAtual: "cliente",
-    etapas: ["cliente", "projeto", "servico", "produtos", "calculo", "resumo"],
+    etapas: ["cliente", "projeto", "servico", "produtos", "revisao", "calculo", "resumo"],
     timerAtualizacao: null,
+    scrollRaf: null,
+    rolagemProgramatica: false,
+    timerRolagemProgramatica: null,
+    timerEncaixeScroll: null,
+    ultimoScrollY: 0,
+    direcaoRolagem: 1,
+    etapaEmPreparacao: "",
     dados: {
         clientes: [],
         projetos: [],
@@ -11,7 +18,9 @@ const OrcamentoInteligenteController = {
     },
 
     async iniciarTela() {
+        document.documentElement.classList.add("orcamento-inteligente-html");
         this.configurarClienteService();
+        this.configurarCatalogosService();
         OrcamentoInteligenteUI.iniciar();
         this.vincularEventos();
         await this.novoOrcamento();
@@ -37,6 +46,52 @@ const OrcamentoInteligenteController = {
         return true;
     },
 
+    configurarCatalogosService() {
+        const criarAdapter = () => {
+            if (typeof criarLocalStorageAdapter === "function") {
+                return criarLocalStorageAdapter();
+            }
+
+            if (typeof criarMemoryAdapter === "function") {
+                return criarMemoryAdapter();
+            }
+
+            return null;
+        };
+
+        if (typeof ServicoRepository !== "undefined" && !ServicoRepository.adapter) {
+            const adapter = criarAdapter();
+            if (adapter) {
+                ServicoRepository.configurar(adapter);
+            }
+        }
+
+        if (
+            typeof ServicoRepository !== "undefined" &&
+            typeof ServicoService !== "undefined" &&
+            typeof ServicoService.configurar === "function"
+        ) {
+            ServicoService.configurar(ServicoRepository);
+        }
+
+        if (typeof ProdutoRepository !== "undefined" && !ProdutoRepository.adapter) {
+            const adapter = criarAdapter();
+            if (adapter) {
+                ProdutoRepository.configurar(adapter);
+            }
+        }
+
+        if (
+            typeof ProdutoRepository !== "undefined" &&
+            typeof ProdutoService !== "undefined" &&
+            typeof ProdutoService.configurar === "function"
+        ) {
+            ProdutoService.configurar(ProdutoRepository);
+        }
+
+        return true;
+    },
+
     vincularEventos() {
         const btnNovo = OrcamentoInteligenteUI.elementos.btnNovo;
         if (btnNovo) {
@@ -48,6 +103,12 @@ const OrcamentoInteligenteController = {
         modulo.addEventListener("click", evento => this.processarAcao(evento));
         modulo.addEventListener("input", evento => this.processarAlteracaoTempoReal(evento));
         modulo.addEventListener("change", evento => this.processarAlteracaoTempoReal(evento));
+
+        window.addEventListener("scroll", () => this.processarScrollFluxo(), { passive: true });
+        window.addEventListener("resize", () => {
+            this.sincronizarEtapaPorScroll();
+            this.agendarEncaixeScroll();
+        }, { passive: true });
     },
 
     async novoOrcamento() {
@@ -124,6 +185,16 @@ const OrcamentoInteligenteController = {
             return;
         }
 
+        if (acao === "ir-etapa") {
+            this.irParaEtapa(botao.dataset.orcamentoEtapa);
+            return;
+        }
+
+        if (acao === "novo-orcamento") {
+            await this.novoOrcamento();
+            return;
+        }
+
         if (acao === "remover-produto") {
             await this.removerProduto(Number(botao.dataset.indice));
             return;
@@ -153,6 +224,31 @@ const OrcamentoInteligenteController = {
 
         if (alvo.matches("#orcamentoProdutoSelect")) {
             this.preencherItemPorProduto(alvo);
+        }
+
+        if (evento.type === "change" && alvo.matches("#orcamentoClienteSelect")) {
+            void this.selecionarCliente(alvo.value);
+            return;
+        }
+
+        if (evento.type === "change" && alvo.matches("#orcamentoProjetoSelect")) {
+            void this.selecionarProjeto(alvo.value);
+            return;
+        }
+
+        if (evento.type === "change" && alvo.matches("[data-orcamento-form='servico'] input[name='servicoIds']")) {
+            const form = alvo.closest("[data-orcamento-form='servico']");
+            const selecionados = Array.from(form?.querySelectorAll("input[name='servicoIds']:checked") || [])
+                .map(item => item.value)
+                .filter(Boolean);
+
+            if (!selecionados.length) {
+                this.mostrarAviso("Selecione pelo menos um tipo de servico.", "erro");
+                return;
+            }
+
+            void this.selecionarServicos(selecionados);
+            return;
         }
 
         if (alvo.closest("[data-orcamento-form='produto']")) {
@@ -193,7 +289,38 @@ const OrcamentoInteligenteController = {
             return;
         }
 
+        if (this.mesmaEntidade(this.contexto?.cliente, cliente)) {
+            const projetoAtual = this.contexto?.projeto || null;
+            const projetoAtualDisponivel = projetoAtual
+                ? this.obterProjetosDisponiveis().some(projeto => this.mesmaEntidade(projeto, projetoAtual))
+                : false;
+
+            if (!projetoAtualDisponivel) {
+                const projetoPadrao = this.obterProjetoPadraoParaCliente(cliente);
+                const comProjetoPadrao = await OrcamentoOrchestrator.selecionarProjeto(this.contexto, projetoPadrao);
+                this.aplicarResultado(comProjetoPadrao, "projeto");
+                return;
+            }
+
+            this.mostrarAviso("Cliente ja estava selecionado.", "info");
+            this.renderizarEtapaAtual();
+            this.atualizarResumo();
+            return;
+        }
+
         const resultado = await OrcamentoOrchestrator.selecionarCliente(this.contexto, cliente);
+        if (!resultado.sucesso) {
+            this.aplicarResultado(resultado, "projeto");
+            return;
+        }
+
+        const projetoPadrao = this.obterProjetoPadraoParaCliente(cliente);
+        if (projetoPadrao) {
+            const comProjetoPadrao = await OrcamentoOrchestrator.selecionarProjeto(resultado.contexto, projetoPadrao);
+            this.aplicarResultado(comProjetoPadrao, "projeto");
+            return;
+        }
+
         this.aplicarResultado(resultado, "projeto");
     },
 
@@ -277,7 +404,7 @@ const OrcamentoInteligenteController = {
         }
 
         const resultado = await OrcamentoOrchestrator.selecionarServico(this.contexto, servico);
-        this.aplicarResultado(resultado, "produtos");
+        this.aplicarResultado(resultado, "");
     },
 
     async selecionarServicos(servicoIds = []) {
@@ -292,7 +419,11 @@ const OrcamentoInteligenteController = {
             ? await OrcamentoOrchestrator.selecionarServicos(this.contexto, ids)
             : await OrcamentoOrchestrator.selecionarServico(this.contexto, ids[0]);
 
-        this.aplicarResultado(resultado, "produtos");
+        this.aplicarResultado(resultado, "");
+
+        if (resultado.sucesso) {
+            this.mostrarAviso("Tipo de servico selecionado. Avance pela timeline quando estiver pronto.", "info");
+        }
     },
 
     async adicionarProduto(dadosItem = {}) {
@@ -328,7 +459,8 @@ const OrcamentoInteligenteController = {
 
     async removerProduto(indice) {
         const resultado = await OrcamentoOrchestrator.removerProduto(this.contexto, { indice });
-        this.aplicarResultado(resultado, "produtos");
+        const possuiProdutos = Array.isArray(resultado.contexto?.produtos) && resultado.contexto.produtos.length > 0;
+        this.aplicarResultado(resultado, possuiProdutos ? "revisao" : "produtos");
     },
 
     async calcularOrcamento(dadosCalculo = {}) {
@@ -341,7 +473,7 @@ const OrcamentoInteligenteController = {
             ? await CalcularOrcamentoUseCase.executar(this.contexto, dadosCalculo)
             : await OrcamentoOrchestrator.calcular(this.contexto, dadosCalculo);
 
-        this.aplicarResultado(resultado, resultado.sucesso ? "resumo" : "calculo");
+        this.aplicarResultado(resultado, "calculo");
     },
 
     async atualizarItensDaTela(opcoes = {}) {
@@ -382,16 +514,20 @@ const OrcamentoInteligenteController = {
         return (this.contexto || {}).resumo || null;
     },
 
-    async validarOrcamento() {
+    async validarOrcamento(opcoes = {}) {
         const resultado = await OrcamentoOrchestrator.validar(this.contexto || {});
         this.contexto = resultado.contexto;
-        this.renderizarEtapaAtual();
+        if (opcoes.renderizar !== false) {
+            this.renderizarEtapaAtual();
+        }
         this.atualizarResumo();
 
-        if (!resultado.sucesso) {
+        if (!resultado.sucesso && !opcoes.silencioso) {
             this.mostrarAviso(resultado.erros.join(" "), "erro");
-        } else {
+        } else if (resultado.sucesso && !opcoes.silencioso) {
             this.mostrarAviso("Orcamento validado para finalizacao.", "info");
+            this.sincronizarFluxo();
+        } else if (resultado.sucesso) {
             this.sincronizarFluxo();
         }
 
@@ -419,16 +555,20 @@ const OrcamentoInteligenteController = {
         } else {
             this.mostrarAviso("Orcamento finalizado e preparado para PDF comercial.", "info");
             this.sincronizarFluxo();
+            const documento = await this.gerarDocumentoComercial({ finalizarSeNecessario: false, silencioso: true });
+            if (documento?.sucesso) {
+                this.irParaCompartilhamento();
+            }
         }
 
         return resultado;
     },
 
-    async gerarDocumentoComercial() {
+    async gerarDocumentoComercial(opcoes = {}) {
         await this.atualizarItensDaTela({ renderizar: false, silencioso: true });
         await this.atualizarComplementos(this.coletarComplementosDaTela(), { silencioso: true });
 
-        if (!this.contexto?.orcamentoPreparado) {
+        if (!this.contexto?.orcamentoPreparado && opcoes.finalizarSeNecessario !== false) {
             const finalizacao = await this.finalizarOrcamento();
             if (!finalizacao?.sucesso) {
                 return finalizacao;
@@ -469,7 +609,9 @@ const OrcamentoInteligenteController = {
         }
 
         await this.persistirDocumentoGerado(resultado.documento);
-        this.mostrarAviso("Documento Comercial gerado e enviado para compartilhamento.", "info");
+        if (!opcoes.silencioso) {
+            this.mostrarAviso("Documento Comercial gerado e enviado para compartilhamento.", "info");
+        }
         return resultado;
     },
 
@@ -481,12 +623,13 @@ const OrcamentoInteligenteController = {
 
         const bloqueio = this.obterBloqueioEtapa(proxima);
         if (bloqueio) {
-            this.mostrarAviso(bloqueio, "erro");
+            this.mostrarAviso(bloqueio, "erro", { destaque: true });
             return;
         }
 
         this.etapaAtual = proxima;
         this.renderizarEtapaAtual();
+        this.rolarParaEtapaAtual();
     },
 
     voltarEtapa() {
@@ -497,6 +640,24 @@ const OrcamentoInteligenteController = {
 
         this.etapaAtual = anterior;
         this.renderizarEtapaAtual();
+        this.rolarParaEtapaAtual();
+    },
+
+    irParaEtapa(etapa) {
+        if (!this.etapas.includes(etapa)) {
+            return false;
+        }
+
+        const bloqueio = this.obterBloqueioAteEtapa(etapa);
+        if (bloqueio.mensagem) {
+            this.mostrarAviso(bloqueio.mensagem, "erro", { destaque: true });
+            return false;
+        }
+
+        this.etapaAtual = etapa;
+        this.renderizarEtapaAtual();
+        this.rolarParaEtapaAtual();
+        return true;
     },
 
     renderizarEtapaAtual() {
@@ -510,6 +671,8 @@ const OrcamentoInteligenteController = {
             },
             this.etapaAtual
         );
+        this.rolarParaEtapaAtual();
+        this.prepararEtapaAoEntrar(this.etapaAtual);
     },
 
     atualizarEtapa(status) {
@@ -534,11 +697,209 @@ const OrcamentoInteligenteController = {
             this.mostrarAviso(resultado.erros.join(" "), "erro");
         } else {
             this.sincronizarFluxo();
+            this.prepararEtapaAoEntrar(this.etapaAtual);
         }
     },
 
-    mostrarAviso(mensagem, tipo = "info") {
-        OrcamentoInteligenteUI.mostrarAviso(mensagem, tipo);
+    processarScrollFluxo() {
+        const scrollAtual = window.scrollY || 0;
+        this.direcaoRolagem = scrollAtual >= this.ultimoScrollY ? 1 : -1;
+        this.ultimoScrollY = scrollAtual;
+        this.sincronizarEtapaPorScroll();
+        this.agendarEncaixeScroll();
+    },
+
+    sincronizarEtapaPorScroll() {
+        if (!this.estaEmMobile() || this.rolagemProgramatica || this.scrollRaf) {
+            return;
+        }
+
+        this.scrollRaf = window.requestAnimationFrame(() => {
+            this.scrollRaf = null;
+
+            const etapaVisivel = this.obterEtapaVisivelPorScroll();
+            if (!etapaVisivel || etapaVisivel === this.etapaAtual) {
+                return;
+            }
+
+            const bloqueio = this.obterBloqueioAteEtapa(etapaVisivel);
+            if (bloqueio.mensagem) {
+                this.etapaAtual = bloqueio.etapaPermitida;
+                OrcamentoInteligenteUI.atualizarEstadoEtapas(this.contextoComResumo(), this.etapaAtual);
+                OrcamentoInteligenteUI.exibirSecaoAtual(this.etapaAtual);
+                this.mostrarAviso(bloqueio.mensagem, "erro", { destaque: true });
+                this.rolarParaEtapa(this.etapaAtual);
+                return;
+            }
+
+            this.etapaAtual = etapaVisivel;
+            OrcamentoInteligenteUI.atualizarEstadoEtapas(this.contextoComResumo(), this.etapaAtual);
+            OrcamentoInteligenteUI.exibirSecaoAtual(this.etapaAtual);
+            this.prepararEtapaAoEntrar(this.etapaAtual);
+        });
+    },
+
+    obterEtapaVisivelPorScroll() {
+        const secoes = this.obterSecoesFluxo();
+        if (!secoes.length) return "";
+
+        const alturaHeader = this.alturaHeaderMobile();
+        const marcador = alturaHeader + ((window.innerHeight - alturaHeader) * 0.42);
+        let melhor = null;
+        let menorDistancia = Number.POSITIVE_INFINITY;
+
+        secoes.forEach(secao => {
+            const rect = secao.getBoundingClientRect();
+            const visivel = rect.bottom > alturaHeader + 12 && rect.top < window.innerHeight - 12;
+
+            if (!visivel) {
+                return;
+            }
+
+            if (rect.top <= marcador && rect.bottom >= marcador) {
+                melhor = secao;
+                menorDistancia = 0;
+                return;
+            }
+
+            const centro = rect.top + (rect.height / 2);
+            const distancia = Math.abs(centro - marcador);
+            if (distancia < menorDistancia) {
+                melhor = secao;
+                menorDistancia = distancia;
+            }
+        });
+
+        return melhor?.dataset.orcamentoSecao || "";
+    },
+
+    obterSecoesFluxo() {
+        return Array.from(document.querySelectorAll("[data-orcamento-secao]"))
+            .filter(secao => this.etapas.includes(secao.dataset.orcamentoSecao));
+    },
+
+    obterBloqueioAteEtapa(etapa) {
+        const indiceAlvo = this.etapas.indexOf(etapa);
+        if (indiceAlvo <= 0) {
+            return { mensagem: "", etapaPermitida: this.etapas[0] };
+        }
+
+        for (let indice = 1; indice <= indiceAlvo; indice += 1) {
+            const etapaAtual = this.etapas[indice];
+            const mensagem = this.obterBloqueioEtapa(etapaAtual);
+
+            if (mensagem) {
+                return {
+                    mensagem,
+                    etapaPermitida: this.etapas[indice - 1] || this.etapas[0]
+                };
+            }
+        }
+
+        return { mensagem: "", etapaPermitida: etapa };
+    },
+
+    agendarEncaixeScroll() {
+        if (!this.estaEmMobile() || this.rolagemProgramatica) {
+            return;
+        }
+
+        window.clearTimeout(this.timerEncaixeScroll);
+        this.timerEncaixeScroll = window.setTimeout(() => this.encaixarEtapaPorScroll(), 130);
+    },
+
+    encaixarEtapaPorScroll() {
+        if (!this.estaEmMobile() || this.rolagemProgramatica) {
+            return;
+        }
+
+        const etapaVisivel = this.obterEtapaVisivelPorScroll();
+        if (!etapaVisivel) return;
+
+        const bloqueio = this.obterBloqueioAteEtapa(etapaVisivel);
+        const etapaDestino = bloqueio.mensagem ? bloqueio.etapaPermitida : etapaVisivel;
+
+        this.etapaAtual = etapaDestino;
+        OrcamentoInteligenteUI.atualizarEstadoEtapas(this.contextoComResumo(), this.etapaAtual);
+        OrcamentoInteligenteUI.exibirSecaoAtual(this.etapaAtual);
+        this.rolarParaEtapa(this.etapaAtual);
+        this.prepararEtapaAoEntrar(this.etapaAtual);
+
+        if (bloqueio.mensagem) {
+            this.mostrarAviso(bloqueio.mensagem, "erro", { destaque: true });
+        }
+    },
+
+    rolarParaEtapaAtual() {
+        this.rolarParaEtapa(this.etapaAtual);
+    },
+
+    rolarParaEtapa(etapa) {
+        if (!this.estaEmMobile()) {
+            return;
+        }
+
+        const secao = document.querySelector(`[data-orcamento-secao="${etapa}"]`);
+        if (!secao) return;
+
+        window.clearTimeout(this.timerRolagemProgramatica);
+        this.rolagemProgramatica = true;
+        const topo = window.scrollY + secao.getBoundingClientRect().top - this.alturaHeaderMobile();
+        window.scrollTo({
+            top: Math.max(0, topo),
+            behavior: "smooth"
+        });
+
+        this.timerRolagemProgramatica = window.setTimeout(() => {
+            this.rolagemProgramatica = false;
+            this.sincronizarEtapaPorScroll();
+        }, 700);
+    },
+
+    async prepararEtapaAoEntrar(etapa) {
+        if (!["calculo", "resumo"].includes(etapa) || this.etapaEmPreparacao === etapa) {
+            return null;
+        }
+
+        this.etapaEmPreparacao = etapa;
+
+        try {
+            if (this.coletarItensDaTela().length) {
+                await this.atualizarItensDaTela({ renderizar: false, silencioso: true });
+            }
+
+            if (etapa === "resumo") {
+                await this.atualizarComplementos(this.coletarComplementosDaTela(), {
+                    renderizar: false,
+                    silencioso: true
+                });
+
+                if (this.contexto?.resultado?.sucesso) {
+                    await this.validarOrcamento({ renderizar: false, silencioso: true });
+                }
+            }
+        } finally {
+            this.etapaEmPreparacao = "";
+        }
+
+        return this.contexto;
+    },
+
+    alturaHeaderMobile() {
+        const header = document.querySelector("body.orcamento-inteligente-page > header");
+        if (!header) return 82;
+
+        return Math.max(58, Math.round(header.getBoundingClientRect().height));
+    },
+
+    estaEmMobile() {
+        return typeof window !== "undefined"
+            && typeof window.matchMedia === "function"
+            && window.matchMedia("(max-width: 820px)").matches;
+    },
+
+    mostrarAviso(mensagem, tipo = "info", opcoes = {}) {
+        OrcamentoInteligenteUI.mostrarAviso(mensagem, tipo, opcoes);
     },
 
     prepararDadosNovoCliente(dadosCliente = {}) {
@@ -882,7 +1243,7 @@ const OrcamentoInteligenteController = {
         if (!cliente) return projetos;
 
         const filtrados = projetos.filter(projeto => this.projetoPertenceAoCliente(projeto, cliente));
-        return filtrados.length ? filtrados : [this.criarProjetoApoio(cliente)];
+        return this.unirProjetos([this.criarProjetoPadrao(cliente)], filtrados);
     },
 
     obterServicosDisponiveis() {
@@ -903,6 +1264,16 @@ const OrcamentoInteligenteController = {
 
     obterProjetoPorId(id) {
         return this.obterPorId(this.obterProjetosDisponiveis(), id);
+    },
+
+    obterProjetoPadraoParaCliente(cliente = {}) {
+        const projetos = this.dados.projetos || [];
+        const filtrados = projetos.filter(projeto => this.projetoPertenceAoCliente(projeto, cliente));
+
+        return filtrados.find(projeto => (
+            projeto.padrao === true ||
+            this.normalizarChave(projeto.nome || projeto.titulo) === "projeto_padrao"
+        )) || this.criarProjetoPadrao(cliente);
     },
 
     obterServicoPorId(id) {
@@ -1041,6 +1412,16 @@ const OrcamentoInteligenteController = {
         return (lista || []).find(item => item.id === id) || null;
     },
 
+    mesmaEntidade(atual = {}, proxima = {}) {
+        if (!atual || !proxima) return false;
+        if (atual.id && proxima.id) return atual.id === proxima.id;
+        return Boolean(atual.nome && proxima.nome && atual.nome === proxima.nome);
+    },
+
+    irParaCompartilhamento() {
+        window.location.assign("compartilhar-documento.html");
+    },
+
     projetoPertenceAoCliente(projeto = {}, cliente = {}) {
         const clienteProjeto = projeto.cliente || {};
         return clienteProjeto.id === cliente.id
@@ -1055,9 +1436,31 @@ const OrcamentoInteligenteController = {
         if (etapa === "projeto" && !contexto.cliente) return "Cliente nao selecionado.";
         if (etapa === "servico" && !contexto.projeto) return "Projeto nao selecionado.";
         if (etapa === "produtos" && !this.obterServicosSelecionados(contexto).length) return "Servico nao selecionado.";
+        if (etapa === "revisao" && !produtos.length) return "Sem produtos.";
         if (etapa === "calculo" && !produtos.length) return "Sem produtos.";
+        if (["calculo", "resumo"].includes(etapa)) {
+            const pendenciaItem = this.obterPendenciaItensDaTela();
+            if (pendenciaItem) return pendenciaItem;
+        }
         if (etapa === "resumo" && !contexto.resultado?.sucesso) return "Calculo pendente.";
         return "";
+    },
+
+    obterPendenciaItensDaTela() {
+        const itens = this.coletarItensDaTela();
+        if (!itens.length) {
+            return "";
+        }
+
+        const invalido = itens.find(item => (
+            Number(item.larguraCm || 0) <= 0
+            || Number(item.alturaCm || 0) <= 0
+            || Number(item.quantidade || 0) <= 0
+            || Number(item.valorUnitario || 0) < 0
+            || !String(item.descricao || "").trim()
+        ));
+
+        return invalido ? "Revise medidas, quantidade, valor e descricao dos itens." : "";
     },
 
     extrairDadosCalculo(dados) {
@@ -1299,6 +1702,53 @@ const OrcamentoInteligenteController = {
                 ativo: true
             })
         ];
+    },
+
+    unirProjetos(...listas) {
+        const mapa = new Map();
+
+        listas.flat().filter(Boolean).forEach(projeto => {
+            const id = projeto.id || this.normalizarChave(projeto.nome || projeto.titulo || projeto.codigo);
+            if (!id || mapa.has(id)) return;
+            mapa.set(id, {
+                ...projeto,
+                id
+            });
+        });
+
+        return Array.from(mapa.values());
+    },
+
+    criarProjetoPadrao(cliente = {}) {
+        const clienteId = cliente.id || this.normalizarChave(cliente.nome || "cliente");
+        const dados = {
+            id: `prj_padrao_${clienteId || "cliente"}`,
+            numero: "PRJ-PADRAO",
+            codigo: "PRJ-PADRAO",
+            titulo: "Projeto padrao",
+            nome: "Projeto padrao",
+            status: "rascunho",
+            tipoProjeto: "Projeto padrao",
+            padrao: true,
+            generico: true,
+            ativo: true,
+            cliente: {
+                id: cliente.id || "",
+                nome: cliente.nome || "",
+                telefone: cliente.telefonePrincipal || cliente.telefone || "",
+                email: cliente.email || ""
+            },
+            obra: {
+                endereco: "A definir",
+                cidade: "Porto Seguro"
+            },
+            descricao: "Projeto padrao para orcamentos rapidos sem obra ou ambiente especifico.",
+            observacoes: "Criado automaticamente como apoio do fluxo guiado."
+        };
+
+        return typeof ProjetoModel !== "undefined" && typeof ProjetoModel.normalizar === "function"
+            ? ProjetoModel.normalizar(dados)
+            : dados;
     },
 
     criarProjetoApoio(cliente = {}) {

@@ -161,7 +161,9 @@ const DocumentShareController = {
         this.estado.pdfUrl = url;
         this.estado.pdfNomeArquivo = pdf.nomeArquivo || resultado.arquivo.nomeArquivo || "documento-comercial.pdf";
         this.registrarAcao("PDF visualizado sem download.");
-        return this.registrarMensagem("PDF gerado para visualizacao. Nenhum download foi iniciado.", "sucesso");
+        const resposta = this.registrarMensagem("PDF gerado para visualizacao. Nenhum download foi iniciado.", "sucesso");
+        this.rolarParaPreview();
+        return resposta;
     },
 
     baixarArquivo(bytes, nomeArquivo = "documento-comercial.pdf", mimeType = "application/pdf") {
@@ -474,6 +476,25 @@ const DocumentShareController = {
             sucesso: tipo !== "erro",
             mensagem: texto
         };
+    },
+
+    rolarParaPreview() {
+        if (typeof window === "undefined" || window.innerWidth > 860) {
+            return false;
+        }
+
+        window.setTimeout(() => {
+            const alvo = document.getElementById("documentSharePreview");
+
+            if (alvo && typeof alvo.scrollIntoView === "function") {
+                alvo.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }
+        }, 80);
+
+        return true;
     },
 
     normalizarDocumento(documento = null) {

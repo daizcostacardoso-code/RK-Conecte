@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <script src="../js/shared/rk-auth.js?v=5.3.1" data-rk-auth="protected"></script>
-    <title>Cat&aacute;logo Comercial de Servi&ccedil;os - RK Vidra&ccedil;aria</title>
+    <title>Servi&ccedil;os - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.2.4">
+    <link rel="stylesheet" href="../css/style.css?v=5.5.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +15,7 @@
     <link rel="manifest" href="../manifest.webmanifest">
     <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
 </head>
-<body class="servicos-page">
+<body class="servicos-page cadastro-page">
 
 <header>
     <div class="container">
@@ -31,87 +31,208 @@
             <ul>
                 <li><a href="../index.html">In&iacute;cio</a></li>
                 <li><a href="clientes.html">Clientes</a></li>
-                <li><a href="orcamento.html">Or&ccedil;amento</a></li>
-                <li><a href="funcionario.html">Painel</a></li>
+                <li><a href="produtos.html">Produtos</a></li>
+                <li><a href="orcamento-inteligente.html">Or&ccedil;amento Inteligente</a></li>
                 <li><a class="login" href="login.html">Login</a></li>
             </ul>
         </nav>
     </div>
 </header>
 
-<main class="servicos-modulo">
+<main class="cadastro-modulo">
     <div class="container">
-        <section class="servicos-cabecalho" aria-labelledby="servicosTitulo">
+        <section class="cadastro-cabecalho" aria-labelledby="servicosTitulo">
             <div>
-                <span class="servicos-modulo-label">Centro Comercial</span>
-                <h1 id="servicosTitulo">Cat&aacute;logo Comercial de Servi&ccedil;os</h1>
+                <span class="cadastro-label">Centro Comercial</span>
+                <h1 id="servicosTitulo">Servi&ccedil;os</h1>
+                <p>Servi&ccedil;os representam o que ser&aacute; feito. Escolha uma categoria como Instala&ccedil;&atilde;o ou Manuten&ccedil;&atilde;o e cadastre os tipos, como Box frontal ou Janela 4 folhas.</p>
             </div>
 
-            <div class="servicos-cabecalho-acoes">
-                <label class="servicos-busca" for="buscaServico">
-                    <span>Pesquisar</span>
-                    <input type="search" id="buscaServico" placeholder="Pesquisar servi&ccedil;o...">
-                </label>
-                <button type="button" id="btnNovoServico" class="botao servicos-btn-principal">Novo Servi&ccedil;o</button>
-            </div>
+            <button type="button" id="btnNovoServico" class="botao cadastro-btn-principal">Novo servi&ccedil;o</button>
         </section>
 
-        <div id="servicosAviso" class="servicos-aviso" aria-live="polite"></div>
-
-        <section class="servicos-painel servicos-categorias-painel" aria-labelledby="servicosCategoriasTitulo">
-            <div class="servicos-painel-topo">
-                <div>
-                    <h2 id="servicosCategoriasTitulo">Categorias</h2>
-                    <p>Base comercial dispon&iacute;vel para o cat&aacute;logo.</p>
-                </div>
-            </div>
-            <div id="servicosCategorias" class="servicos-categorias-grid"></div>
+        <section class="cadastro-filtros" aria-label="Filtros de servicos">
+            <label>
+                <span>Pesquisar</span>
+                <input type="search" id="buscaServico" placeholder="Nome, categoria ou depend&ecirc;ncia">
+            </label>
+            <label>
+                <span>Macro</span>
+                <select id="filtroServicoCategoria">
+                    <option value="">Todas</option>
+                    <option value="instalacao">Instala&ccedil;&atilde;o</option>
+                    <option value="manutencao">Manuten&ccedil;&atilde;o</option>
+                    <option value="limpeza">Limpeza</option>
+                    <option value="medicao_tecnica">Medi&ccedil;&atilde;o t&eacute;cnica</option>
+                    <option value="remocao">Remo&ccedil;&atilde;o</option>
+                    <option value="outros">Outros</option>
+                </select>
+            </label>
+            <label>
+                <span>Status</span>
+                <select id="filtroServicoStatus">
+                    <option value="">Todos</option>
+                    <option value="ativo">Ativos</option>
+                    <option value="inativo">Inativos</option>
+                </select>
+            </label>
         </section>
 
-        <section class="servicos-layout">
-            <div class="servicos-painel servicos-lista-painel">
-                <div class="servicos-painel-topo">
+        <div id="servicosAviso" class="cadastro-aviso" aria-live="polite"></div>
+
+        <section class="cadastro-grid">
+            <div class="cadastro-painel cadastro-lista-painel">
+                <div class="cadastro-painel-topo">
                     <div>
-                        <h2>Servi&ccedil;os</h2>
+                        <h2>Lista de servi&ccedil;os</h2>
                         <p id="servicosResumo">0 servi&ccedil;os cadastrados</p>
                     </div>
                 </div>
 
-                <div id="servicosLista" class="servicos-grid-cards" aria-live="polite">
-                    <p class="servicos-estado-vazio">Nenhum servi&ccedil;o cadastrado.</p>
+                <div class="cadastro-tabela-wrap">
+                    <table class="cadastro-tabela">
+                        <thead>
+                            <tr>
+                                <th>Servi&ccedil;o</th>
+                                <th>Macro</th>
+                                <th>Tipos</th>
+                                <th>Tamanhos</th>
+                                <th>Status</th>
+                                <th>A&ccedil;&otilde;es</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicosTabelaCorpo">
+                            <tr>
+                                <td colspan="6" class="cadastro-estado-vazio">Nenhum servi&ccedil;o cadastrado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <aside class="servicos-painel servicos-detalhe-painel" aria-labelledby="servicoDetalheTitulo">
-                <div class="servicos-painel-topo">
+            <aside class="cadastro-painel cadastro-form-painel">
+                <div class="cadastro-painel-topo">
                     <div>
-                        <span class="servicos-modulo-label">Resumo comercial</span>
-                        <h2 id="servicoDetalheTitulo">Visualiza&ccedil;&atilde;o do servi&ccedil;o</h2>
-                        <p id="servicoDetalheResumo">Selecione um servi&ccedil;o para visualizar.</p>
+                        <h2 id="servicoFormTitulo">Cadastro de servi&ccedil;o</h2>
+                        <p>Depend&ecirc;ncias s&atilde;o produtos cadastrados necess&aacute;rios para executar este tipo de servi&ccedil;o, com custo para controle futuro.</p>
                     </div>
                 </div>
 
-                <div id="servicoDetalheConteudo" class="servico-detalhe-conteudo"></div>
+                <form id="formServico" class="cadastro-form" novalidate>
+                    <input type="hidden" id="servicoId" name="id">
 
-                <div class="servico-preparacao-grid" aria-label="Campos preparados para o or&ccedil;amento inteligente">
-                    <section class="servico-placeholder-bloco">
-                        <h3>Produtos sugeridos</h3>
-                        <div id="servicoProdutosSugeridos" class="servico-placeholder-conteudo"></div>
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Nome da macro categoria</span>
+                        <input type="text" id="servicoNome" name="nome" required>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Macro</span>
+                        <select id="servicoCategoria" name="categoria" required>
+                            <option value="instalacao">Instala&ccedil;&atilde;o</option>
+                            <option value="manutencao">Manuten&ccedil;&atilde;o</option>
+                            <option value="limpeza">Limpeza</option>
+                            <option value="medicao_tecnica">Medi&ccedil;&atilde;o t&eacute;cnica</option>
+                            <option value="remocao">Remo&ccedil;&atilde;o</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </label>
+
+                    <input type="hidden" id="servicoTipoCalculo" name="tipoCalculo" value="personalizado">
+                    <input type="hidden" id="servicoUnidadeVenda" name="unidadeVenda" value="servico">
+
+                    <label class="cadastro-campo">
+                        <span>Status</span>
+                        <select id="servicoAtivo" name="ativo">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </label>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Descri&ccedil;&atilde;o</span>
+                        <textarea id="servicoDescricao" name="descricao" rows="3"></textarea>
+                    </label>
+
+                    <section class="cadastro-subform cadastro-campo-cheio" aria-labelledby="servicoTiposTitulo">
+                        <h3 id="servicoTiposTitulo">Tipos de servi&ccedil;o</h3>
+                        <div class="cadastro-mini-grid">
+                            <input type="text" id="servicoTipoNome" placeholder="Instala&ccedil;&atilde;o de box frontal">
+                            <input type="text" id="servicoTipoDescricao" placeholder="Descri&ccedil;&atilde;o curta">
+                            <input type="number" id="servicoTipoTempoMedio" placeholder="Tempo m&eacute;dio" min="0" step="0.25" inputmode="decimal">
+                            <select id="servicoTipoUnidadeTempo">
+                                <option value="hora">Hora</option>
+                                <option value="minuto">Minuto</option>
+                                <option value="dia">Dia</option>
+                            </select>
+                            <textarea id="servicoTipoObservacoesTecnicas" rows="2" placeholder="Observa&ccedil;&otilde;es t&eacute;cnicas"></textarea>
+                        </div>
+                        <div class="cadastro-inline-form cadastro-inline-form-3">
+                            <select id="servicoTipoDependenciaSelect" aria-label="Produto para depend&ecirc;ncia do tipo">
+                                <option value="">Selecione um produto ativo</option>
+                            </select>
+                            <input type="number" id="servicoTipoQuantidadePadrao" placeholder="Qtd. padr&atilde;o" min="0" step="0.01" inputmode="decimal">
+                            <select id="servicoTipoObrigatoria" aria-label="Depend&ecirc;ncia obrigat&oacute;ria">
+                                <option value="true">Obrigat&oacute;ria</option>
+                                <option value="false">Opcional</option>
+                            </select>
+                            <input type="text" id="servicoTipoDependenciaObservacao" placeholder="Observa&ccedil;&atilde;o da depend&ecirc;ncia">
+                            <button type="button" id="btnAdicionarServicoTipoDependencia" class="btn-pequeno">Adicionar depend&ecirc;ncia</button>
+                        </div>
+                        <div id="servicoTipoDependenciasLista" class="cadastro-chip-lista"></div>
+                        <div class="cadastro-inline-form">
+                            <button type="button" id="btnAdicionarServicoTipo" class="btn-pequeno">Adicionar</button>
+                        </div>
+                        <div id="servicoTiposLista" class="cadastro-lista-compacta"></div>
                     </section>
-                    <section class="servico-placeholder-bloco">
-                        <h3>Ferragens sugeridas</h3>
-                        <div id="servicoFerragensSugeridas" class="servico-placeholder-conteudo"></div>
+
+                    <section class="cadastro-subform cadastro-campo-cheio" aria-labelledby="servicoDependenciasTitulo">
+                        <h3 id="servicoDependenciasTitulo">Depend&ecirc;ncias padr&atilde;o</h3>
+                        <div class="cadastro-inline-form cadastro-inline-form-3">
+                            <select id="servicoDependenciaInput" aria-label="Produto para depend&ecirc;ncia padr&atilde;o">
+                                <option value="">Selecione um produto ativo</option>
+                            </select>
+                            <input type="number" id="servicoDependenciaQuantidade" placeholder="Qtd. padr&atilde;o" min="0" step="0.01" inputmode="decimal">
+                            <input type="text" id="servicoDependenciaObservacao" placeholder="Observa&ccedil;&atilde;o">
+                            <button type="button" id="btnAdicionarServicoDependencia" class="btn-pequeno">Adicionar</button>
+                        </div>
+                        <div id="servicoDependenciasLista" class="cadastro-chip-lista"></div>
                     </section>
-                    <section class="servico-placeholder-bloco">
-                        <h3>Campos obrigat&oacute;rios</h3>
-                        <div id="servicoCamposObrigatorios" class="servico-placeholder-conteudo"></div>
+
+                    <section class="cadastro-subform cadastro-campo-cheio" aria-labelledby="servicoTamanhosTitulo">
+                        <h3 id="servicoTamanhosTitulo">Tamanhos padr&atilde;o</h3>
+                        <div class="cadastro-inline-form cadastro-inline-form-3">
+                            <input type="text" id="servicoTamanhoModelo" placeholder="Modelo relacionado">
+                            <input type="text" id="servicoTamanhoNome" placeholder="80 x 210 cm">
+                            <input type="number" id="servicoTamanhoLargura" placeholder="Largura cm" min="0" step="0.01">
+                            <input type="number" id="servicoTamanhoAltura" placeholder="Altura cm" min="0" step="0.01">
+                            <button type="button" id="btnAdicionarServicoTamanho" class="btn-pequeno">Adicionar</button>
+                        </div>
+                        <div id="servicoTamanhosLista" class="cadastro-lista-compacta"></div>
                     </section>
-                    <section class="servico-placeholder-bloco">
-                        <h3>Fluxo do or&ccedil;amento</h3>
-                        <div id="servicoFluxoOrcamento" class="servico-placeholder-conteudo"></div>
-                    </section>
-                </div>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Observa&ccedil;&otilde;es</span>
+                        <textarea id="servicoObservacoes" name="observacoes" rows="3"></textarea>
+                    </label>
+
+                    <div class="cadastro-form-acoes cadastro-campo-cheio">
+                        <button type="submit" class="botao cadastro-btn-principal">Salvar servi&ccedil;o</button>
+                        <button type="reset" class="botao botao-claro">Limpar</button>
+                    </div>
+                </form>
             </aside>
+        </section>
+
+        <section class="cadastro-painel cadastro-detalhe-painel" aria-labelledby="servicoDetalheTitulo">
+            <div class="cadastro-painel-topo">
+                <div>
+                    <span class="cadastro-label">Resumo de depend&ecirc;ncias</span>
+                    <h2 id="servicoDetalheTitulo">Servi&ccedil;o selecionado</h2>
+                    <p id="servicoDetalheResumo">Selecione um servi&ccedil;o para visualizar.</p>
+                </div>
+            </div>
+            <div id="servicoDetalheConteudo" class="cadastro-detalhe-conteudo"></div>
         </section>
     </div>
 </main>
@@ -121,21 +242,29 @@
     <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
-<script src="../js/core/event-types.js?v=3.5.0"></script>
-<script src="../js/core/event-bus.js?v=3.5.0"></script>
-<script src="../js/core/event-dispatcher.js?v=3.5.0"></script>
-<script src="../js/core/event-listener.js?v=3.5.0"></script>
-<script src="../js/storage/storage-adapter.js?v=3.5.0"></script>
-<script src="../js/storage/memory-adapter.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-model.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-validator.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-factory.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-repository.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-service.js?v=3.5.0"></script>
-<script src="../js/usecases/servicos/buscar-servico-usecase.js?v=3.5.0"></script>
-<script src="../js/usecases/servicos/listar-servicos-usecase.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-ui.js?v=3.5.0"></script>
-<script src="../js/servicos/servico-controller.js?v=3.5.0"></script>
+<script src="../js/config.js?v=5.4.0"></script>
+<script src="../js/storage/storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/local-storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/memory-adapter.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-model.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-validator.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-factory.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-repository.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-service.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/criar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/listar-produtos-usecase.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-model.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-validator.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-factory.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-repository.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-service.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/criar-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/buscar-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/listar-servicos-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/atualizar-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/excluir-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-ui.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-controller.js?v=5.4.0"></script>
 <script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>

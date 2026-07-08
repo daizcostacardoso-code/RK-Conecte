@@ -169,9 +169,7 @@ const PdfAdapter = {
             this.desenharProdutos(estado, dados.produtos, dados.totais);
             this.desenharResumoFinanceiro(estado, dados);
             this.desenharProjeto(estado, dados.projeto);
-            this.desenharServico(estado, dados.servico, dados.servicos);
             this.desenharObservacoes(estado, dados.observacoes);
-            this.desenharCondicoes(estado, dados.condicoesComerciais, dados.validade);
             this.desenharAssinaturas(estado, dados);
             this.desenharRodape(estado, dados);
 
@@ -286,6 +284,10 @@ const PdfAdapter = {
             return null;
         }
 
+        if (typeof window === "undefined" && !this.ehUrlAbsoluta(caminho)) {
+            return null;
+        }
+
         try {
             const resposta = await fetch(caminho, { cache: "force-cache" });
 
@@ -320,6 +322,10 @@ const PdfAdapter = {
         }
 
         return "imagens/logo.jpeg";
+    },
+
+    ehUrlAbsoluta(caminho = "") {
+        return /^(https?:|data:|file:|blob:)/i.test(String(caminho || ""));
     },
 
     detectarTipoImagem(bytes = [], caminho = "") {
@@ -662,20 +668,20 @@ const PdfAdapter = {
 
         estado.pagina.drawText(this.limparTextoPdf(dados.empresa?.nome || "RK Vidracaria"), {
             x: estado.margem,
-            y: yLinha - 16,
+            y: yLinha - 12,
             size: 9,
             font: estado.fonte,
             color: estado.corSuave
         });
         estado.pagina.drawText(this.limparTextoPdf(dados.cliente?.nome || "Cliente"), {
             x: estado.largura - estado.margem - larguraLinha,
-            y: yLinha - 16,
+            y: yLinha - 12,
             size: 9,
             font: estado.fonte,
             color: estado.corSuave
         });
 
-        estado.y = yLinha - 36;
+        estado.y = yLinha - 28;
     },
 
     desenharRodape(estado, dados = {}) {
@@ -728,7 +734,7 @@ const PdfAdapter = {
                 return;
             }
 
-            this.garantirEspaco(estado, 34);
+            this.garantirEspaco(estado, 30);
 
             estado.pagina.drawText(`${rotulo}:`, {
                 x: estado.margem,
@@ -744,10 +750,10 @@ const PdfAdapter = {
                 cor: estado.corTexto
             });
 
-            estado.y -= 8;
+            estado.y -= 4;
         });
 
-        estado.y -= 8;
+        estado.y -= 4;
     },
 
     desenharLinhaTabela(estado, valores = [], colunas = [], cabecalho = false) {
@@ -799,7 +805,7 @@ const PdfAdapter = {
         let yAtual = y;
 
         linhas.forEach(linha => {
-            this.garantirEspaco(estado, 24);
+            this.garantirEspaco(estado, 22);
             estado.pagina.drawText(linha || "", {
                 x,
                 y: yAtual,
@@ -807,7 +813,7 @@ const PdfAdapter = {
                 font: fonte,
                 color: cor
             });
-            yAtual -= tamanho + 3;
+            yAtual -= tamanho + 2;
             estado.y = yAtual;
         });
 

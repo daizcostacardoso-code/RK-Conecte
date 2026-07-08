@@ -1,12 +1,13 @@
 const OrcamentoInteligenteUI = {
     elementos: {},
     etapas: [
-        { chave: "cliente", rotulo: "Cliente" },
-        { chave: "projeto", rotulo: "Projeto" },
-        { chave: "servico", rotulo: "Servi\u00e7o" },
-        { chave: "produtos", rotulo: "Itens" },
-        { chave: "calculo", rotulo: "C\u00e1lculo" },
-        { chave: "resumo", rotulo: "Resumo" }
+        { chave: "cliente", rotulo: "Cliente", icone: "&#128100;", dica: "Quem recebera a proposta." },
+        { chave: "projeto", rotulo: "Projeto", icone: "&#8962;", dica: "Obra ou atendimento vinculado." },
+        { chave: "servico", rotulo: "Servico", icone: "&#128736;", dica: "Tipos de servico de vidracaria." },
+        { chave: "produtos", rotulo: "Itens", icone: "&#9638;", dica: "Medidas, quantidade e valores." },
+        { chave: "revisao", rotulo: "Revisao", icone: "&#10003;", dica: "Conferencia dos itens adicionados." },
+        { chave: "calculo", rotulo: "Calculo", icone: "R$", dica: "Conferencia financeira." },
+        { chave: "resumo", rotulo: "Resumo", icone: "&#128279;", dica: "Finalizacao e documento." }
     ],
 
     iniciar() {
@@ -26,6 +27,7 @@ const OrcamentoInteligenteUI = {
             projeto: document.getElementById("orcamentoInteligenteProjeto"),
             servico: document.getElementById("orcamentoInteligenteServico"),
             produtos: document.getElementById("orcamentoInteligenteProdutos"),
+            revisao: document.getElementById("orcamentoInteligenteRevisao"),
             calculo: document.getElementById("orcamentoInteligenteCalculo"),
             resumo: document.getElementById("orcamentoInteligenteResumo")
         };
@@ -37,6 +39,7 @@ const OrcamentoInteligenteUI = {
         this.renderizarProjeto(contexto, dados.projetos || []);
         this.renderizarServico(contexto, dados.servicos || []);
         this.renderizarProdutos(contexto, dados.produtos || []);
+        this.renderizarRevisao(contexto);
         this.renderizarCalculo(contexto, etapaAtual);
         this.renderizarResumo(contexto);
         this.exibirSecaoAtual(etapaAtual);
@@ -52,12 +55,43 @@ const OrcamentoInteligenteUI = {
                 : this.etapaConcluida(etapa.chave, contexto) ? "concluida" : "pendente";
 
             return `
-                <article class="orcamento-inteligente-etapa ${estado}">
-                    <span>${indice + 1}</span>
+                <button type="button" class="orcamento-inteligente-etapa ${estado}" data-orcamento-action="ir-etapa" data-orcamento-etapa="${this.escapar(etapa.chave)}" data-orcamento-etapa-indice="${indice}" aria-current="${estado === "ativa" ? "step" : "false"}" title="${this.escaparAtributo(etapa.dica || etapa.rotulo)}" aria-label="Ir para etapa ${this.escaparAtributo(etapa.rotulo)}">
+                    <span class="orcamento-inteligente-etapa-bola" aria-hidden="true">${etapa.icone}</span>
                     <strong>${this.escapar(etapa.rotulo)}</strong>
-                </article>
+                    <small>${this.escapar(this.rotuloEstadoEtapa(estado))}</small>
+                </button>
             `;
         }).join("");
+
+        this.atualizarStatus(this.estadoOperacional(contexto));
+    },
+
+    atualizarEstadoEtapas(contexto = {}, etapaAtual = "cliente") {
+        const container = this.elementos.etapas;
+        if (!container) return;
+
+        const elementos = Array.from(container.querySelectorAll("[data-orcamento-etapa]"));
+        if (!elementos.length) {
+            this.renderizarEtapas(contexto, etapaAtual);
+            return;
+        }
+
+        elementos.forEach(elemento => {
+            const chave = elemento.dataset.orcamentoEtapa;
+            const estado = chave === etapaAtual
+                ? "ativa"
+                : this.etapaConcluida(chave, contexto) ? "concluida" : "pendente";
+
+            elemento.classList.toggle("ativa", estado === "ativa");
+            elemento.classList.toggle("concluida", estado === "concluida");
+            elemento.classList.toggle("pendente", estado === "pendente");
+            elemento.setAttribute("aria-current", estado === "ativa" ? "step" : "false");
+
+            const status = elemento.querySelector("small");
+            if (status) {
+                status.textContent = this.rotuloEstadoEtapa(estado);
+            }
+        });
 
         this.atualizarStatus(this.estadoOperacional(contexto));
     },
@@ -79,7 +113,6 @@ const OrcamentoInteligenteUI = {
                             <option value="">Selecione um cliente</option>
                             ${options}
                         </select>
-                        <button type="submit" class="botao orcamento-inteligente-btn-form">Selecionar</button>
                     </form>
                     <form class="orcamento-inteligente-form orcamento-inteligente-form-novo-cliente" data-orcamento-form="cliente-novo">
                         <h3>Novo cliente</h3>
@@ -142,7 +175,6 @@ const OrcamentoInteligenteUI = {
                         <option value="">Selecione um projeto</option>
                         ${options}
                     </select>
-                    <button type="submit" class="botao orcamento-inteligente-btn-form">Selecionar projeto</button>
                 </form>
                 ${projetoSelecionado ? this.renderizarEntidadeSelecionada("Projeto atual", projetoSelecionado) : ""}
                 ${this.renderizarNavegacao({ podeVoltar: true, exibirAvancar: false })}
@@ -175,10 +207,10 @@ const OrcamentoInteligenteUI = {
                     ${servicosBase.map(servico => `
                         <label class="orcamento-inteligente-servico-opcao ${selecionados.has(servico.id) ? "selecionado" : ""}">
                             <input type="checkbox" name="servicoIds" value="${this.escapar(servico.id)}" ${selecionados.has(servico.id) ? "checked" : ""}>
+                            <span class="orcamento-inteligente-servico-icone" aria-hidden="true">${this.escapar(this.iconeServico(servico))}</span>
                             <span>${this.escapar(servico.nome)}</span>
                         </label>
                     `).join("")}
-                    <button type="submit" class="botao orcamento-inteligente-btn-form">Atualizar tipos</button>
                 </form>
                 ${servicosSelecionados.length ? this.renderizarListaServicosSelecionados(servicosSelecionados) : ""}
                 ${this.renderizarNavegacao({ podeVoltar: true, exibirAvancar: false })}
@@ -210,8 +242,31 @@ const OrcamentoInteligenteUI = {
                 <div class="orcamento-inteligente-grupos-itens">
                     ${servicosSelecionados.map(servico => this.renderizarGrupoItem(servico)).join("")}
                 </div>
+                ${produtos.length ? this.renderizarResumoItensAdicionados(produtos) : ""}
+            </div>
+        `;
+    },
+
+    renderizarRevisao(contexto = {}) {
+        const container = this.elementos.revisao;
+        if (!container) return;
+
+        const produtos = Array.isArray(contexto.produtos) ? contexto.produtos : [];
+
+        if (!produtos.length) {
+            container.innerHTML = `
+                <div class="orcamento-inteligente-fluxo">
+                    ${this.renderizarEstadoFluxo("Nenhum item para revisar", false)}
+                    <div class="orcamento-inteligente-lista-vazia">Adicione pelo menos um item antes da revisao.</div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="orcamento-inteligente-fluxo">
+                ${this.renderizarEstadoFluxo("Revise os itens adicionados", true)}
                 ${this.renderizarListaProdutos(produtos)}
-                ${this.renderizarNavegacao({ podeVoltar: true, podeAvancar: produtos.length > 0, exibirAvancar: produtos.length > 0, rotuloAvancar: "Ir para calculo" })}
             </div>
         `;
     },
@@ -239,7 +294,6 @@ const OrcamentoInteligenteUI = {
         container.innerHTML = `
             <div class="orcamento-inteligente-fluxo">
                 ${this.renderizarEstadoFluxo(contexto.resultado?.sucesso ? "Calculo em tempo real atualizado" : "Calculo pendente", !!contexto.resultado?.sucesso)}
-                ${this.renderizarTabelaItens(produtos)}
                 ${contexto.resultado ? this.renderizarResultado(contexto.resultado) : ""}
                 ${this.renderizarTotais(contexto)}
                 <form class="orcamento-inteligente-form-complementos" data-orcamento-form="complementos">
@@ -273,9 +327,6 @@ const OrcamentoInteligenteUI = {
         ];
 
         container.innerHTML = `
-            <div class="orcamento-inteligente-resumo-status ${resultado?.sucesso ? "ok" : "pendente"}">
-                ${this.escapar(resultado?.sucesso ? "Resumo atualizado" : "Resumo pendente")}
-            </div>
             <dl>
                 ${campos.map(([rotulo, valor]) => `
                     <div>
@@ -285,6 +336,28 @@ const OrcamentoInteligenteUI = {
                 `).join("")}
             </dl>
             ${this.renderizarTotais(contexto)}
+            ${this.renderizarResumoMobileAcoes(contexto)}
+        `;
+    },
+
+    renderizarResumoMobileAcoes(contexto = {}) {
+        if (!contexto.resultado?.sucesso) {
+            return `
+                <section class="orcamento-inteligente-resumo-mobile-acoes">
+                    <div class="orcamento-inteligente-validacao pendente">
+                        <strong>Conclua o calculo para finalizar.</strong>
+                    </div>
+                </section>
+            `;
+        }
+
+        return `
+            <section class="orcamento-inteligente-resumo-mobile-acoes">
+                ${this.renderizarValidacao(contexto)}
+                <div class="orcamento-inteligente-navegacao">
+                    <button type="button" class="btn-pequeno" data-orcamento-action="finalizar-orcamento">Finalizar orcamento</button>
+                </div>
+            </section>
         `;
     },
 
@@ -302,9 +375,7 @@ const OrcamentoInteligenteUI = {
                     ${this.renderizarCondicoes(contexto)}
                 </form>
                 ${this.renderizarValidacao(contexto)}
-                ${contexto.orcamentoPreparado ? this.renderizarPreparacaoPdf(contexto) : ""}
                 <div class="orcamento-inteligente-navegacao">
-                    <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="voltar">Voltar</button>
                     <button type="button" class="btn-pequeno" data-orcamento-action="finalizar-orcamento">Finalizar orcamento</button>
                 </div>
             </div>
@@ -383,8 +454,8 @@ const OrcamentoInteligenteUI = {
                     </select>
                 </div>
                 <div class="orcamento-inteligente-campo">
-                    <label for="orcamentoDescontoValor">Valor do desconto</label>
-                    <input id="orcamentoDescontoValor" type="number" name="descontoValor" min="0" step="0.01" value="${this.valorCalculo(ajustes.descontoValor, 0)}">
+                    <label for="orcamentoDescontoValor">Valor do desconto <small>R$ ou %</small></label>
+                    <input id="orcamentoDescontoValor" type="number" name="descontoValor" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(ajustes.descontoValor, 0)}">
                 </div>
                 <div class="orcamento-inteligente-campo">
                     <label for="orcamentoAcrescimoTipo">Acr\u00e9scimo</label>
@@ -397,8 +468,8 @@ const OrcamentoInteligenteUI = {
                     </select>
                 </div>
                 <div class="orcamento-inteligente-campo">
-                    <label for="orcamentoAcrescimoValor">Valor do acr\u00e9scimo</label>
-                    <input id="orcamentoAcrescimoValor" type="number" name="acrescimoValor" min="0" step="0.01" value="${this.valorCalculo(ajustes.acrescimoValor, 0)}">
+                    <label for="orcamentoAcrescimoValor">Valor do acrescimo <small>R$ ou %</small></label>
+                    <input id="orcamentoAcrescimoValor" type="number" name="acrescimoValor" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(ajustes.acrescimoValor, 0)}">
                 </div>
             </section>
         `;
@@ -477,10 +548,6 @@ const OrcamentoInteligenteUI = {
             <section class="orcamento-inteligente-validacao ok">
                 <strong>Objeto padronizado preparado para PDF Comercial.</strong>
                 <span>${this.escapar(preparado.preparadoPara || "PDF_COMERCIAL")} | ${this.escapar(preparado.versao || "5.2.1")}</span>
-                <div class="orcamento-inteligente-documento-acoes">
-                    <button type="button" class="botao" data-orcamento-action="gerar-documento">Gerar Documento Comercial</button>
-                    <a class="botao botao-claro" href="compartilhar-documento.html">Compartilhar</a>
-                </div>
             </section>
         `;
     },
@@ -491,12 +558,12 @@ const OrcamentoInteligenteUI = {
         if (tipo === "area_m2" || tipo === "AREA_M2") {
             return `
                 <div class="orcamento-inteligente-campo">
-                    <label for="orcamentoCalculoLargura">Largura</label>
-                    <input id="orcamentoCalculoLargura" type="number" name="largura" min="0" step="0.01" value="${this.valorCalculo(calculo.largura, 0)}" required>
+                    <label for="orcamentoCalculoLargura">Largura <small>cm</small></label>
+                    <input id="orcamentoCalculoLargura" type="number" name="largura" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(calculo.largura, 0)}" required>
                 </div>
                 <div class="orcamento-inteligente-campo">
-                    <label for="orcamentoCalculoAltura">Altura</label>
-                    <input id="orcamentoCalculoAltura" type="number" name="altura" min="0" step="0.01" value="${this.valorCalculo(calculo.altura, 0)}" required>
+                    <label for="orcamentoCalculoAltura">Altura <small>cm</small></label>
+                    <input id="orcamentoCalculoAltura" type="number" name="altura" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(calculo.altura, 0)}" required>
                 </div>
             `;
         }
@@ -504,8 +571,8 @@ const OrcamentoInteligenteUI = {
         if (tipo === "linear_m" || tipo === "LINEAR_M") {
             return `
                 <div class="orcamento-inteligente-campo">
-                    <label for="orcamentoCalculoComprimento">Comprimento</label>
-                    <input id="orcamentoCalculoComprimento" type="number" name="comprimento" min="0" step="0.01" value="${this.valorCalculo(calculo.comprimento, 0)}" required>
+                    <label for="orcamentoCalculoComprimento">Comprimento <small>m</small></label>
+                    <input id="orcamentoCalculoComprimento" type="number" name="comprimento" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(calculo.comprimento, 0)}" required>
                 </div>
             `;
         }
@@ -618,6 +685,19 @@ const OrcamentoInteligenteUI = {
         `;
     },
 
+    renderizarResumoItensAdicionados(produtos = []) {
+        const total = Array.isArray(produtos) ? produtos.length : 0;
+        const rotulo = total === 1 ? "1 item adicionado" : `${total} itens adicionados`;
+
+        return `
+            <div class="orcamento-inteligente-selecionado">
+                <span>Itens do orçamento</span>
+                <strong>${this.escapar(rotulo)}</strong>
+                <small>Continue rolando para revisar medidas, quantidades e valores.</small>
+            </div>
+        `;
+    },
+
     renderizarGrupoItem(servico = {}) {
         const grupoServico = servico.id || "";
         const tipos = this.obterTiposItem(grupoServico);
@@ -633,7 +713,7 @@ const OrcamentoInteligenteUI = {
         return `
             <section class="orcamento-inteligente-grupo-item">
                 <div class="orcamento-inteligente-grupo-topo">
-                    <h3>${this.escapar((servico.plural || servico.nome || "Itens").toUpperCase())}</h3>
+                    <h3><span class="orcamento-inteligente-grupo-icone" aria-hidden="true">${this.escapar(this.iconeServico(servico))}</span>${this.escapar((servico.plural || servico.nome || "Itens").toUpperCase())}</h3>
                     <span>Adicionar ${this.escapar(servico.itemSingular || servico.nome || "item")}</span>
                 </div>
                 <form class="orcamento-inteligente-form orcamento-inteligente-form-item" data-orcamento-form="produto" data-orcamento-novo-item data-grupo-servico="${this.escapar(grupoServico)}">
@@ -662,11 +742,11 @@ const OrcamentoInteligenteUI = {
                     })}
                     <div class="orcamento-inteligente-campo">
                         <label>Quantidade</label>
-                        <input type="number" name="quantidade" min="0.01" step="0.01" inputmode="decimal" value="1" required>
+                        <input type="number" name="quantidade" min="0.01" step="0.01" inputmode="decimal" placeholder="1.00" value="1.00" required>
                     </div>
                     <div class="orcamento-inteligente-campo">
-                        <label>Valor unitario</label>
-                        <input type="number" name="valorUnitario" min="0" step="0.01" inputmode="decimal" value="${this.valorCalculo(this.obterValorUnitarioPadrao(grupoServico), 0)}" required>
+                        <label>Valor unitario <small>R$</small></label>
+                        <input type="number" name="valorUnitario" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(this.obterValorUnitarioPadrao(grupoServico), 0)}" required>
                     </div>
                     <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
                         <label>Descricao</label>
@@ -677,7 +757,7 @@ const OrcamentoInteligenteUI = {
                         <label>Observacao do item</label>
                         <textarea name="observacoes" rows="2"></textarea>
                     </div>
-                    <button type="submit" class="botao orcamento-inteligente-btn-form">Adicionar ${this.escapar(servico.itemSingular || "item")}</button>
+                    <button type="submit" class="botao orcamento-inteligente-btn-form"><span class="orcamento-inteligente-btn-icone" aria-hidden="true">+</span>Adicionar ${this.escapar(servico.itemSingular || "item")}</button>
                 </form>
             </section>
         `;
@@ -708,16 +788,16 @@ const OrcamentoInteligenteUI = {
                 </div>
             ` : `<input type="hidden" name="tipoDimensao" value="engenharia">`}
             <div class="orcamento-inteligente-campo">
-                <label>Largura (cm)</label>
-                <input type="number" name="larguraCm" min="0" step="0.01" inputmode="decimal" value="${this.valorCalculo(item.larguraCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>
+                <label>Largura <small>cm</small></label>
+                <input type="number" name="larguraCm" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.larguraCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>
             </div>
             <div class="orcamento-inteligente-campo">
-                <label>Altura (cm)</label>
-                <input type="number" name="alturaCm" min="0" step="0.01" inputmode="decimal" value="${this.valorCalculo(item.alturaCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>
+                <label>Altura <small>cm</small></label>
+                <input type="number" name="alturaCm" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.alturaCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>
             </div>
             <div class="orcamento-inteligente-campo ${tipoDimensao === "engenharia" ? "" : "orcamento-inteligente-campo-oculto"}" data-engenharia-campo>
                 <label>Adicional engenharia (%)</label>
-                <input type="number" name="percentualEngenharia" min="0" step="0.01" inputmode="decimal" value="${this.valorCalculo(item.percentualEngenharia, 0)}">
+                <input type="number" name="percentualEngenharia" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.percentualEngenharia, 0)}">
             </div>
         `;
     },
@@ -756,7 +836,7 @@ const OrcamentoInteligenteUI = {
                         data-tipo-calculo="${this.escapar(produto.tipoCalculo || "area_m2")}">
                         <div class="orcamento-inteligente-item-topo">
                             <div>
-                                <span>Item ${indice + 1} | ${this.escapar(produto.grupoServicoNome || produto.categoria || "Servico")}</span>
+                                <span class="orcamento-inteligente-item-identificador">Item ${indice + 1} | ${this.escapar(produto.grupoServicoNome || produto.categoria || "Servico")}</span>
                                 <strong>${this.escapar(produto.tipoItemNome || this.nomeEntidade(produto) || "Item")}</strong>
                             </div>
                             <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="remover-produto" data-indice="${indice}">
@@ -780,12 +860,12 @@ const OrcamentoInteligenteUI = {
                             ${this.renderizarCamposDimensao(produto)}
                             <label>
                                 <span>Quantidade</span>
-                                <input type="number" name="quantidade" min="0.01" step="0.01" inputmode="decimal" value="${this.valorCalculo(produto.quantidade, 1)}">
+                                <input type="number" name="quantidade" min="0.01" step="0.01" inputmode="decimal" placeholder="1.00" value="${this.valorCalculo(produto.quantidade, 1)}">
                             </label>
                             <input type="hidden" name="unidade" value="${this.escapar(produto.unidade || "m2")}">
                             <label>
-                                <span>Valor unitario</span>
-                                <input type="number" name="valorUnitario" min="0" step="0.01" inputmode="decimal" value="${this.valorCalculo(produto.valorUnitario, 0)}">
+                                <span>Valor unitario (R$)</span>
+                                <input type="number" name="valorUnitario" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(produto.valorUnitario, 0)}">
                             </label>
                             <label class="orcamento-inteligente-item-observacao">
                                 <span>Descricao</span>
@@ -859,7 +939,7 @@ const OrcamentoInteligenteUI = {
 
         return `
             <div class="orcamento-inteligente-resultado ${sucesso ? "ok" : "erro"}">
-                <span>${this.escapar(sucesso ? "Resultado" : "Calculo nao concluido")}</span>
+                <span>${this.escapar(sucesso ? "Resultado atualizado" : "Calculo nao concluido")}</span>
                 <strong>${this.escapar(texto)}</strong>
             </div>
         `;
@@ -868,6 +948,7 @@ const OrcamentoInteligenteUI = {
     renderizarEstadoFluxo(texto, concluido) {
         return `
             <div class="orcamento-inteligente-estado ${concluido ? "ok" : "pendente"}">
+                <span class="orcamento-inteligente-estado-icone" aria-hidden="true">${this.escapar(concluido ? "OK" : "...")}</span>
                 <strong>${this.escapar(texto)}</strong>
             </div>
         `;
@@ -880,33 +961,33 @@ const OrcamentoInteligenteUI = {
         exibirAvancar = true,
         rotuloAvancar = "Avancar"
     } = {}) {
-        const botoes = [
-            exibirVoltar ? `
-                <button type="button" class="btn-pequeno btn-cinza" data-orcamento-action="voltar" ${podeVoltar ? "" : "disabled"}>
-                    Voltar
-                </button>
-            ` : "",
-            exibirAvancar ? `
-                <button type="button" class="btn-pequeno" data-orcamento-action="avancar" ${podeAvancar ? "" : "disabled"}>
-                    ${this.escapar(rotuloAvancar)}
-                </button>
-            ` : ""
-        ].filter(Boolean);
-
-        if (!botoes.length) {
-            return "";
-        }
-
-        return `
-            <div class="orcamento-inteligente-navegacao">
-                ${botoes.join("")}
-            </div>
-        `;
+        void podeVoltar;
+        void podeAvancar;
+        void exibirVoltar;
+        void exibirAvancar;
+        void rotuloAvancar;
+        return "";
     },
 
     exibirSecaoAtual(etapaAtual = "cliente") {
+        if (this.ehViewportMobile()) {
+            ["cliente", "projeto", "servico", "produtos", "revisao", "calculo"].forEach(chave => {
+                const elemento = this.elementos[chave];
+                const painel = elemento?.closest(".orcamento-inteligente-painel");
+                if (!painel) return;
+
+                painel.classList.remove("orcamento-inteligente-secao-oculta");
+                painel.classList.toggle("orcamento-inteligente-secao-ativa", chave === etapaAtual);
+            });
+
+            const etapaResumo = etapaAtual === "resumo";
+            this.elementos.resumoPainel?.classList.add("orcamento-inteligente-resumo-mobile-visivel");
+            this.elementos.resumoPainel?.classList.toggle("orcamento-inteligente-secao-ativa", etapaResumo);
+            return;
+        }
+
         const chaveVisivel = etapaAtual === "resumo" ? "calculo" : etapaAtual;
-        ["cliente", "projeto", "servico", "produtos", "calculo"].forEach(chave => {
+        ["cliente", "projeto", "servico", "produtos", "revisao", "calculo"].forEach(chave => {
             const elemento = this.elementos[chave];
             const painel = elemento?.closest(".orcamento-inteligente-painel");
             if (!painel) return;
@@ -915,6 +996,12 @@ const OrcamentoInteligenteUI = {
 
         const etapaResumo = etapaAtual === "resumo";
         this.elementos.resumoPainel?.classList.toggle("orcamento-inteligente-resumo-mobile-visivel", etapaResumo);
+    },
+
+    ehViewportMobile() {
+        return typeof window !== "undefined"
+            && typeof window.matchMedia === "function"
+            && window.matchMedia("(max-width: 820px)").matches;
     },
 
     atualizarIndicadoresItens(contexto = {}) {
@@ -955,12 +1042,16 @@ const OrcamentoInteligenteUI = {
         });
     },
 
-    mostrarAviso(mensagem, tipo = "info") {
+    mostrarAviso(mensagem, tipo = "info", opcoes = {}) {
         const status = this.elementos.status;
         if (!status) return;
 
         status.textContent = mensagem || "";
-        status.className = `orcamento-inteligente-status ${tipo}`;
+        status.className = [
+            "orcamento-inteligente-status",
+            tipo,
+            opcoes.destaque ? "bloqueio-etapa" : ""
+        ].filter(Boolean).join(" ");
     },
 
     atualizarStatus(mensagem) {
@@ -979,6 +1070,7 @@ const OrcamentoInteligenteUI = {
             projeto: !!contexto.projeto,
             servico: servicosSelecionados.length > 0,
             produtos: produtos.length > 0,
+            revisao: produtos.length > 0,
             calculo: !!contexto.resultado?.sucesso,
             resumo: !!contexto.resultado?.sucesso
         };
@@ -1054,7 +1146,39 @@ const OrcamentoInteligenteUI = {
 
     valorCalculo(valor, fallback = 0) {
         const numero = valor === undefined || valor === null || valor === "" ? fallback : valor;
-        return this.escapar(Number(numero || 0));
+        const normalizado = Number(numero || 0);
+
+        if (!Number.isFinite(normalizado)) {
+            return this.escapar(Number(fallback || 0).toFixed(2));
+        }
+
+        return this.escapar(normalizado.toFixed(2));
+    },
+
+    rotuloEstadoEtapa(estado) {
+        const rotulos = {
+            ativa: "Em uso",
+            concluida: "Pronto",
+            pendente: "Pendente"
+        };
+
+        return rotulos[estado] || "Pendente";
+    },
+
+    iconeServico(servico = {}) {
+        const id = this.normalizarValorOpcao(servico.id || servico.categoria || servico.nome);
+        const mapa = {
+            porta: "PT",
+            janela: "JN",
+            box: "BX",
+            espelho: "ES",
+            vidro_fixo: "VF",
+            fachada: "FD",
+            guarda_corpo: "GC",
+            outros: "+"
+        };
+
+        return mapa[id] || "SV";
     },
 
     normalizarTipoCalculo(tipoCalculo) {
@@ -1185,6 +1309,10 @@ const OrcamentoInteligenteUI = {
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+    },
+
+    escaparAtributo(valor) {
+        return this.escapar(valor);
     },
 
     escaparSeletor(valor) {

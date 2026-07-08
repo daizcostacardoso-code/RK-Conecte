@@ -5,6 +5,7 @@ const STATUS_PROJETO = Object.freeze({
     APROVADO: "aprovado",
     EM_PRODUCAO: "em_producao",
     EM_INSTALACAO: "em_instalacao",
+    FINALIZADO: "finalizado",
     CONCLUIDO: "concluido",
     CANCELADO: "cancelado"
 });
@@ -25,6 +26,7 @@ const ProjetoStatus = {
         aprovado: "Aprovado",
         em_producao: "Em producao",
         em_instalacao: "Em instalacao",
+        finalizado: "Finalizado",
         concluido: "Concluido",
         cancelado: "Cancelado"
     },
@@ -36,6 +38,7 @@ const ProjetoStatus = {
         aprovado: "comercial",
         em_producao: "producao",
         em_instalacao: "instalacao",
+        finalizado: "finalizado",
         concluido: "finalizado",
         cancelado: "finalizado"
     },
@@ -57,7 +60,6 @@ const ProjetoStatus = {
     },
 
     finalizado(status) {
-        return status === STATUS_PROJETO.CONCLUIDO || status === STATUS_PROJETO.CANCELADO;
+        return status === STATUS_PROJETO.FINALIZADO || status === STATUS_PROJETO.CONCLUIDO || status === STATUS_PROJETO.CANCELADO;
     }
 };
-

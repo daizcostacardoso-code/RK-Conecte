@@ -464,21 +464,9 @@ const RKE2EDemoState = {
     },
 
     renderizarAvisoDemo(estado = {}) {
-        if (!estado.demo || document.querySelector("[data-rk-demo-banner='true']")) {
-            return false;
-        }
-
-        const main = document.querySelector("main");
-        if (!main) {
-            return false;
-        }
-
-        const aviso = document.createElement("div");
-        aviso.className = "rk-demo-banner";
-        aviso.dataset.rkDemoBanner = "true";
-        aviso.textContent = "Fluxo de demonstracao: dados locais para teste online, sem banco externo.";
-        main.insertBefore(aviso, main.firstChild);
-        return true;
+        document.querySelectorAll("[data-rk-demo-banner='true'], .rk-demo-banner")
+            .forEach(aviso => aviso.remove());
+        return false;
     },
 
     obterAppStateService() {

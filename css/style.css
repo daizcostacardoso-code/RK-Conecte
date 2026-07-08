@@ -6487,59 +6487,109 @@ body.login-pro-body {
 
 .orcamento-inteligente-etapas {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0;
+    padding: 4px 0 0;
 }
 
 .orcamento-inteligente-etapa {
-    min-height: 72px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 1px solid #dbe4ed;
-    border-radius: 8px;
-    background: #fbfcfe;
-    padding: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    min-height: 58px;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-content: start;
+    gap: 5px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: 0 6px;
+    text-align: center;
 }
 
-.orcamento-inteligente-etapa span {
+.orcamento-inteligente-etapa::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    left: -50%;
+    right: 50%;
+    z-index: 0;
+    height: 1px;
+    background: #dbe4ed;
+}
+
+.orcamento-inteligente-etapa:first-child::before {
+    display: none;
+}
+
+.orcamento-inteligente-etapa-bola {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 34px;
+    height: 34px;
     border-radius: 999px;
-    background: #eef5fb;
-    color: #344252;
-    font-size: 13px;
+    border: 1px solid #dbe4ed;
+    background: #ffffff;
+    color: #0b48b6;
+    font-size: 14px;
     font-weight: 700;
-    flex: 0 0 auto;
+    line-height: 1;
+    box-shadow: 0 0 0 5px #fff;
+    transition: transform .2s ease, border-color .2s ease, background-color .2s ease, color .2s ease;
 }
 
 .orcamento-inteligente-etapa strong {
     color: #1f2933;
-    font-size: 14px;
-    line-height: 1.25;
+    font-size: 12px;
+    line-height: 1.15;
+    max-width: 82px;
+    overflow-wrap: anywhere;
 }
 
-.orcamento-inteligente-etapa.ativa {
+.orcamento-inteligente-etapa small {
+    color: #617080;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.orcamento-inteligente-etapa:focus-visible .orcamento-inteligente-etapa-bola {
+    outline: 2px solid #126bff;
+    outline-offset: 3px;
+}
+
+.orcamento-inteligente-etapa.ativa .orcamento-inteligente-etapa-bola {
     border-color: #126bff;
-    background: #f2f7ff;
-}
-
-.orcamento-inteligente-etapa.ativa span {
     background: #126bff;
     color: #fff;
+    transform: translateY(-1px) scale(1.04);
 }
 
-.orcamento-inteligente-etapa.concluida {
-    border-color: #badbcc;
-    background: #f3fbf6;
-}
-
-.orcamento-inteligente-etapa.concluida span {
+.orcamento-inteligente-etapa.concluida::before,
+.orcamento-inteligente-etapa.ativa::before {
     background: #2f9e44;
-    color: #fff;
+}
+
+.orcamento-inteligente-etapa.concluida .orcamento-inteligente-etapa-bola {
+    border-color: #2f9e44;
+    background: #f3fbf6;
+    color: #146c43;
+}
+
+.orcamento-inteligente-etapa.ativa strong {
+    color: #0b48b6;
+    font-weight: 800;
+}
+
+.orcamento-inteligente-etapa.concluida strong {
+    color: #146c43;
 }
 
 .orcamento-inteligente-layout {
@@ -6684,10 +6734,26 @@ body.login-pro-body {
 }
 
 .orcamento-inteligente-estado {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
     border-left: 4px solid #cfd9e4;
     background: #fbfcfe;
     color: #44515f;
     padding: 10px 12px;
+}
+
+.orcamento-inteligente-estado-icone {
+    min-width: 36px;
+    border-radius: 999px;
+    background: #eef2f6;
+    color: #344252;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 7px 8px;
+    text-align: center;
 }
 
 .orcamento-inteligente-estado strong {
@@ -6701,9 +6767,19 @@ body.login-pro-body {
     color: #146c43;
 }
 
+.orcamento-inteligente-estado.ok .orcamento-inteligente-estado-icone {
+    background: #dff4e6;
+    color: #146c43;
+}
+
 .orcamento-inteligente-estado.pendente {
     border-left-color: #f59f00;
     background: #fff8e8;
+    color: #7a4d00;
+}
+
+.orcamento-inteligente-estado.pendente .orcamento-inteligente-estado-icone {
+    background: #fff0c7;
     color: #7a4d00;
 }
 
@@ -6716,9 +6792,24 @@ body.login-pro-body {
 
 .orcamento-inteligente-form label,
 .orcamento-inteligente-campo label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     color: #344252;
     font-size: 12px;
     font-weight: 700;
+}
+
+.orcamento-inteligente-campo label small,
+.orcamento-inteligente-form label small {
+    border-radius: 999px;
+    background: #eef5fb;
+    color: #0b48b6;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 4px 7px;
 }
 
 .orcamento-inteligente-form>label {
@@ -6799,6 +6890,19 @@ body.login-pro-body {
     overflow-wrap: break-word;
 }
 
+.orcamento-inteligente-form input[type="number"],
+.orcamento-inteligente-form-complementos input[type="number"],
+.orcamento-inteligente-itens input[type="number"] {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.orcamento-inteligente-form input::placeholder,
+.orcamento-inteligente-form-complementos input::placeholder,
+.orcamento-inteligente-itens input::placeholder {
+    color: #93a1ae;
+}
+
 .orcamento-inteligente-selecionado small {
     color: #5d6975;
     font-size: 13px;
@@ -6872,6 +6976,28 @@ body.login-pro-body {
 
 .orcamento-inteligente-navegacao .btn-pequeno {
     margin-top: 0;
+}
+
+.orcamento-inteligente-navegacao .btn-pequeno,
+.orcamento-inteligente-btn-form,
+.orcamento-inteligente-documento-acoes .botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.orcamento-inteligente-btn-icone {
+    min-width: 24px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .24);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 5px 6px;
 }
 
 .orcamento-inteligente-navegacao button[disabled],
@@ -7054,6 +7180,21 @@ body.login-pro-body {
     font-weight: 700;
 }
 
+.orcamento-inteligente-servico-icone,
+.orcamento-inteligente-grupo-icone {
+    min-width: 34px;
+    border-radius: 8px;
+    background: #eef5fb;
+    color: #0b48b6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 7px 8px;
+}
+
 .orcamento-inteligente-servico-opcao input {
     width: 17px;
     height: 17px;
@@ -7064,6 +7205,11 @@ body.login-pro-body {
     border-color: #0b48b6;
     background: #f2f7ff;
     color: #0b48b6;
+}
+
+.orcamento-inteligente-servico-opcao.selecionado .orcamento-inteligente-servico-icone {
+    background: #0b48b6;
+    color: #ffffff;
 }
 
 .orcamento-inteligente-grupos-itens {
@@ -7087,6 +7233,9 @@ body.login-pro-body {
 }
 
 .orcamento-inteligente-grupo-topo h3 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: #052a52;
     font-size: 15px;
     line-height: 1.2;
@@ -7196,6 +7345,11 @@ body.login-pro-body {
     color: #617080;
     font-size: 12px;
     font-weight: 700;
+}
+
+.orcamento-inteligente-item-topo .orcamento-inteligente-item-identificador {
+    color: #1f2933;
+    font-weight: 800;
 }
 
 .orcamento-inteligente-item-topo strong,
@@ -9508,6 +9662,7 @@ body.rk-app-interna > footer {
         min-width: 74px;
         min-height: 0;
         display: grid;
+        grid-template-columns: 1fr;
         justify-items: center;
         gap: 5px;
         border: 0;
@@ -9538,10 +9693,10 @@ body.rk-app-interna > footer {
         background: #2f9e44;
     }
 
-    body.orcamento-inteligente-page .orcamento-inteligente-etapa span {
-        width: 22px;
-        height: 22px;
-        font-size: 11px;
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
         box-shadow: 0 0 0 3px #fff;
     }
 
@@ -9550,6 +9705,17 @@ body.rk-app-interna > footer {
         color: #4b5a6a;
         font-size: 11px;
         line-height: 1.1;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa small {
+        grid-column: auto;
+        max-width: 68px;
+        font-size: 9px;
+        line-height: 1;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
@@ -9796,11 +9962,3823 @@ body.rk-app-interna > footer {
 
 @media (max-width: 430px) {
     body.orcamento-inteligente-page .orcamento-inteligente-etapa {
-        min-width: 66px;
+        min-width: 72px;
     }
 
     body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
-        max-width: 60px;
+        max-width: 64px;
         font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa small {
+        max-width: 64px;
+    }
+}
+
+.orcamento-inteligente-resumo-mobile-acoes {
+    display: none;
+}
+
+@media (max-width: 820px) {
+    body.orcamento-inteligente-page {
+        --orcamento-mobile-header-altura: 58px;
+        --orcamento-mobile-timeline-largura: 46px;
+        background: #f3f7fb;
+        scroll-padding-top: calc(var(--orcamento-mobile-header-altura) + 8px);
+        overscroll-behavior-y: contain;
+    }
+
+    html.orcamento-inteligente-html {
+        --orcamento-mobile-header-altura: 58px;
+        scroll-padding-top: var(--orcamento-mobile-header-altura);
+        scroll-snap-type: y mandatory;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo {
+        padding: 0 0 calc(10px + var(--safe-bottom, 0px));
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo > .container {
+        width: 100%;
+        max-width: none;
+        padding-left: 10px;
+        padding-right: calc(var(--orcamento-mobile-timeline-largura) + 12px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel {
+        position: fixed;
+        top: calc(var(--orcamento-mobile-header-altura) + 8px);
+        right: 4px;
+        bottom: calc(12px + var(--safe-bottom, 0px));
+        z-index: 85;
+        width: var(--orcamento-mobile-timeline-largura);
+        display: flex;
+        flex-direction: column;
+        padding: 7px 3px !important;
+        border-radius: 8px;
+        border-color: rgba(11, 72, 182, .14);
+        background: rgba(255, 255, 255, .9);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel .orcamento-inteligente-painel-topo {
+        position: fixed;
+        top: calc(var(--orcamento-mobile-header-altura) + 8px);
+        left: 10px;
+        right: calc(var(--orcamento-mobile-timeline-largura) + 16px);
+        z-index: 86;
+        display: block;
+        margin: 0;
+        pointer-events: none;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteEtapasTitulo {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteStatus {
+        display: none;
+        width: fit-content;
+        max-width: 100%;
+        min-height: 28px;
+        align-items: center;
+        border: 1px solid rgba(11, 72, 182, .16);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, .94);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+        color: #344252;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1.2;
+        padding: 6px 8px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteStatus.erro,
+    body.orcamento-inteligente-page #orcamentoInteligenteStatus.info {
+        display: inline-flex;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteStatus.erro.bloqueio-etapa {
+        border-color: rgba(220, 38, 38, .58);
+        background: #fee2e2;
+        box-shadow: 0 12px 28px rgba(185, 28, 28, .22);
+        color: #991b1b;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas {
+        height: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        align-content: space-between;
+        gap: 2px;
+        overflow: visible;
+        padding: 0;
+        scroll-snap-type: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa {
+        position: relative;
+        flex: none;
+        min-width: 0;
+        width: 100%;
+        min-height: 42px;
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        align-content: center;
+        gap: 3px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        padding: 3px 1px;
+        opacity: .72;
+        transform: scale(.96);
+        transition: transform .24s ease, opacity .24s ease, background-color .24s ease, box-shadow .24s ease;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        bottom: 50%;
+        left: 50%;
+        z-index: -1;
+        width: 2px;
+        height: auto;
+        background: #dbe4ed;
+        transform: translateX(-50%);
+        transition: background-color .24s ease;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa:first-child::before {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.concluida::before,
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.ativa::before {
+        background: #2f9e44;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .96);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        max-width: 40px;
+        color: #4b5a6a;
+        font-size: 8.5px;
+        line-height: 1.05;
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa small {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.ativa {
+        opacity: 1;
+        transform: scale(1);
+        background: #f2f7ff;
+        box-shadow: inset 0 0 0 1px rgba(18, 107, 255, .18);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.ativa strong {
+        color: #0b48b6;
+        font-weight: 800;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.concluida {
+        opacity: .95;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-layout,
+    body.orcamento-inteligente-page .orcamento-inteligente-principal {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+        margin-top: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel.orcamento-inteligente-resumo-mobile-visivel {
+        height: calc(100vh - var(--orcamento-mobile-header-altura));
+        height: calc(100dvh - var(--orcamento-mobile-header-altura));
+        min-height: 520px;
+        display: flex !important;
+        flex-direction: column;
+        gap: 0;
+        overflow: hidden;
+        scroll-margin-top: calc(var(--orcamento-mobile-header-altura) + 8px);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        border: 0;
+        border-bottom: 1px solid #dbe4ed;
+        border-radius: 0;
+        box-shadow: none;
+        background: #ffffff;
+        padding: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-secao-oculta {
+        display: flex !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-secao-ativa {
+        box-shadow: inset 4px 0 0 rgba(18, 107, 255, .88);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel-topo {
+        flex: 0 0 auto;
+        margin-bottom: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel h2 {
+        font-size: 17px;
+        margin-bottom: 2px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-label {
+        font-size: 10px;
+        margin-bottom: 2px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-placeholder,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        border: 0;
+        background: transparent;
+        padding: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo > dl {
+        flex: 1 1 150px;
+        min-height: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo > .orcamento-inteligente-totais {
+        flex: 0 0 auto;
+        max-height: 160px;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-fluxo {
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado {
+        flex: 0 0 auto;
+        min-height: 38px;
+        padding: 7px 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado-icone {
+        min-width: 30px;
+        padding: 6px;
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado strong {
+        font-size: 12px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form select,
+    body.orcamento-inteligente-page .orcamento-inteligente-form input,
+    body.orcamento-inteligente-page .orcamento-inteligente-form textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos select,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos input,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens input,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens select {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form textarea {
+        min-height: 58px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-campo {
+        gap: 3px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form label,
+    body.orcamento-inteligente-page .orcamento-inteligente-campo label,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-grid span,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-topo span,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-totais span {
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-btn-form,
+    body.orcamento-inteligente-page .orcamento-inteligente-navegacao .btn-pequeno,
+    body.orcamento-inteligente-page .orcamento-inteligente-lista-produtos .btn-pequeno {
+        min-height: 36px;
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-navegacao {
+        flex: 0 0 auto;
+        margin-top: auto;
+        padding-top: 8px;
+        gap: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cliente-grid,
+    body.orcamento-inteligente-page .orcamento-inteligente-servicos-grid,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dl {
+        min-height: 0;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cliente-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form-novo-cliente {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-servicos-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+        gap: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-servico-opcao {
+        min-height: 42px;
+        border-radius: 7px;
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-fluxo {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteRevisao .orcamento-inteligente-fluxo {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupos-itens {
+        min-height: 0;
+        overflow: auto;
+        display: grid;
+        gap: 8px;
+        padding-right: 2px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-item,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-card {
+        border-radius: 7px;
+        padding: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-topo {
+        margin-bottom: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-topo h3 {
+        font-size: 13px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item .orcamento-inteligente-campo-cheio,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-observacao,
+    body.orcamento-inteligente-page .orcamento-inteligente-dependencias {
+        grid-column: 1 / -1;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-dependencias {
+        gap: 3px;
+        padding: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-dependencias strong {
+        font-size: 11px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item textarea {
+        min-height: 44px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-itens {
+        min-height: 0;
+        overflow: auto;
+        gap: 8px;
+        padding-right: 2px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-item-card {
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-item-topo,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-totais {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-item-topo strong,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-totais strong {
+        font-size: 12px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-item-topo .btn-pequeno {
+        width: auto;
+        min-height: 32px;
+        flex: 0 0 auto;
+        padding: 7px 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-item-totais {
+        flex-wrap: wrap;
+        padding-top: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-wrap,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos {
+        min-height: 0;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-itens {
+        min-width: 760px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-subpainel {
+        gap: 8px;
+        padding: 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-subpainel h3 {
+        font-size: 13px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dl,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dl {
+        border-radius: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo div,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais div,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo .orcamento-inteligente-totais div {
+        min-height: 42px;
+        padding: 7px 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dt {
+        font-size: 10px;
+        margin-bottom: 3px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dd,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dd {
+        font-size: 12px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-total-geral dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-total-geral dd {
+        font-size: 14px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-mobile-acoes {
+        flex: 0 0 auto;
+        position: sticky;
+        bottom: 0;
+        display: grid;
+        gap: 8px;
+        margin-top: 0;
+        border-top: 1px solid #e3ebf3;
+        background: #ffffff;
+        padding-top: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-documento-acoes {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-documento-acoes .botao {
+        width: 100%;
+    }
+}
+
+@media (min-width: 761px) and (max-width: 820px) {
+    body.orcamento-inteligente-page {
+        --orcamento-mobile-header-altura: 58px;
+    }
+}
+
+/* Cadastros internos - Projetos, Produtos e Servicos */
+.cadastro-page {
+    background: #f3f6f9;
+}
+
+.cadastro-modulo {
+    padding: 34px 0 42px;
+}
+
+.cadastro-cabecalho,
+.cadastro-filtros,
+.cadastro-painel {
+    border: 1px solid #dbe5ee;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(20, 43, 66, 0.08);
+}
+
+.cadastro-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+    padding: 22px;
+}
+
+.cadastro-label {
+    display: inline-block;
+    margin-bottom: 7px;
+    color: #0b6a8f;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.cadastro-cabecalho h1 {
+    margin: 0;
+    color: #102c3f;
+    font-size: 28px;
+    line-height: 1.16;
+}
+
+.cadastro-cabecalho p,
+.cadastro-painel p {
+    margin: 6px 0 0;
+    color: #5f6f7d;
+}
+
+.cadastro-btn-principal {
+    background: #0b6a8f;
+    border-color: #0b6a8f;
+}
+
+.cadastro-btn-principal:hover {
+    background: #084f72;
+    border-color: #084f72;
+}
+
+.cadastro-filtros {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px) minmax(140px, 180px);
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 16px;
+}
+
+.cadastro-filtros label,
+.cadastro-campo {
+    display: grid;
+    gap: 6px;
+    color: #263f52;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.cadastro-filtros input,
+.cadastro-filtros select,
+.cadastro-form input,
+.cadastro-form select,
+.cadastro-form textarea,
+.cadastro-inline-form input,
+.cadastro-inline-form select,
+.cadastro-inline-form textarea,
+.cadastro-mini-grid input,
+.cadastro-mini-grid select,
+.cadastro-mini-grid textarea {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #cfdbe6;
+    border-radius: 7px;
+    background: #fbfdff;
+    color: #173044;
+    font: inherit;
+    padding: 10px 11px;
+}
+
+.cadastro-form textarea {
+    min-height: 86px;
+    resize: vertical;
+}
+
+.cadastro-filtros input:focus,
+.cadastro-filtros select:focus,
+.cadastro-form input:focus,
+.cadastro-form select:focus,
+.cadastro-form textarea:focus,
+.cadastro-inline-form input:focus,
+.cadastro-inline-form select:focus,
+.cadastro-inline-form textarea:focus,
+.cadastro-mini-grid input:focus,
+.cadastro-mini-grid select:focus,
+.cadastro-mini-grid textarea:focus {
+    border-color: #0b6a8f;
+    box-shadow: 0 0 0 3px rgba(11, 106, 143, 0.12);
+    outline: none;
+}
+
+.cadastro-aviso {
+    display: none;
+    margin-bottom: 14px;
+    border-radius: 7px;
+    padding: 11px 13px;
+    font-weight: 700;
+}
+
+.cadastro-aviso.visivel {
+    display: block;
+}
+
+.cadastro-aviso.sucesso {
+    border: 1px solid #b9e4ca;
+    background: #eaf8ef;
+    color: #24633b;
+}
+
+.cadastro-aviso.erro {
+    border: 1px solid #f0b8b8;
+    background: #fff0f0;
+    color: #8b2d2d;
+}
+
+.cadastro-aviso.info {
+    border: 1px solid #c9def2;
+    background: #eef6ff;
+    color: #255f8d;
+}
+
+.cadastro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.85fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.cadastro-grid > *,
+.cadastro-painel {
+    min-width: 0;
+}
+
+.cadastro-painel {
+    padding: 18px;
+}
+
+.cadastro-painel-topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cadastro-painel h2 {
+    margin: 0;
+    color: #173044;
+    font-size: 20px;
+}
+
+.cadastro-tabela-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cadastro-tabela {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+.cadastro-tabela th,
+.cadastro-tabela td {
+    border-bottom: 1px solid #e4edf4;
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.cadastro-tabela th {
+    color: #5e7080;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.cadastro-tabela td strong,
+.cadastro-tabela td small {
+    display: block;
+}
+
+.cadastro-tabela td small {
+    margin-top: 3px;
+    color: #718391;
+    font-size: 12px;
+}
+
+.cadastro-tabela tbody tr:hover {
+    background: #f8fbfd;
+}
+
+.cadastro-estado-vazio,
+.cadastro-placeholder {
+    color: #718391;
+    font-weight: 600;
+}
+
+.cadastro-tabela-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cadastro-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    background: #eaf8ef;
+    color: #24633b;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 9px;
+}
+
+.cadastro-status.inativo,
+.cadastro-status.status-cancelado {
+    background: #fff0f0;
+    color: #8b2d2d;
+}
+
+.cadastro-status.status-finalizado {
+    background: #edf1f5;
+    color: #465a69;
+}
+
+.cadastro-status.status-em_orcamento {
+    background: #fff7df;
+    color: #76531a;
+}
+
+.cadastro-status.status-em_producao {
+    background: #eef6ff;
+    color: #255f8d;
+}
+
+.cadastro-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.cadastro-campo-cheio,
+.cadastro-subform,
+.cadastro-form-acoes {
+    grid-column: 1 / -1;
+}
+
+.cadastro-subform {
+    display: grid;
+    gap: 10px;
+    border: 1px solid #e4edf4;
+    border-radius: 8px;
+    background: #fbfdff;
+    padding: 12px;
+}
+
+.cadastro-subform h3,
+.cadastro-detalhe-bloco h3 {
+    margin: 0;
+    color: #173044;
+    font-size: 15px;
+}
+
+.cadastro-inline-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.cadastro-inline-form-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+}
+
+.cadastro-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.cadastro-mini-grid textarea {
+    grid-column: 1 / -1;
+    min-height: 70px;
+    resize: vertical;
+}
+
+.cadastro-chip-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.cadastro-chip,
+.cadastro-chip-estatico,
+.cadastro-chip-vazio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    border-radius: 999px;
+    border: 1px solid #d5e2ec;
+    background: #ffffff;
+    color: #263f52;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 9px;
+}
+
+.cadastro-chip-vazio {
+    color: #718391;
+    font-weight: 700;
+}
+
+.cadastro-chip button {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 50%;
+    background: #edf3f8;
+    color: #486070;
+    cursor: pointer;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.cadastro-lista-compacta {
+    display: grid;
+    gap: 8px;
+}
+
+.cadastro-lista-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid #e4edf4;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px;
+}
+
+.cadastro-lista-item strong,
+.cadastro-lista-item small {
+    display: block;
+}
+
+.cadastro-lista-item small {
+    margin-top: 3px;
+    color: #718391;
+    font-size: 12px;
+}
+
+.cadastro-observacao-tecnica {
+    margin: 8px 0 0;
+    color: #486070;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cadastro-dependencias-tecnicas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.cadastro-dependencias-tecnicas div {
+    border: 1px solid #e4edf4;
+    border-radius: 7px;
+    background: #fbfdff;
+    padding: 8px;
+}
+
+.cadastro-dependencias-tecnicas span,
+.cadastro-dependencias-tecnicas strong {
+    display: block;
+}
+
+.cadastro-dependencias-tecnicas span {
+    color: #718391;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cadastro-dependencias-tecnicas strong {
+    margin-top: 4px;
+    color: #173044;
+    font-size: 12px;
+}
+
+.cadastro-form-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cadastro-detalhe-painel {
+    margin-top: 16px;
+}
+
+.cadastro-detalhe-conteudo {
+    display: grid;
+    gap: 14px;
+}
+
+.cadastro-resumo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.cadastro-resumo-grid div {
+    border: 1px solid #e4edf4;
+    border-radius: 8px;
+    background: #fbfdff;
+    padding: 11px;
+}
+
+.cadastro-resumo-grid span {
+    display: block;
+    margin-bottom: 5px;
+    color: #718391;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cadastro-resumo-grid strong {
+    color: #173044;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.cadastro-detalhe-bloco {
+    display: grid;
+    gap: 9px;
+    border-top: 1px solid #e4edf4;
+    padding-top: 12px;
+}
+
+.cadastro-detalhe-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+@media (max-width: 980px) {
+    .cadastro-grid,
+    .cadastro-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .cadastro-form-painel {
+        order: -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .cadastro-modulo {
+        padding: 20px 0 30px;
+    }
+
+    .cadastro-cabecalho {
+        display: grid;
+        padding: 16px;
+    }
+
+    .cadastro-cabecalho h1 {
+        font-size: 24px;
+    }
+
+    .cadastro-cabecalho .botao,
+    .cadastro-form-acoes .botao {
+        width: 100%;
+    }
+
+    .cadastro-painel,
+    .cadastro-filtros {
+        padding: 14px;
+    }
+
+    .cadastro-form,
+    .cadastro-resumo-grid,
+    .cadastro-inline-form,
+    .cadastro-inline-form-3,
+    .cadastro-mini-grid,
+    .cadastro-dependencias-tecnicas {
+        grid-template-columns: 1fr;
+    }
+
+    .cadastro-lista-item,
+    .cadastro-form-acoes {
+        display: grid;
+    }
+
+    .cadastro-lista-item .btn-pequeno,
+    .cadastro-inline-form .btn-pequeno,
+    .cadastro-inline-form-3 .btn-pequeno {
+        width: 100%;
+    }
+}
+
+/* Sprint - Desktop compacto estilo sistema */
+@media (min-width: 1200px) {
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) {
+        background: #eef3f7;
+        color: #182532;
+        font-size: 14px;
+        overflow-x: hidden;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header {
+        min-height: auto !important;
+        padding: 0 !important;
+        background: #083d67 !important;
+        box-shadow: 0 4px 16px rgba(10, 30, 48, .18) !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header .container,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) main > .container {
+        width: min(98%, 1480px);
+        max-width: 1480px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header .container {
+        min-height: 54px;
+        gap: 14px;
+        padding: 7px 0;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta {
+        gap: 9px;
+        min-width: 210px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header img,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta img {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header h1,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta strong {
+        font-size: 16px;
+        line-height: 1.1;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta small {
+        font-size: 11px;
+        line-height: 1.15;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav ul,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal {
+        gap: 6px;
+        justify-content: flex-end;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav a,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal a {
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.15;
+        margin-left: 0 !important;
+        padding: 7px 9px !important;
+        text-shadow: none;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav a.login,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal a.login {
+        border-radius: 7px !important;
+        padding: 7px 12px !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-demo-banner {
+        width: min(98%, 1480px);
+        margin-top: 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 7px 10px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .botao,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .btn-pequeno {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.15;
+        padding: 7px 11px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .botao:hover,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .btn-pequeno:hover {
+        transform: translateY(-1px);
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > footer {
+        border-radius: 0;
+        font-size: 12px;
+        margin-top: 0;
+        padding: 14px 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-main {
+        min-height: calc(100vh - 92px);
+        padding: 10px 0 18px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shell {
+        max-width: none;
+        border-radius: 6px;
+        box-shadow: 0 8px 22px rgba(20, 43, 66, .08);
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-header {
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-eyebrow {
+        margin-bottom: 3px;
+        font-size: 11px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-header h1 {
+        font-size: 21px;
+        line-height: 1.12;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-subtitle {
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-refresh {
+        min-height: 32px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 11px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-content {
+        display: grid;
+        grid-template-columns: minmax(0, 1.28fr) minmax(330px, .72fr);
+        grid-template-areas:
+            "atalhos atalhos"
+            "resumo negociacao"
+            "orcamentos atividades";
+        gap: 10px;
+        padding: 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-atalhos {
+        grid-area: atalhos;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-resumo {
+        grid-area: resumo;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-negociacao-acoes {
+        grid-area: negociacao;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-orcamentos {
+        grid-area: orcamentos;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-atividades {
+        grid-area: atividades;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-section,
+    body.dashboard-comercial-page .dashboard-comercial-panel {
+        border-radius: 6px;
+        padding: 11px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-section-top {
+        margin-bottom: 8px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-section-top h2 {
+        font-size: 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-section-top span {
+        font-size: 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-cards {
+        gap: 8px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-card {
+        min-height: 76px;
+        gap: 5px;
+        border-radius: 6px;
+        padding: 10px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-card span,
+    body.dashboard-comercial-page .dashboard-comercial-card small,
+    body.dashboard-comercial-page .dashboard-comercial-action strong,
+    body.dashboard-comercial-page .dashboard-comercial-value span,
+    body.dashboard-comercial-page .dashboard-comercial-value-list span {
+        font-size: 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-card strong,
+    body.dashboard-comercial-page .dashboard-comercial-value strong {
+        font-size: 24px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts .botao {
+        min-height: 38px;
+        display: grid;
+        grid-template-columns: 22px minmax(0, 1fr);
+        gap: 7px;
+        justify-content: stretch;
+        border: 1px solid #d6e3ec;
+        background: #ffffff;
+        color: #172532;
+        box-shadow: none;
+        padding: 8px 10px;
+        text-align: left;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-icon {
+        width: 22px;
+        height: 22px;
+        border: 1px solid #bddaf4;
+        border-radius: 5px;
+        background: #e9faff;
+        color: #0b48b6;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-copy {
+        min-width: 0;
+        display: block;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-title {
+        display: block;
+        font-size: 12px;
+        line-height: 1.15;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-desc {
+        display: none;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-value {
+        margin-bottom: 8px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-value-list,
+    body.dashboard-comercial-page .dashboard-comercial-actions,
+    body.dashboard-comercial-page .dashboard-comercial-activities {
+        gap: 7px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-value-list div,
+    body.dashboard-comercial-page .dashboard-comercial-action,
+    body.dashboard-comercial-page .dashboard-comercial-activity {
+        border-radius: 6px;
+        padding: 8px 9px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-table-wrap,
+    body.dashboard-comercial-page .dashboard-comercial-activities {
+        max-height: 220px;
+        overflow: auto;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-table {
+        min-width: 620px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f5f8fb;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-table th,
+    body.dashboard-comercial-page .dashboard-comercial-table td {
+        font-size: 12px;
+        padding: 7px 8px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-empty {
+        padding: 14px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo {
+        padding: 10px 0 18px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho {
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-label,
+    body.producao-page .producao-label,
+    body.cadastro-page .cadastro-label {
+        font-size: 10px;
+        margin-bottom: 3px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho h1,
+    body.producao-page .producao-cabecalho h1,
+    body.cadastro-page .cadastro-cabecalho h1 {
+        font-size: 22px;
+        line-height: 1.12;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho p,
+    body.producao-page .producao-cabecalho p,
+    body.cadastro-page .cadastro-cabecalho p {
+        font-size: 12px;
+        line-height: 1.3;
+        margin-top: 3px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho .botao {
+        min-height: 32px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel {
+        border-radius: 6px;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, .05);
+        padding: 11px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel-topo {
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel h2 {
+        font-size: 15px;
+        margin-bottom: 2px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel p,
+    body.orcamento-inteligente-page .orcamento-inteligente-status {
+        font-size: 12px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        padding-top: 2px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa {
+        min-height: 42px;
+        gap: 3px;
+        padding: 0 4px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa::before {
+        top: 12px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 24px;
+        height: 24px;
+        box-shadow: 0 0 0 4px #fff;
+        font-size: 11px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        max-width: 94px;
+        font-size: 11px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa small {
+        font-size: 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-layout {
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 10px;
+        align-items: start;
+        margin-top: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        min-width: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel:not(.orcamento-inteligente-secao-oculta) {
+        min-height: 0;
+        max-height: calc(100vh - 194px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-placeholder {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow: auto;
+        padding: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel {
+        position: sticky;
+        top: 10px;
+        max-height: calc(100vh - 140px);
+        overflow: auto;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo div,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais div {
+        min-height: 42px;
+        padding: 7px 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-selecionado span,
+    body.orcamento-inteligente-page .orcamento-inteligente-lista-produtos span {
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dd,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dd {
+        font-size: 12px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-total-geral dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-total-geral dd {
+        font-size: 14px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-fluxo,
+    body.orcamento-inteligente-page .orcamento-inteligente-grupos-itens,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos {
+        gap: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado,
+    body.orcamento-inteligente-page .orcamento-inteligente-resultado,
+    body.orcamento-inteligente-page .orcamento-inteligente-validacao {
+        padding: 8px 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado-icone,
+    body.orcamento-inteligente-page .orcamento-inteligente-servico-icone,
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-icone {
+        min-width: 28px;
+        border-radius: 6px;
+        font-size: 10px;
+        padding: 5px 6px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado strong,
+    body.orcamento-inteligente-page .orcamento-inteligente-selecionado strong,
+    body.orcamento-inteligente-page .orcamento-inteligente-lista-produtos strong {
+        font-size: 13px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-calculo,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-novo-cliente,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item {
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cliente-grid {
+        grid-template-columns: minmax(230px, .72fr) minmax(0, 1.28fr);
+        gap: 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-servicos-grid {
+        grid-template-columns: repeat(4, minmax(120px, 1fr));
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-servico-opcao {
+        min-height: 38px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 7px 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-item,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-card,
+    body.orcamento-inteligente-page .orcamento-inteligente-subpainel {
+        border-radius: 6px;
+        padding: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-topo {
+        margin-bottom: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-grupo-topo h3,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-novo-cliente h3,
+    body.orcamento-inteligente-page .orcamento-inteligente-subpainel h3 {
+        font-size: 13px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form select,
+    body.orcamento-inteligente-page .orcamento-inteligente-form input,
+    body.orcamento-inteligente-page .orcamento-inteligente-form textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos select,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos input,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens input,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens select {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item textarea {
+        min-height: 56px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form label,
+    body.orcamento-inteligente-page .orcamento-inteligente-campo label,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-grid span,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-topo span,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-totais span {
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-btn-form,
+    body.orcamento-inteligente-page .orcamento-inteligente-navegacao .btn-pequeno,
+    body.orcamento-inteligente-page .orcamento-inteligente-lista-produtos .btn-pequeno {
+        min-height: 34px;
+        font-size: 12px;
+        padding: 7px 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-navegacao {
+        margin-top: 2px;
+        padding-top: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-wrap {
+        max-height: 260px;
+        overflow: auto;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-itens {
+        min-width: 900px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-itens th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-itens th,
+    body.orcamento-inteligente-page .orcamento-inteligente-tabela-itens td {
+        font-size: 12px;
+        padding: 7px 8px;
+    }
+
+    body.cadastro-page .cadastro-modulo {
+        padding: 10px 0 18px;
+    }
+
+    body.cadastro-page .cadastro-cabecalho {
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+        padding: 12px 14px;
+    }
+
+    body.cadastro-page .cadastro-filtros {
+        gap: 8px;
+        margin-bottom: 10px;
+        padding: 10px;
+    }
+
+    body.cadastro-page .cadastro-filtros label,
+    body.cadastro-page .cadastro-campo {
+        gap: 4px;
+        font-size: 12px;
+    }
+
+    body.cadastro-page .cadastro-grid {
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    body.cadastro-page .cadastro-painel {
+        border-radius: 6px;
+        box-shadow: 0 8px 22px rgba(20, 43, 66, .06);
+        padding: 11px;
+    }
+
+    body.cadastro-page .cadastro-lista-painel,
+    body.cadastro-page .cadastro-form-painel {
+        max-height: calc(100vh - 212px);
+        overflow: auto;
+    }
+
+    body.cadastro-page .cadastro-form-painel {
+        position: sticky;
+        top: 10px;
+    }
+
+    body.cadastro-page .cadastro-painel-topo {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    body.cadastro-page .cadastro-painel h2 {
+        font-size: 16px;
+    }
+
+    body.cadastro-page .cadastro-painel p,
+    body.cadastro-page .cadastro-cabecalho p {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    body.cadastro-page .cadastro-aviso {
+        margin-bottom: 8px;
+        padding: 8px 10px;
+    }
+
+    body.cadastro-page .cadastro-tabela-wrap {
+        max-height: calc(100vh - 322px);
+        overflow: auto;
+    }
+
+    body.cadastro-page .cadastro-tabela {
+        min-width: 700px;
+    }
+
+    body.cadastro-page .cadastro-tabela th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f6f9fc;
+    }
+
+    body.cadastro-page .cadastro-tabela th,
+    body.cadastro-page .cadastro-tabela td {
+        font-size: 12px;
+        padding: 7px 8px;
+    }
+
+    body.cadastro-page .cadastro-tabela td small {
+        font-size: 11px;
+    }
+
+    body.cadastro-page .cadastro-status {
+        min-height: 23px;
+        font-size: 10px;
+        padding: 3px 7px;
+    }
+
+    body.cadastro-page .cadastro-tabela-acoes {
+        gap: 4px;
+    }
+
+    body.cadastro-page .cadastro-form {
+        gap: 8px;
+    }
+
+    body.cadastro-page .cadastro-filtros input,
+    body.cadastro-page .cadastro-filtros select,
+    body.cadastro-page .cadastro-form input,
+    body.cadastro-page .cadastro-form select,
+    body.cadastro-page .cadastro-form textarea,
+    body.cadastro-page .cadastro-inline-form input,
+    body.cadastro-page .cadastro-inline-form select,
+    body.cadastro-page .cadastro-inline-form textarea,
+    body.cadastro-page .cadastro-mini-grid input,
+    body.cadastro-page .cadastro-mini-grid select,
+    body.cadastro-page .cadastro-mini-grid textarea {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    body.cadastro-page .cadastro-form textarea {
+        min-height: 58px;
+    }
+
+    body.cadastro-page .cadastro-subform {
+        gap: 7px;
+        border-radius: 6px;
+        padding: 8px;
+    }
+
+    body.cadastro-page .cadastro-subform h3,
+    body.cadastro-page .cadastro-detalhe-bloco h3 {
+        font-size: 13px;
+    }
+
+    body.cadastro-page .cadastro-inline-form,
+    body.cadastro-page .cadastro-mini-grid,
+    body.cadastro-page .cadastro-dependencias-tecnicas,
+    body.cadastro-page .cadastro-resumo-grid,
+    body.cadastro-page .cadastro-lista-compacta,
+    body.cadastro-page .cadastro-detalhe-conteudo {
+        gap: 7px;
+    }
+
+    body.cadastro-page .cadastro-chip,
+    body.cadastro-page .cadastro-chip-estatico,
+    body.cadastro-page .cadastro-chip-vazio {
+        min-height: 24px;
+        border-radius: 6px;
+        font-size: 11px;
+        padding: 4px 7px;
+    }
+
+    body.cadastro-page .cadastro-lista-item,
+    body.cadastro-page .cadastro-resumo-grid div,
+    body.cadastro-page .cadastro-dependencias-tecnicas div {
+        border-radius: 6px;
+        padding: 7px 8px;
+    }
+
+    body.cadastro-page .cadastro-detalhe-painel {
+        margin-top: 10px;
+    }
+
+    body.cadastro-page .cadastro-detalhe-conteudo {
+        max-height: 220px;
+        overflow: auto;
+    }
+
+    body.producao-page .producao-main {
+        min-height: calc(100vh - 92px);
+        padding: 10px 0 18px;
+    }
+
+    body.producao-page .producao-shell {
+        gap: 10px;
+    }
+
+    body.producao-page .producao-cabecalho {
+        align-items: center;
+        gap: 12px;
+    }
+
+    body.producao-page .producao-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(340px, .78fr);
+        gap: 10px;
+    }
+
+    body.producao-page .producao-painel {
+        border-radius: 6px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
+        padding: 11px;
+    }
+
+    body.producao-page .producao-lista {
+        max-height: calc(100vh - 292px);
+        overflow: auto;
+        padding-right: 2px;
+    }
+
+    body.producao-page .producao-detalhes {
+        max-height: calc(100vh - 164px);
+        overflow: auto;
+    }
+
+    body.producao-page .producao-painel-topo {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    body.producao-page .producao-painel h2 {
+        font-size: 16px;
+    }
+
+    body.producao-page .producao-painel p,
+    body.producao-page .producao-card p {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    body.producao-page .producao-indicadores {
+        gap: 7px;
+    }
+
+    body.producao-page .producao-indicador {
+        min-height: 58px;
+        gap: 5px;
+        border-radius: 6px;
+        padding: 8px;
+    }
+
+    body.producao-page .producao-indicador span,
+    body.producao-page .producao-meta span,
+    body.producao-page .producao-resumo-grid span,
+    body.producao-page .producao-form span,
+    body.producao-page .producao-check-item small,
+    body.producao-page .producao-historico span {
+        font-size: 10px;
+    }
+
+    body.producao-page .producao-indicador strong {
+        font-size: 22px;
+    }
+
+    body.producao-page .producao-card {
+        gap: 7px;
+        border-radius: 6px;
+        padding: 9px;
+    }
+
+    body.producao-page .producao-card h3 {
+        font-size: 15px;
+    }
+
+    body.producao-page .producao-meta div {
+        min-height: 42px;
+        padding: 7px 8px;
+    }
+
+    body.producao-page .producao-meta strong,
+    body.producao-page .producao-resumo-grid strong,
+    body.producao-page .producao-check-item span,
+    body.producao-page .producao-historico strong {
+        font-size: 12px;
+    }
+
+    body.producao-page .producao-status {
+        font-size: 10px;
+        padding: 4px 7px;
+    }
+
+    body.producao-page .producao-detalhes,
+    body.producao-page .producao-detalhe-section,
+    body.producao-page .producao-form,
+    body.producao-page .producao-checklist,
+    body.producao-page .producao-historico {
+        gap: 8px;
+    }
+
+    body.producao-page .producao-detalhe-section {
+        padding-top: 10px;
+    }
+
+    body.producao-page .producao-detalhe-section h3 {
+        font-size: 14px;
+    }
+
+    body.producao-page .producao-resumo-grid div,
+    body.producao-page .producao-check-item,
+    body.producao-page .producao-historico li {
+        border-radius: 6px;
+        min-height: 40px;
+        padding: 7px 8px;
+    }
+
+    body.producao-page .producao-form input,
+    body.producao-page .producao-form select,
+    body.producao-page .producao-form textarea {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    body.producao-page .producao-form textarea {
+        min-height: 54px;
+    }
+
+    body.document-share-page .document-share-main {
+        min-height: calc(100vh - 92px);
+        padding: 10px 0 18px;
+    }
+
+    body.document-share-page .document-share-shell {
+        max-width: none;
+        border-radius: 6px;
+        box-shadow: 0 8px 22px rgba(17, 24, 39, .08);
+    }
+
+    body.document-share-page .document-share-grid {
+        grid-template-columns: minmax(260px, .42fr) minmax(0, 1.58fr);
+    }
+
+    body.document-share-page .document-share-actions,
+    body.document-share-page .document-share-preview-area,
+    body.document-share-page .document-share-footer {
+        padding: 11px;
+    }
+
+    body.document-share-page .document-share-section {
+        padding: 9px 0;
+    }
+
+    body.document-share-page .document-share-section h2 {
+        margin-bottom: 7px;
+        font-size: 12px;
+    }
+
+    body.document-share-page .document-share-button-list,
+    body.document-share-page .document-share-filter-form,
+    body.document-share-page .document-share-results {
+        gap: 7px;
+    }
+
+    body.document-share-page .document-share-button {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 7px 9px;
+    }
+
+    body.document-share-page .document-share-button-token {
+        min-width: 44px;
+        border-radius: 6px;
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    body.document-share-page .document-share-filter-form label,
+    body.document-share-page .document-share-result-button,
+    body.document-share-page .document-share-results p,
+    body.document-share-page .document-share-result span {
+        font-size: 12px;
+    }
+
+    body.document-share-page .document-share-filter-form input {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    body.document-share-page .document-share-results {
+        max-height: 210px;
+        overflow: auto;
+    }
+
+    body.document-share-page .document-share-result {
+        gap: 5px;
+        border-radius: 6px;
+        padding: 8px;
+    }
+
+    body.document-share-page .document-share-result-button {
+        min-height: 30px;
+    }
+
+    body.document-share-page .document-share-message,
+    body.document-share-page .document-share-history {
+        margin-bottom: 8px;
+        padding: 9px 10px;
+    }
+
+    body.document-share-page .document-share-preview {
+        min-height: calc(100vh - 176px);
+        max-height: calc(100vh - 176px);
+        border-radius: 6px;
+        padding: 10px;
+        overflow: auto;
+    }
+
+    body.document-share-page .document-share-preview-pdf {
+        padding: 0;
+    }
+
+    body.document-share-page .document-share-pdf-toolbar {
+        min-height: 40px;
+        padding: 7px 9px;
+    }
+
+    body.document-share-page .document-share-pdf-toolbar span,
+    body.document-share-page .document-share-pdf-toolbar-actions a {
+        font-size: 12px;
+    }
+
+    body.document-share-page .document-share-pdf-toolbar-actions a {
+        min-height: 30px;
+        padding: 5px 8px;
+    }
+
+    body.document-share-page .document-share-pdf-object {
+        min-height: calc(100vh - 224px);
+    }
+
+    body.comercial-page .comercial-main {
+        min-height: calc(100vh - 92px);
+        padding: 10px 0 18px;
+    }
+
+    body.comercial-page .comercial-shell {
+        max-width: none;
+        border-radius: 6px;
+        box-shadow: 0 8px 22px rgba(17, 24, 39, .08);
+    }
+
+    body.comercial-page .comercial-header,
+    body.comercial-page .comercial-panel,
+    body.comercial-page .comercial-preview-area {
+        padding: 12px;
+    }
+
+    body.comercial-page .comercial-header h1 {
+        font-size: 24px;
+        line-height: 1.1;
+    }
+
+    body.comercial-page .comercial-eyebrow {
+        margin-bottom: 4px;
+        font-size: 11px;
+    }
+
+    body.comercial-page .comercial-summary {
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    body.comercial-page .comercial-summary span {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    body.comercial-page .comercial-grid {
+        grid-template-columns: minmax(280px, .55fr) minmax(0, 1.45fr);
+        min-height: calc(100vh - 166px);
+    }
+
+    body.comercial-page .comercial-section {
+        padding: 10px 0;
+    }
+
+    body.comercial-page .comercial-section h2 {
+        margin-bottom: 7px;
+        font-size: 12px;
+    }
+
+    body.comercial-page .comercial-status {
+        gap: 5px;
+        border-radius: 6px;
+        padding: 9px;
+    }
+
+    body.comercial-page .comercial-status strong {
+        font-size: 14px;
+    }
+
+    body.comercial-page .comercial-status span,
+    body.comercial-page .comercial-note,
+    body.comercial-page .comercial-message p {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    body.comercial-page .comercial-actions {
+        gap: 7px;
+    }
+
+    body.comercial-page .comercial-button {
+        min-height: 34px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 7px 9px;
+    }
+
+    body.comercial-page .comercial-message {
+        margin-bottom: 8px;
+        padding: 9px 10px;
+    }
+
+    body.comercial-page .comercial-preview {
+        min-height: calc(100vh - 204px);
+        max-height: calc(100vh - 204px);
+        border-radius: 6px;
+        padding: 10px;
+    }
+
+    body.comercial-page .comercial-preview-empty {
+        min-height: 300px;
+    }
+
+    body.conversao-page .conversao-main {
+        min-height: calc(100vh - 92px);
+        padding: 10px 0 18px;
+    }
+
+    body.conversao-page .conversao-shell {
+        max-width: 1180px;
+        border-radius: 6px;
+        box-shadow: 0 8px 22px rgba(17, 24, 39, .08);
+    }
+
+    body.conversao-page .conversao-header,
+    body.conversao-page .conversao-body {
+        padding: 14px;
+    }
+
+    body.conversao-page .conversao-eyebrow {
+        margin-bottom: 4px;
+        font-size: 11px;
+    }
+
+    body.conversao-page .conversao-header h1 {
+        font-size: 24px;
+        line-height: 1.1;
+    }
+
+    body.conversao-page .conversao-body {
+        gap: 12px;
+    }
+
+    body.conversao-page .conversao-flow {
+        grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr) 28px minmax(0, 1fr);
+        align-items: stretch;
+        gap: 10px;
+        text-align: left;
+    }
+
+    body.conversao-page .conversao-step {
+        width: 100%;
+        border-radius: 6px;
+        padding: 12px;
+    }
+
+    body.conversao-page .conversao-step strong {
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    body.conversao-page .conversao-step span,
+    body.conversao-page .conversao-message p {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    body.conversao-page .conversao-arrow {
+        align-self: center;
+        justify-self: center;
+        font-size: 20px;
+        transform: rotate(-90deg);
+    }
+
+    body.conversao-page .conversao-button {
+        align-self: center;
+        min-width: 160px;
+        min-height: 38px;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    body.conversao-page .conversao-message {
+        width: 100%;
+        border-radius: 6px;
+        padding: 9px 10px;
+    }
+}
+
+@media (min-width: 1280px) {
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item .orcamento-inteligente-campo-cheio,
+    body.orcamento-inteligente-page .orcamento-inteligente-item-observacao,
+    body.orcamento-inteligente-page .orcamento-inteligente-dependencias {
+        grid-column: 1 / -1;
+    }
+
+    body.cadastro-page .cadastro-grid {
+        grid-template-columns: minmax(0, 1.55fr) minmax(340px, .7fr);
+    }
+
+    body.producao-page .producao-grid {
+        grid-template-columns: minmax(0, 1.05fr) minmax(420px, .72fr);
+    }
+}
+
+/* Sprint Desktop UX 2.0 - ajustes somente desktop amplo */
+.rk-desktop-launchers {
+    display: none;
+}
+
+@media (min-width: 1200px) {
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) {
+        background: #eef4f8;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header {
+        position: relative !important;
+        overflow: hidden !important;
+        min-height: 58px !important;
+        padding: 0 !important;
+        background:
+            linear-gradient(118deg,
+                rgba(207, 239, 252, .95) 0 10%,
+                rgba(18, 107, 255, .96) 10% 24%,
+                rgba(11, 72, 182, .98) 24% 66%,
+                rgba(5, 42, 82, 1) 66% 100%) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, .18) !important;
+        box-shadow: 0 10px 28px rgba(5, 42, 82, .22) !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header::before,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header::after {
+        content: "" !important;
+        position: absolute;
+        display: block !important;
+        pointer-events: none;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header::before {
+        inset: 0 auto 0 -42px;
+        width: 270px;
+        background: linear-gradient(120deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 58%);
+        transform: skewX(-18deg);
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header::after {
+        top: -36px;
+        right: 20%;
+        width: 150px;
+        height: 128px;
+        border-left: 1px solid rgba(255, 255, 255, .22);
+        border-right: 1px solid rgba(255, 255, 255, .10);
+        background: rgba(255, 255, 255, .10);
+        transform: rotate(18deg);
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header .container {
+        position: relative;
+        z-index: 2;
+        min-height: 58px;
+        width: min(98%, 1500px);
+        max-width: 1500px;
+        padding: 6px 0;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta {
+        min-width: 226px;
+        gap: 10px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header img,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta img {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        padding: 3px;
+        background: #fff !important;
+        border: 2px solid rgba(255, 255, 255, .95) !important;
+        box-shadow: 0 12px 26px rgba(0, 0, 0, .22) !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header h1,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta strong {
+        color: #fff !important;
+        font-size: 17px;
+        line-height: 1.08;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, .24);
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .marca-header-compacta small {
+        color: rgba(233, 250, 255, .88) !important;
+        font-size: 11px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav ul,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal {
+        gap: 7px;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav a,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal a {
+        min-height: 32px;
+        border: 1px solid rgba(255, 255, 255, .14);
+        border-radius: 7px;
+        background: rgba(255, 255, 255, .08);
+        color: rgba(255, 255, 255, .94) !important;
+        font-size: 12px;
+        padding: 7px 10px !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav a:hover,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal a:hover {
+        background: rgba(255, 255, 255, .16);
+        color: #e9faff !important;
+    }
+
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) > header nav a.login,
+    :is(
+        body.dashboard-comercial-page,
+        body.orcamento-inteligente-page,
+        body.clientes-page,
+        body.document-share-page,
+        body.comercial-page,
+        body.conversao-page,
+        body.producao-page,
+        body.cadastro-page
+    ) .rk-nav-principal a.login {
+        border-color: rgba(255, 255, 255, .58);
+        background: #e9faff !important;
+        color: #052a52 !important;
+        box-shadow: 0 9px 20px rgba(5, 42, 82, .18);
+    }
+
+    .rk-desktop-launchers {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin: 0 0 10px;
+    }
+
+    .rk-desktop-launcher,
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts .botao {
+        min-height: 82px;
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+        border: 1px solid rgba(11, 72, 182, .13);
+        border-radius: 8px;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, .98), rgba(245, 250, 255, .96));
+        color: #172532;
+        box-shadow: 0 8px 22px rgba(20, 43, 66, .07);
+        padding: 12px;
+        text-align: left;
+        text-decoration: none;
+        transform: translateY(0);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+    }
+
+    .rk-desktop-launcher:hover,
+    .rk-desktop-launcher:focus-visible,
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts .botao:hover,
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts .botao:focus-visible {
+        border-color: rgba(18, 107, 255, .36);
+        background: #ffffff;
+        box-shadow: 0 14px 30px rgba(20, 43, 66, .12);
+        outline: none;
+        transform: translateY(-2px);
+    }
+
+    .rk-desktop-launcher-icon,
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-icon {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(18, 107, 255, .18);
+        border-radius: 8px;
+        background:
+            linear-gradient(135deg, #e9faff 0%, #dbeeff 100%);
+        color: #0b48b6;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .rk-desktop-launcher strong,
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-title {
+        display: block;
+        color: #172532;
+        font-size: 14px;
+        line-height: 1.15;
+        margin-bottom: 4px;
+    }
+
+    .rk-desktop-launcher small,
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-desc {
+        display: block;
+        color: #667789;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-main {
+        min-height: calc(100vh - 58px);
+        padding: 8px 0 14px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1.14fr) minmax(340px, .86fr);
+        grid-template-areas:
+            "atalhos atalhos"
+            "workspace workspace"
+            "resumo atividades"
+            "negociacao atividades"
+            "orcamentos orcamentos";
+        gap: 9px;
+        max-width: none;
+        overflow: visible;
+        border-radius: 8px;
+        background: #f7fafc;
+        padding: 10px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-content {
+        display: contents;
+        padding: 0;
+        background: transparent;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-header {
+        grid-area: workspace;
+        align-items: center;
+        border: 1px solid #dfe8ef !important;
+        border-radius: 7px;
+        background: #ffffff !important;
+        padding: 9px 11px !important;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-header h1 {
+        font-size: 19px;
+        text-transform: uppercase;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-subtitle {
+        max-width: 760px;
+        margin-top: 2px;
+        font-size: 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-refresh {
+        min-height: 30px;
+        padding: 5px 10px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-atalhos {
+        grid-area: atalhos;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-atalhos .dashboard-comercial-section-top {
+        display: none;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-icon {
+        font-size: 0;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-icon::before {
+        font-size: 19px;
+        font-weight: 800;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(1) .dashboard-comercial-shortcut-icon::before {
+        content: "+";
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(2) .dashboard-comercial-shortcut-icon::before {
+        content: "R$";
+        font-size: 16px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(3) .dashboard-comercial-shortcut-icon::before {
+        content: "OK";
+        font-size: 15px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(4) .dashboard-comercial-shortcut-icon::before {
+        content: "OP";
+        font-size: 15px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(3) .dashboard-comercial-shortcut-title,
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-desc {
+        font-size: 0;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(3) .dashboard-comercial-shortcut-title::before {
+        content: "Aprova\00e7\00f5es";
+        font-size: 14px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut-desc::before {
+        font-size: 12px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(1) .dashboard-comercial-shortcut-desc::before {
+        content: "Cadastrar contato";
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(2) .dashboard-comercial-shortcut-desc::before {
+        content: "Criar proposta";
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(3) .dashboard-comercial-shortcut-desc::before {
+        content: "Revisar respostas";
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shortcut:nth-child(4) .dashboard-comercial-shortcut-desc::before {
+        content: "Acompanhar OPs";
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-resumo {
+        grid-area: resumo;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-atividades {
+        grid-area: atividades;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-negociacao-acoes {
+        grid-area: negociacao;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-orcamentos {
+        grid-area: orcamentos;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-section,
+    body.dashboard-comercial-page .dashboard-comercial-panel {
+        border-radius: 7px;
+        padding: 10px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-section-top {
+        margin-bottom: 7px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-cards {
+        gap: 7px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-card {
+        min-height: 68px;
+        padding: 8px 9px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-card strong,
+    body.dashboard-comercial-page .dashboard-comercial-value strong {
+        font-size: 21px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-table-wrap {
+        max-height: 150px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-activities {
+        max-height: 255px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo,
+    body.clientes-page .clientes-modulo {
+        padding: 8px 0 16px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo > .container,
+    body.clientes-page .clientes-modulo > .container {
+        width: min(98%, 1500px);
+        max-width: 1500px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho,
+    body.clientes-page .clientes-cabecalho {
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-label,
+    body.clientes-page .clientes-modulo-label {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho h1,
+    body.clientes-page .clientes-cabecalho h1 {
+        font-size: 20px;
+        line-height: 1.1;
+        text-transform: uppercase;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho p {
+        margin-top: 3px;
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho .botao,
+    body.clientes-page .clientes-cabecalho-acoes .botao {
+        min-height: 31px;
+        padding: 6px 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel {
+        display: grid;
+        grid-template-columns: minmax(150px, .2fr) minmax(0, .8fr);
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel .orcamento-inteligente-painel-topo {
+        margin-bottom: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel h2 {
+        font-size: 13px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteStatus {
+        font-size: 10px;
+        line-height: 1.2;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas {
+        padding: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa {
+        min-height: 36px;
+        gap: 2px;
+        padding: 0 3px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa::before {
+        top: 11px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+        box-shadow: 0 0 0 4px #fff;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        max-width: 96px;
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa small {
+        font-size: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-layout {
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 9px;
+        margin-top: 9px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel {
+        padding: 9px 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel-topo {
+        margin-bottom: 6px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-painel h2 {
+        font-size: 14px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel:not(.orcamento-inteligente-secao-oculta) {
+        max-height: calc(100vh - 182px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-placeholder {
+        padding: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel {
+        top: 8px;
+        max-height: calc(100vh - 82px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo div,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais div {
+        min-height: 36px;
+        padding: 6px 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dt {
+        margin-bottom: 2px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-fluxo,
+    body.orcamento-inteligente-page .orcamento-inteligente-grupos-itens,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos {
+        gap: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-calculo,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-novo-cliente,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-item {
+        gap: 6px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-form select,
+    body.orcamento-inteligente-page .orcamento-inteligente-form input,
+    body.orcamento-inteligente-page .orcamento-inteligente-form textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos select,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos input,
+    body.orcamento-inteligente-page .orcamento-inteligente-form-complementos textarea,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens input,
+    body.orcamento-inteligente-page .orcamento-inteligente-itens select,
+    body.clientes-page .clientes-busca input,
+    body.clientes-page .cliente-campo input,
+    body.clientes-page .cliente-campo select,
+    body.clientes-page .cliente-campo textarea {
+        min-height: 32px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    body.clientes-page .clientes-busca {
+        min-width: 300px;
+        gap: 3px;
+        font-size: 11px;
+    }
+
+    body.clientes-page .clientes-grid {
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 10px;
+    }
+
+    body.clientes-page .clientes-grid-operacional {
+        margin-bottom: 10px;
+    }
+
+    body.clientes-page .clientes-centro-painel {
+        margin-top: 10px;
+    }
+
+    body.clientes-page .clientes-painel {
+        border-radius: 7px;
+        padding: 10px;
+    }
+
+    body.clientes-page .clientes-painel-topo,
+    body.clientes-page .clientes-centro-topo {
+        gap: 8px;
+        margin-bottom: 7px;
+        padding-bottom: 8px;
+    }
+
+    body.clientes-page .clientes-painel h2 {
+        font-size: 15px;
+    }
+
+    body.clientes-page .clientes-painel p,
+    body.clientes-page .cliente-aba-painel p,
+    body.clientes-page .cliente-detalhe-bloco p {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    body.clientes-page .cliente-form {
+        gap: 7px;
+    }
+
+    body.clientes-page .cliente-campo {
+        gap: 3px;
+    }
+
+    body.clientes-page .cliente-campo label {
+        font-size: 10px;
+    }
+
+    body.clientes-page .cliente-campo textarea {
+        min-height: 58px;
+    }
+
+    body.clientes-page .cliente-form-acoes {
+        gap: 7px;
+    }
+
+    body.clientes-page .clientes-tabela-wrap {
+        max-height: calc(100vh - 318px);
+        overflow: auto;
+    }
+
+    body.clientes-page .clientes-tabela {
+        min-width: 820px;
+    }
+
+    body.clientes-page .clientes-tabela th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 7px 8px;
+        font-size: 11px;
+    }
+
+    body.clientes-page .clientes-tabela td {
+        padding: 7px 8px;
+        font-size: 12px;
+    }
+
+    body.clientes-page .cliente-status {
+        min-height: 22px;
+        min-width: 56px;
+        font-size: 10px;
+        padding: 3px 7px;
+    }
+
+    body.clientes-page .cliente-resumo-grid {
+        margin-bottom: 9px;
+    }
+
+    body.clientes-page .cliente-resumo-item {
+        min-height: 52px;
+        padding: 8px;
+    }
+
+    body.clientes-page .cliente-resumo-item span,
+    body.clientes-page .cliente-indicador-item span,
+    body.clientes-page .cliente-dados-lista dt {
+        margin-bottom: 3px;
+        font-size: 10px;
+    }
+
+    body.clientes-page .cliente-resumo-item strong,
+    body.clientes-page .cliente-indicador-item strong,
+    body.clientes-page .cliente-dados-lista dd {
+        font-size: 12px;
+    }
+
+    body.clientes-page .cliente-centro-layout {
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 10px;
+    }
+
+    body.clientes-page .cliente-abas {
+        gap: 5px;
+        margin-bottom: 8px;
+        padding-bottom: 7px;
+    }
+
+    body.clientes-page .cliente-abas button {
+        min-height: 30px;
+        border-radius: 6px;
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    body.clientes-page .cliente-dados-lista div {
+        min-height: 48px;
+        padding: 7px 8px;
+    }
+
+    body.clientes-page .cliente-lista-preparada li,
+    body.clientes-page .cliente-placeholder {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    body.clientes-page .cliente-indicadores {
+        padding-left: 10px;
+    }
+
+    body.clientes-page .cliente-indicador-item {
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+    }
+}
+
+/* Atalhos globais do RK Conecte */
+.rk-system-shortcuts {
+    position: relative;
+    z-index: 12;
+    border-bottom: 1px solid rgba(11, 72, 182, .10);
+    background:
+        linear-gradient(180deg, rgba(248, 252, 255, .98), rgba(238, 244, 248, .96));
+    padding: 8px 0;
+}
+
+.rk-system-shortcuts__inner {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    width: 95%;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.rk-system-shortcut {
+    position: relative;
+    min-width: 0;
+    min-height: 76px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    gap: 11px;
+    overflow: hidden;
+    border: 1px solid rgba(11, 72, 182, .13);
+    border-radius: 10px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .98), rgba(246, 250, 255, .96));
+    color: #172532;
+    box-shadow: 0 8px 22px rgba(20, 43, 66, .07);
+    padding: 10px 11px;
+    text-decoration: none;
+    transform: translateY(0);
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.rk-system-shortcut::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(120deg, transparent 0 32%, rgba(255, 255, 255, .54) 45%, transparent 58%);
+    opacity: 0;
+    transform: translateX(-60%);
+    transition: opacity .2s ease, transform .45s ease;
+    pointer-events: none;
+}
+
+.rk-system-shortcut__media {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(18, 107, 255, .18);
+    border-radius: 10px;
+    background:
+        linear-gradient(135deg, #e9faff 0%, #dbeeff 100%);
+    color: #0b48b6;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .74);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.rk-system-shortcut__media img,
+.rk-system-shortcut__media video,
+.rk-system-shortcut__media lottie-player {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.rk-system-shortcut__media img,
+.rk-system-shortcut__media video {
+    padding: 5px;
+}
+
+.rk-system-shortcut__media--erro img,
+.rk-system-shortcut__media--erro video,
+.rk-system-shortcut__media--loaded .rk-system-shortcut__fallback {
+    display: none;
+}
+
+.rk-system-shortcut__fallback {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0b48b6;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.rk-system-shortcut__copy {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.rk-system-shortcut__copy strong,
+.rk-system-shortcut__copy small {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.rk-system-shortcut__copy strong {
+    color: #172532;
+    font-size: 14px;
+    line-height: 1.12;
+}
+
+.rk-system-shortcut__copy small {
+    color: #667789;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.18;
+}
+
+.dashboard-comercial-atalhos {
+    display: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .rk-system-shortcut:hover,
+    .rk-system-shortcut:focus-visible {
+        border-color: rgba(18, 107, 255, .36);
+        background: #ffffff;
+        box-shadow: 0 15px 32px rgba(20, 43, 66, .13);
+        outline: none;
+        transform: translateY(-2px);
+    }
+
+    .rk-system-shortcut:hover::after,
+    .rk-system-shortcut:focus-visible::after {
+        opacity: 1;
+        transform: translateX(60%);
+    }
+
+    .rk-system-shortcut:hover .rk-system-shortcut__media,
+    .rk-system-shortcut:focus-visible .rk-system-shortcut__media {
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .84), 0 9px 18px rgba(18, 107, 255, .16);
+        transform: scale(1.05) rotate(-1deg);
+    }
+}
+
+.rk-system-shortcut:active,
+.rk-system-shortcut--pulse {
+    border-color: rgba(18, 107, 255, .38);
+    box-shadow: 0 10px 24px rgba(20, 43, 66, .11);
+    transform: translateY(-1px) scale(.99);
+}
+
+.rk-system-shortcut:active .rk-system-shortcut__media,
+.rk-system-shortcut--pulse .rk-system-shortcut__media {
+    transform: scale(1.04);
+}
+
+@media (max-width: 820px) {
+    .rk-system-shortcuts {
+        padding: 7px 0;
+    }
+
+    .rk-system-shortcuts__inner {
+        width: calc(100% - 20px);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .rk-system-shortcut {
+        min-height: 62px;
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 8px;
+        border-radius: 8px;
+        padding: 8px;
+    }
+
+    .rk-system-shortcut__media {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+    }
+
+    .rk-system-shortcut__media img,
+    .rk-system-shortcut__media video {
+        padding: 4px;
+    }
+
+    .rk-system-shortcut__fallback {
+        font-size: 15px;
+    }
+
+    .rk-system-shortcut__copy {
+        gap: 2px;
+    }
+
+    .rk-system-shortcut__copy strong {
+        font-size: 12px;
+        line-height: 1.1;
+    }
+
+    .rk-system-shortcut__copy small {
+        font-size: 10px;
+        line-height: 1.1;
+    }
+}
+
+@media (min-width: 1200px) {
+    .rk-system-shortcuts {
+        padding: 9px 0;
+    }
+
+    .rk-system-shortcuts__inner {
+        width: min(98%, 1500px);
+        gap: 10px;
+    }
+
+    .rk-system-shortcut {
+        min-height: 80px;
+        border-radius: 9px;
+    }
+
+    body.dashboard-comercial-page .dashboard-comercial-shell {
+        grid-template-areas:
+            "workspace workspace"
+            "resumo atividades"
+            "negociacao atividades"
+            "orcamentos orcamentos";
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .rk-system-shortcut {
+        animation: rkShortcutEnter .36s ease both;
+        animation-delay: calc(var(--rk-shortcut-index, 0) * 45ms);
+    }
+
+    .rk-system-shortcut--pulse .rk-system-shortcut__media {
+        animation: rkShortcutIconPulse .44s ease;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rk-system-shortcut,
+    .rk-system-shortcut::after,
+    .rk-system-shortcut__media {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@keyframes rkShortcutEnter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rkShortcutIconPulse {
+    0% {
+        transform: scale(1);
+    }
+    45% {
+        transform: scale(1.08) rotate(-1deg);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.orcamento-inteligente-btn-resumo {
+    display: none;
+}
+
+body.orcamento-inteligente-page .btn-instalar-app,
+body.orcamento-inteligente-page .dica-instalar-app {
+    display: none !important;
+}
+
+@media (min-width: 1200px) {
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo > .container {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        grid-template-areas:
+            "etapas resumo"
+            "principal resumo";
+        gap: 9px;
+        align-items: start;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-cabecalho {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-btn-resumo {
+        display: inline-flex;
+        min-height: 30px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        font-size: 11px;
+        line-height: 1.1;
+        padding: 6px 9px;
+        white-space: nowrap;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel {
+        grid-area: etapas;
+        width: 100%;
+        display: block;
+        min-width: 0;
+        padding: 9px 10px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel .orcamento-inteligente-painel-topo {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        padding: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-layout {
+        display: contents;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal {
+        grid-area: principal;
+        width: 100%;
+        min-width: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel {
+        grid-area: resumo;
+        width: 100%;
+        min-width: 0;
+        position: sticky;
+        top: 8px;
+        max-height: calc(100vh - 72px);
+        overflow: auto;
+        padding: 8px;
+        scrollbar-gutter: stable;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel .orcamento-inteligente-painel-topo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 7px;
+        margin-bottom: 6px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel .orcamento-inteligente-label {
+        display: none !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel h2 {
+        color: #0b48b6;
+        font-size: 15px;
+        line-height: 1.1;
+        margin: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel:not(.orcamento-inteligente-secao-oculta) {
+        max-height: calc(100vh - 166px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo {
+        display: grid;
+        gap: 6px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel .orcamento-inteligente-subpainel {
+        gap: 6px;
+        padding: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel .orcamento-inteligente-subpainel h3 {
+        font-size: 13px;
+        line-height: 1.15;
+        margin: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dl,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dl {
+        border-color: #d8e3ee;
+        border-radius: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo div,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais div,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo .orcamento-inteligente-totais div {
+        min-height: 34px;
+        background: #ffffff;
+        padding: 5px 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dt {
+        color: #5d6b7a;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo dd,
+    body.orcamento-inteligente-page .orcamento-inteligente-totais dd {
+        color: #172532;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-total-geral dt,
+    body.orcamento-inteligente-page .orcamento-inteligente-total-geral dd {
+        color: #0b48b6;
+        font-size: 13px;
+        font-weight: 900;
     }
 }

@@ -6,7 +6,7 @@
     <script src="../js/shared/rk-auth.js?v=5.3.1" data-rk-auth="protected"></script>
     <title>Projetos - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.2.4">
+    <link rel="stylesheet" href="../css/style.css?v=5.5.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +15,7 @@
     <link rel="manifest" href="../manifest.webmanifest">
     <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
 </head>
-<body class="projetos-page">
+<body class="projetos-page cadastro-page">
 
 <header>
     <div class="container">
@@ -31,6 +31,8 @@
             <ul>
                 <li><a href="../index.html">In&iacute;cio</a></li>
                 <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="servicos.html">Servi&ccedil;os</a></li>
+                <li><a href="produtos.html">Produtos</a></li>
                 <li><a href="orcamento-inteligente.html">Or&ccedil;amento Inteligente</a></li>
                 <li><a class="login" href="login.html">Login</a></li>
             </ul>
@@ -38,9 +40,150 @@
     </div>
 </header>
 
-<main class="projetos-main">
+<main class="cadastro-modulo">
     <div class="container">
-        <div id="projetosRoot"></div>
+        <section class="cadastro-cabecalho" aria-labelledby="projetosTitulo">
+            <div>
+                <span class="cadastro-label">Centro Comercial</span>
+                <h1 id="projetosTitulo">Projetos</h1>
+                <p>Use Projeto padr&atilde;o para or&ccedil;amentos r&aacute;pidos. Crie projetos espec&iacute;ficos quando quiser organizar uma obra por ambiente ou cliente.</p>
+            </div>
+
+            <button type="button" id="btnNovoProjeto" class="botao cadastro-btn-principal">Novo projeto</button>
+        </section>
+
+        <section class="cadastro-filtros" aria-label="Filtros de projetos">
+            <label>
+                <span>Pesquisar</span>
+                <input type="search" id="buscaProjeto" placeholder="Cliente, nome, cidade ou status">
+            </label>
+            <label>
+                <span>Status</span>
+                <select id="filtroProjetoStatus">
+                    <option value="">Todos</option>
+                    <option value="rascunho">Rascunho</option>
+                    <option value="em_orcamento">Em or&ccedil;amento</option>
+                    <option value="aprovado">Aprovado</option>
+                    <option value="em_producao">Em produ&ccedil;&atilde;o</option>
+                    <option value="finalizado">Finalizado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </label>
+        </section>
+
+        <div id="projetosAviso" class="cadastro-aviso" aria-live="polite"></div>
+
+        <section class="cadastro-grid">
+            <div class="cadastro-painel cadastro-lista-painel">
+                <div class="cadastro-painel-topo">
+                    <div>
+                        <h2>Lista de projetos</h2>
+                        <p id="projetosResumo">0 projetos cadastrados</p>
+                    </div>
+                </div>
+
+                <div class="cadastro-tabela-wrap">
+                    <table class="cadastro-tabela">
+                        <thead>
+                            <tr>
+                                <th>Projeto</th>
+                                <th>Cliente</th>
+                                <th>Cidade</th>
+                                <th>Status</th>
+                                <th>Atualizado</th>
+                                <th>A&ccedil;&otilde;es</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projetosTabelaCorpo">
+                            <tr>
+                                <td colspan="6" class="cadastro-estado-vazio">Nenhum projeto cadastrado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <aside class="cadastro-painel cadastro-form-painel">
+                <div class="cadastro-painel-topo">
+                    <div>
+                        <h2 id="projetoFormTitulo">Cadastro de projeto</h2>
+                        <p>Base para hist&oacute;rico e or&ccedil;amentos internos.</p>
+                    </div>
+                </div>
+
+                <form id="formProjeto" class="cadastro-form" novalidate>
+                    <input type="hidden" id="projetoId" name="id">
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Nome do projeto</span>
+                        <input type="text" id="projetoNome" name="nome" required>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Cliente ID</span>
+                        <input type="text" id="projetoClienteId" name="clienteId">
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Cliente</span>
+                        <input type="text" id="projetoClienteNome" name="clienteNome" required>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Status</span>
+                        <select id="projetoStatus" name="status">
+                            <option value="rascunho">Rascunho</option>
+                            <option value="em_orcamento">Em or&ccedil;amento</option>
+                            <option value="aprovado">Aprovado</option>
+                            <option value="em_producao">Em produ&ccedil;&atilde;o</option>
+                            <option value="finalizado">Finalizado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Tipo</span>
+                        <input type="text" id="projetoTipoProjeto" name="tipoProjeto" placeholder="Box, fachada, reforma">
+                    </label>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Descri&ccedil;&atilde;o</span>
+                        <textarea id="projetoDescricao" name="descricao" rows="3"></textarea>
+                    </label>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Endere&ccedil;o da obra</span>
+                        <input type="text" id="projetoEnderecoObra" name="enderecoObra">
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Cidade</span>
+                        <input type="text" id="projetoCidade" name="cidade" value="Porto Seguro">
+                    </label>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Observa&ccedil;&otilde;es</span>
+                        <textarea id="projetoObservacoes" name="observacoes" rows="3"></textarea>
+                    </label>
+
+                    <div class="cadastro-form-acoes cadastro-campo-cheio">
+                        <button type="submit" class="botao cadastro-btn-principal">Salvar projeto</button>
+                        <button type="reset" class="botao botao-claro">Limpar</button>
+                    </div>
+                </form>
+            </aside>
+        </section>
+
+        <section class="cadastro-painel cadastro-detalhe-painel" aria-labelledby="projetoDetalheTitulo">
+            <div class="cadastro-painel-topo">
+                <div>
+                    <span class="cadastro-label">Projeto atual</span>
+                    <h2 id="projetoDetalheTitulo">Projeto selecionado</h2>
+                    <p id="projetoDetalheResumo">Selecione um projeto para visualizar.</p>
+                </div>
+            </div>
+            <div id="projetoDetalheConteudo" class="cadastro-detalhe-conteudo"></div>
+        </section>
     </div>
 </main>
 
@@ -49,22 +192,31 @@
     <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
-<script src="../js/config.js?v=5.1A"></script>
-<script src="../js/storage.js?v=5.1A"></script>
-<script src="../js/util.js?v=5.1A"></script>
+<script src="../js/config.js?v=5.4.0"></script>
+<script src="../js/storage.js?v=5.4.0"></script>
+<script src="../js/util.js?v=5.4.0"></script>
+<script src="../js/storage/storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/local-storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/memory-adapter.js?v=5.4.0"></script>
 <script src="../js/core/event-types.js?v=5.1A"></script>
 <script src="../js/core/event-bus.js?v=5.1A"></script>
 <script src="../js/core/app-state-events.js?v=5.1A"></script>
 <script src="../js/core/app-state.js?v=5.1A"></script>
 <script src="../js/core/app-state-service.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-status.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-historico.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-model.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-storage.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-service.js?v=5.1A"></script>
+<script src="../js/projetos/projeto-status.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-historico.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-model.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-validator.js?v=5.4.0"></script>
+<script src="../js/repositories/projeto-repository.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-storage.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-service.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/criar-projeto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/listar-projetos-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/atualizar-projeto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/excluir-projeto-usecase.js?v=5.4.0"></script>
 <script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-ui.js?v=5.1A"></script>
-<script src="../js/projetos/projeto-controller.js?v=5.1A"></script>
+<script src="../js/projetos/projeto-ui.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-controller.js?v=5.4.0"></script>
 <script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>

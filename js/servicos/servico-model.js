@@ -1,15 +1,11 @@
 const ServicoModel = {
     categorias: {
-        box: "Box",
-        espelho: "Espelho",
-        guarda_corpo: "Guarda-corpo",
-        cobertura: "Cobertura",
-        fachada: "Fachada",
-        janela: "Janela",
-        porta: "Porta",
-        fechamento: "Fechamento",
+        instalacao: "Instalacao",
         manutencao: "Manutencao",
-        projeto_personalizado: "Projeto Personalizado"
+        limpeza: "Limpeza",
+        medicao_tecnica: "Medicao tecnica",
+        remocao: "Remocao",
+        outros: "Outros"
     },
 
     tiposCalculo: {
@@ -45,6 +41,9 @@ const ServicoModel = {
             camposObrigatorios: this.normalizarListaTexto(dados.camposObrigatorios),
             produtosSugeridos: this.normalizarListaTexto(dados.produtosSugeridos),
             ferragensSugeridas: this.normalizarListaTexto(dados.ferragensSugeridas),
+            tiposItem: this.normalizarTiposItem(dados.tiposItem),
+            dependenciasPadrao: this.normalizarDependencias(dados.dependenciasPadrao || dados.dependencias),
+            tamanhosPadrao: this.normalizarTamanhosPadrao(dados.tamanhosPadrao),
             tempoEstimado: this.texto(dados.tempoEstimado),
             ativo: this.normalizarAtivo(dados.ativo),
             observacoes: this.texto(dados.observacoes),
@@ -62,6 +61,9 @@ const ServicoModel = {
             camposObrigatorios: alteracoes.camposObrigatorios || anterior.camposObrigatorios,
             produtosSugeridos: alteracoes.produtosSugeridos || anterior.produtosSugeridos,
             ferragensSugeridas: alteracoes.ferragensSugeridas || anterior.ferragensSugeridas,
+            tiposItem: alteracoes.tiposItem || anterior.tiposItem,
+            dependenciasPadrao: alteracoes.dependenciasPadrao || anterior.dependenciasPadrao,
+            tamanhosPadrao: alteracoes.tamanhosPadrao || anterior.tamanhosPadrao,
             criadoEm: anterior.criadoEm,
             atualizadoEm: this.agoraISO()
         });
@@ -81,12 +83,37 @@ const ServicoModel = {
     normalizarCategoria(categoria) {
         const valor = this.slug(categoria);
         const aliases = {
-            guarda_corpo: "guarda_corpo",
-            guardacorpo: "guarda_corpo",
-            guarda_corpos: "guarda_corpo",
+            guarda_corpo: "outros",
+            guardacorpo: "outros",
+            guarda_corpos: "outros",
+            vidro_fixo: "outros",
+            vidrofixo: "outros",
+            fixo: "outros",
+            porta: "instalacao",
+            portas: "instalacao",
+            janela: "instalacao",
+            janelas: "instalacao",
+            box: "instalacao",
+            espelho: "instalacao",
+            fachada: "instalacao",
+            fechamento: "instalacao",
+            cobertura: "instalacao",
+            instalacao: "instalacao",
+            instalacoes: "instalacao",
+            instalar: "instalacao",
             manutencao: "manutencao",
-            projeto_personalizado: "projeto_personalizado",
-            personalizado: "projeto_personalizado"
+            manutencoes: "manutencao",
+            reparo: "manutencao",
+            limpeza: "limpeza",
+            medicao: "medicao_tecnica",
+            medicao_tecnica: "medicao_tecnica",
+            medida_tecnica: "medicao_tecnica",
+            remocao: "remocao",
+            remover: "remocao",
+            projeto_personalizado: "outros",
+            personalizado: "outros",
+            outros: "outros",
+            outro: "outros"
         };
 
         return aliases[valor] || valor;
@@ -144,11 +171,162 @@ const ServicoModel = {
     },
 
     normalizarListaTexto(lista) {
+        if (typeof lista === "string") {
+            return lista
+                .split(/[\n,;]+/)
+                .map(item => this.texto(item))
+                .filter(Boolean);
+        }
+
         if (!Array.isArray(lista)) {
             return [];
         }
 
         return lista.map(item => this.texto(item)).filter(Boolean);
+    },
+
+    normalizarTiposItem(tipos = []) {
+        if (!Array.isArray(tipos)) {
+            return [];
+        }
+
+        return tipos
+            .map(tipo => this.normalizarTipoItem(tipo))
+            .filter(tipo => tipo.nome);
+    },
+
+    normalizarTipoItem(tipo = {}) {
+        const nome = this.texto(tipo.nome || tipo.rotulo || tipo.id);
+        const dependencias = this.normalizarDependencias(tipo.dependencias || tipo.dependenciasPadrao);
+
+        return {
+            id: tipo.id || this.slug(nome) || this.criarId("tipo"),
+            nome,
+            descricao: this.texto(tipo.descricao),
+            subtipos: this.normalizarListaTexto(tipo.subtipos),
+            dependencias,
+            dependenciasPadrao: dependencias,
+            tempoMedio: this.numero(tipo.tempoMedio ?? tipo.tempoEstimado),
+            unidadeTempo: this.normalizarUnidadeTempo(tipo.unidadeTempo),
+            ativo: this.normalizarAtivo(tipo.ativo),
+            observacoesTecnicas: this.texto(tipo.observacoesTecnicas || tipo.observacoes)
+        };
+    },
+
+    normalizarDependencias(dependencias = []) {
+        if (!Array.isArray(dependencias)) {
+            return [];
+        }
+
+        return dependencias
+            .map(dependencia => this.normalizarDependencia(dependencia))
+            .filter(Boolean);
+    },
+
+    normalizarDependencia(dependencia = {}) {
+        if (typeof dependencia === "string") {
+            return {
+                produtoId: "",
+                produtoNome: this.texto(dependencia),
+                categoria: "",
+                unidadeCalculo: "",
+                regraCalculo: "",
+                quantidadePadrao: 0,
+                custoUnitario: 0,
+                custoEstimado: 0,
+                obrigatoria: true,
+                observacao: ""
+            };
+        }
+
+        if (!dependencia || typeof dependencia !== "object") {
+            return null;
+        }
+
+        const produto = dependencia.produto && typeof dependencia.produto === "object" ? dependencia.produto : dependencia;
+        const produtoId = this.texto(dependencia.produtoId || produto.id);
+        const produtoNome = this.texto(dependencia.produtoNome || dependencia.nome || produto.nome);
+        const quantidadePadrao = this.numero(dependencia.quantidadePadrao ?? dependencia.quantidade ?? 1);
+        const custoUnitario = this.numero(
+            dependencia.custoUnitario ??
+            dependencia.custo ??
+            produto.custoUnitario ??
+            produto.custo ??
+            produto.precoCusto
+        );
+
+        return {
+            produtoId,
+            produtoNome,
+            categoria: this.texto(dependencia.categoria || produto.categoria),
+            unidadeCalculo: this.texto(dependencia.unidadeCalculo || produto.unidadeCalculo || produto.unidade || produto.unidadeVenda),
+            regraCalculo: this.texto(dependencia.regraCalculo || produto.regraCalculo || produto.tipoCalculo),
+            quantidadePadrao,
+            custoUnitario,
+            custoEstimado: this.calcularCustoEstimado(custoUnitario, quantidadePadrao),
+            obrigatoria: this.normalizarAtivo(dependencia.obrigatoria === undefined ? true : dependencia.obrigatoria),
+            observacao: this.texto(dependencia.observacao || dependencia.observacoes)
+        };
+    },
+
+    calcularCustoEstimado(custoUnitario, quantidadePadrao) {
+        const custo = this.numero(custoUnitario);
+        const quantidade = this.numero(quantidadePadrao);
+        return Number((custo * quantidade).toFixed(2));
+    },
+
+    normalizarUnidadeTempo(unidadeTempo) {
+        const valor = this.slug(unidadeTempo || "hora");
+        const aliases = {
+            minuto: "minuto",
+            minutos: "minuto",
+            min: "minuto",
+            hora: "hora",
+            horas: "hora",
+            h: "hora",
+            dia: "dia",
+            dias: "dia"
+        };
+
+        return aliases[valor] || "hora";
+    },
+
+    normalizarTamanhosPadrao(tamanhos = []) {
+        if (!Array.isArray(tamanhos)) {
+            return [];
+        }
+
+        return tamanhos
+            .map(tamanho => this.normalizarTamanhoPadrao(tamanho))
+            .filter(tamanho => tamanho.nome || (tamanho.larguraCm > 0 && tamanho.alturaCm > 0));
+    },
+
+    normalizarTamanhoPadrao(tamanho = {}) {
+        const larguraCm = this.numero(tamanho.larguraCm ?? tamanho.largura);
+        const alturaCm = this.numero(tamanho.alturaCm ?? tamanho.altura);
+        const nome = this.texto(tamanho.nome) || (larguraCm && alturaCm ? `${larguraCm} x ${alturaCm} cm` : "");
+
+        return {
+            id: tamanho.id || this.criarId("tam"),
+            tipoItem: this.texto(tamanho.tipoItem || tamanho.modelo),
+            modeloRelacionado: this.texto(tamanho.modeloRelacionado || tamanho.tipoItem || tamanho.modelo),
+            nome,
+            larguraCm,
+            alturaCm,
+            ativo: this.normalizarAtivo(tamanho.ativo),
+            areaM2: this.calcularAreaM2(larguraCm, alturaCm)
+        };
+    },
+
+    calcularAreaM2(larguraCm, alturaCm) {
+        const largura = this.numero(larguraCm);
+        const altura = this.numero(alturaCm);
+
+        if (largura <= 0 || altura <= 0) {
+            return 0;
+        }
+
+        return Number(((largura * altura) / 10000).toFixed(4));
     },
 
     categoriaValida(categoria) {
@@ -165,6 +343,34 @@ const ServicoModel = {
 
     rotuloTipoCalculo(tipoCalculo) {
         return this.tiposCalculo[this.normalizarTipoCalculo(tipoCalculo)] || tipoCalculo || "";
+    },
+
+    rotuloUnidadeTempo(unidadeTempo) {
+        const mapa = {
+            minuto: "minuto",
+            hora: "hora",
+            dia: "dia"
+        };
+
+        return mapa[this.normalizarUnidadeTempo(unidadeTempo)] || unidadeTempo || "";
+    },
+
+    rotuloDependencia(dependencia = {}) {
+        if (typeof dependencia === "string") return dependencia;
+        return dependencia.produtoNome || dependencia.nome || dependencia.produtoId || "";
+    },
+
+    numero(valor) {
+        if (valor === undefined || valor === null || valor === "") {
+            return 0;
+        }
+
+        if (typeof valor === "number") {
+            return valor;
+        }
+
+        const numero = Number(String(valor).replace(",", "."));
+        return Number.isFinite(numero) ? numero : 0;
     },
 
     slug(valor) {

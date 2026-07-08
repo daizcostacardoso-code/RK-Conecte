@@ -1,42 +1,33 @@
 const ProdutoModel = {
     categorias: {
         vidro: "Vidro",
+        aluminio_perfil: "Aluminio/perfil",
         ferragem: "Ferragem",
-        perfil: "Perfil",
         acessorio: "Acess\u00f3rio",
         insumo: "Insumo",
-        servico_complementar: "Servi\u00e7o Complementar"
+        mao_de_obra: "Mao de obra",
+        kit: "Kit",
+        acabamento: "Acabamento",
+        outro: "Outro"
     },
 
-    subcategoriasVidro: {
-        comum: "Comum",
-        temperado: "Temperado",
-        laminado: "Laminado",
-        espelho: "Espelho",
-        reflecta: "Reflecta",
-        canelado: "Canelado"
+    unidadesCalculo: {
+        m2: "m\u00b2",
+        metro_linear: "Metro linear",
+        unidade: "Unidade",
+        kit: "Kit",
+        hora: "Hora"
     },
 
     tiposCalculo: {
-        area_m2: "\u00c1rea (m\u00b2)",
-        linear_m: "Linear (m)",
-        unidade: "Unidade",
-        quantidade: "Quantidade",
-        peso_kg: "Peso (kg)",
-        personalizado: "Personalizado"
+        area_m2: "\u00c1rea",
+        linear_m: "Largura",
+        linear_altura: "Altura",
+        perimetro: "Perimetro",
+        quantidade_fixa: "Quantidade fixa",
+        unidade: "Por unidade",
+        hora: "Tempo medio"
     },
-
-    atributosPreparados: [
-        "espessura",
-        "cor",
-        "acabamento",
-        "marca",
-        "modelo",
-        "peso",
-        "largura",
-        "altura",
-        "comprimento"
-    ],
 
     criar(dados = {}) {
         const agora = this.agoraISO();
@@ -52,20 +43,29 @@ const ProdutoModel = {
 
     normalizar(dados = {}) {
         const agora = this.agoraISO();
+        const unidade = this.normalizarUnidade(dados.unidade || dados.unidadeVenda || dados.unidadeCalculo);
+        const regraCalculo = this.normalizarTipoCalculo(dados.regraCalculo || dados.tipoCalculo || dados.regra || unidade);
+        const custoUnitario = this.numero(
+            dados.custoUnitario ??
+            dados.custo ??
+            dados.precoCusto ??
+            0
+        );
 
         return {
             id: dados.id || this.criarId(),
             nome: this.texto(dados.nome),
             categoria: this.normalizarCategoria(dados.categoria),
-            subcategoria: this.normalizarSubcategoria(dados.subcategoria),
             descricao: this.texto(dados.descricao),
-            unidadeVenda: this.texto(dados.unidadeVenda),
-            tipoCalculo: this.normalizarTipoCalculo(dados.tipoCalculo),
-            precoCusto: this.numero(dados.precoCusto),
-            precoVenda: this.numero(dados.precoVenda),
-            margem: this.numero(dados.margem),
+            unidade,
+            unidadeVenda: unidade,
+            unidadeCalculo: unidade,
+            tipoCalculo: regraCalculo,
+            regraCalculo,
+            custoUnitario,
+            custo: custoUnitario,
+            precoCusto: custoUnitario,
             ativo: this.normalizarAtivo(dados.ativo),
-            atributos: this.normalizarAtributos(dados),
             observacoes: this.texto(dados.observacoes),
             criadoEm: dados.criadoEm || dados.criadoEmISO || agora,
             atualizadoEm: dados.atualizadoEm || dados.atualizadoEmISO || agora
@@ -78,7 +78,6 @@ const ProdutoModel = {
         return this.normalizar({
             ...anterior,
             ...alteracoes,
-            atributos: alteracoes.atributos || anterior.atributos,
             criadoEm: anterior.criadoEm,
             atualizadoEm: this.agoraISO()
         });
@@ -100,32 +99,32 @@ const ProdutoModel = {
         const aliases = {
             vidro: "vidro",
             vidros: "vidro",
+            aluminio: "aluminio_perfil",
+            aluminio_perfil: "aluminio_perfil",
+            aluminio_e_perfil: "aluminio_perfil",
+            aluminio_perfis: "aluminio_perfil",
+            aluminio_perfil_: "aluminio_perfil",
+            perfil: "aluminio_perfil",
+            perfis: "aluminio_perfil",
             ferragem: "ferragem",
             ferragens: "ferragem",
-            perfil: "perfil",
-            perfis: "perfil",
+            kit: "kit",
+            kits: "kit",
+            acabamento: "acabamento",
+            acabamentos: "acabamento",
+            mao_de_obra: "mao_de_obra",
+            mao_obra: "mao_de_obra",
+            servico: "mao_de_obra",
+            servicos: "mao_de_obra",
             acessorio: "acessorio",
             acessorios: "acessorio",
             insumo: "insumo",
             insumos: "insumo",
-            servico_complementar: "servico_complementar",
-            servicos_complementares: "servico_complementar",
-            complementar: "servico_complementar"
-        };
-
-        return aliases[valor] || valor;
-    },
-
-    normalizarSubcategoria(subcategoria) {
-        const valor = this.slug(subcategoria);
-        const aliases = {
-            comum: "comum",
-            temperado: "temperado",
-            laminado: "laminado",
-            espelho: "espelho",
-            reflecta: "reflecta",
-            refletivo: "reflecta",
-            canelado: "canelado"
+            outro: "outro",
+            outros: "outro",
+            servico_complementar: "outro",
+            servicos_complementares: "outro",
+            complementar: "outro"
         };
 
         return aliases[valor] || valor;
@@ -140,19 +139,59 @@ const ProdutoModel = {
             metro_quadrado: "area_m2",
             linear: "linear_m",
             linear_m: "linear_m",
+            linear_largura: "linear_m",
+            metro_linear_largura: "linear_m",
             metro_linear: "linear_m",
             m: "linear_m",
+            metro: "linear_m",
+            metro_linear_altura: "linear_altura",
+            linear_altura: "linear_altura",
+            altura: "linear_altura",
+            perimetro: "perimetro",
+            perimetral: "perimetro",
             unidade: "unidade",
             unitario: "unidade",
-            quantidade: "quantidade",
-            qtd: "quantidade",
-            peso: "peso_kg",
-            peso_kg: "peso_kg",
-            kg: "peso_kg",
-            personalizado: "personalizado"
+            por_unidade: "unidade",
+            un: "unidade",
+            servico: "unidade",
+            quantidade: "quantidade_fixa",
+            quantidade_fixa: "quantidade_fixa",
+            fixo: "quantidade_fixa",
+            fixa: "quantidade_fixa",
+            qtd: "quantidade_fixa",
+            kit: "quantidade_fixa",
+            hora: "hora",
+            horas: "hora",
+            por_hora: "hora",
+            tempo_medio: "hora",
+            personalizado: "unidade"
         };
 
         return aliases[valor] || valor;
+    },
+
+    normalizarUnidade(unidade) {
+        const valor = this.slug(unidade);
+        const aliases = {
+            m2: "m2",
+            area_m2: "m2",
+            metro_quadrado: "m2",
+            metros_quadrados: "m2",
+            m: "metro_linear",
+            metro: "metro_linear",
+            metro_linear: "metro_linear",
+            linear_m: "metro_linear",
+            unidade: "unidade",
+            unitario: "unidade",
+            un: "unidade",
+            peca: "unidade",
+            servico: "unidade",
+            kit: "kit",
+            hora: "hora",
+            horas: "hora"
+        };
+
+        return aliases[valor] || valor || "unidade";
     },
 
     normalizarAtivo(valor) {
@@ -185,39 +224,28 @@ const ProdutoModel = {
         return valor;
     },
 
-    normalizarAtributos(dados = {}) {
-        const origem = dados.atributos && typeof dados.atributos === "object" ? dados.atributos : {};
-
-        return this.atributosPreparados.reduce((atributos, chave) => {
-            const valor = origem[chave] ?? dados[chave];
-            atributos[chave] = this.texto(valor);
-            return atributos;
-        }, {});
-    },
-
     categoriaValida(categoria) {
         return !!this.categorias[this.normalizarCategoria(categoria)];
-    },
-
-    subcategoriaVidroValida(subcategoria) {
-        const normalizada = this.normalizarSubcategoria(subcategoria);
-        return !normalizada || !!this.subcategoriasVidro[normalizada];
     },
 
     tipoCalculoValido(tipoCalculo) {
         return !!this.tiposCalculo[this.normalizarTipoCalculo(tipoCalculo)];
     },
 
+    unidadeValida(unidade) {
+        return !!this.unidadesCalculo[this.normalizarUnidade(unidade)];
+    },
+
     rotuloCategoria(categoria) {
         return this.categorias[this.normalizarCategoria(categoria)] || categoria || "";
     },
 
-    rotuloSubcategoria(subcategoria) {
-        return this.subcategoriasVidro[this.normalizarSubcategoria(subcategoria)] || subcategoria || "";
-    },
-
     rotuloTipoCalculo(tipoCalculo) {
         return this.tiposCalculo[this.normalizarTipoCalculo(tipoCalculo)] || tipoCalculo || "";
+    },
+
+    rotuloUnidade(unidade) {
+        return this.unidadesCalculo[this.normalizarUnidade(unidade)] || unidade || "";
     },
 
     numero(valor) {
@@ -236,6 +264,7 @@ const ProdutoModel = {
     slug(valor) {
         return this.removerAcentos(valor)
             .toLowerCase()
+            .replace(/m²/g, "m2")
             .replace(/mÂ²/g, "m2")
             .replace(/[^a-z0-9]+/g, "_")
             .replace(/^_+|_+$/g, "");

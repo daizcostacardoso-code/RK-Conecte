@@ -13,6 +13,8 @@ const Config = {
         solicitacoesSite: "vidracaria_solicitacoes_site",
         projetos: "vidracaria_projetos",
         projetoAtual: "vidracaria_projeto_atual",
+        produtos: "vidracaria_produtos",
+        servicos: "vidracaria_servicos",
         caixaEmpresa: "vidracaria_caixa_empresa",
         configuracoesSistema: "vidracaria_configuracoes_sistema",
         lembretes: "vidracaria_lembretes"

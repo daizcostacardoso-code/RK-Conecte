@@ -136,32 +136,35 @@ const ProdutoService = {
     filtrar(produtos = [], filtros = {}) {
         const busca = String(filtros.busca || "").trim().toLowerCase();
         const categoria = filtros.categoria ? ProdutoModel.normalizarCategoria(filtros.categoria) : "";
-        const subcategoria = filtros.subcategoria ? ProdutoModel.normalizarSubcategoria(filtros.subcategoria) : "";
         const tipoCalculo = filtros.tipoCalculo ? ProdutoModel.normalizarTipoCalculo(filtros.tipoCalculo) : "";
-        const ativo = typeof filtros.ativo === "boolean" ? filtros.ativo : null;
+        const ativo = typeof filtros.ativo === "boolean"
+            ? filtros.ativo
+            : filtros.status === "ativo"
+                ? true
+                : filtros.status === "inativo"
+                    ? false
+                    : null;
 
         return produtos.filter(produto => {
             const categoriaOk = !categoria || produto.categoria === categoria;
-            const subcategoriaOk = !subcategoria || produto.subcategoria === subcategoria;
             const tipoOk = !tipoCalculo || produto.tipoCalculo === tipoCalculo;
             const ativoOk = ativo === null || produto.ativo === ativo;
-            const atributos = produto.atributos && typeof produto.atributos === "object"
-                ? Object.values(produto.atributos)
-                : [];
             const buscaOk = !busca || [
                 produto.nome,
                 produto.categoria,
                 ProdutoModel.rotuloCategoria(produto.categoria),
-                produto.subcategoria,
-                ProdutoModel.rotuloSubcategoria(produto.subcategoria),
                 produto.descricao,
                 produto.tipoCalculo,
                 ProdutoModel.rotuloTipoCalculo(produto.tipoCalculo),
+                produto.custoUnitario,
+                produto.custo,
                 produto.unidadeVenda,
-                ...atributos
+                produto.unidade,
+                produto.unidadeCalculo,
+                produto.observacoes
             ].some(valor => String(valor || "").toLowerCase().includes(busca));
 
-            return categoriaOk && subcategoriaOk && tipoOk && ativoOk && buscaOk;
+            return categoriaOk && tipoOk && ativoOk && buscaOk;
         });
     },
 

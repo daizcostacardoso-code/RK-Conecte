@@ -10,14 +10,15 @@ const ProdutoFactory = {
     criarPadrao(dados = {}) {
         return this.criar({
             categoria: "vidro",
-            subcategoria: "",
             unidadeVenda: "unidade",
+            unidade: "unidade",
+            unidadeCalculo: "unidade",
             tipoCalculo: "unidade",
+            regraCalculo: "unidade",
+            custoUnitario: 0,
             precoCusto: 0,
-            precoVenda: 0,
-            margem: 0,
+            custo: 0,
             ativo: true,
-            atributos: {},
             ...dados
         });
     },

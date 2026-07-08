@@ -4,100 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <script src="../js/shared/rk-auth.js?v=5.3.1" data-rk-auth="protected"></script>
-    <title>Produtos - RK Vidraçaria</title>
+    <title>Produtos - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.2.4">
-
+    <link rel="stylesheet" href="../css/style.css?v=5.5.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
     <link rel="manifest" href="../manifest.webmanifest">
     <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
 </head>
-<body>
+<body class="produtos-page cadastro-page">
 
 <header>
     <div class="container">
-        <div class="marca-header">
-                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
-                <h1>RK Vidraçaria</h1>
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Centro Comercial</small>
             </div>
+        </div>
 
-<nav>
-
-    <ul>
-
-        <li><a href="../index.html">Início</a></li>
-
-        <li><a href="servicos.html">Serviços</a></li>
-
-        <li><a href="produtos.html">Produtos</a></li>
-
-        <li><a href="contato.html">Contato</a></li>
-
-        <li><a href="orcamento.html">Orçamento</a></li>
-
-        <li><a class="login" href="login.html">Login</a></li>
-
-    </ul>
-
-</nav>
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="servicos.html">Servi&ccedil;os</a></li>
+                <li><a href="orcamento-inteligente.html">Or&ccedil;amento Inteligente</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
     </div>
 </header>
 
-<section class="banner">
-    <h2>Nossos Produtos</h2>
-    <p>Vidros de alta qualidade para residências e empresas.</p>
-</section>
-
-<section class="produtos">
+<main class="cadastro-modulo">
     <div class="container">
-
-        <div class="cards">
-
-            <div class="card">
-                <h3>🪟 Vidro Temperado</h3>
-                <p>Ideal para portas, janelas, boxes e fachadas. Alta resistência e segurança.</p>
+        <section class="cadastro-cabecalho" aria-labelledby="produtosTitulo">
+            <div>
+                <span class="cadastro-label">Centro Comercial</span>
+                <h1 id="produtosTitulo">Produtos</h1>
+                <p>Produtos s&atilde;o os itens usados nos servi&ccedil;os: vidro, alum&iacute;nio, acess&oacute;rios, insumos e m&atilde;o de obra. Somente produtos cadastrados podem virar depend&ecirc;ncias.</p>
             </div>
 
-            <div class="card">
-                <h3>🚿 Box de Banheiro</h3>
-                <p>Boxes de correr e de abrir em diversas cores e acabamentos.</p>
+            <button type="button" id="btnNovoProduto" class="botao cadastro-btn-principal">Novo produto</button>
+        </section>
+
+        <section class="cadastro-filtros" aria-label="Filtros de produtos">
+            <label>
+                <span>Pesquisar</span>
+                <input type="search" id="buscaProduto" placeholder="Nome, categoria ou custo">
+            </label>
+            <label>
+                <span>Categoria</span>
+                <select id="filtroProdutoCategoria">
+                    <option value="">Todas</option>
+                    <option value="vidro">Vidro</option>
+                    <option value="aluminio_perfil">Alum&iacute;nio/perfil</option>
+                    <option value="ferragem">Ferragem</option>
+                    <option value="acessorio">Acess&oacute;rio</option>
+                    <option value="insumo">Insumo</option>
+                    <option value="mao_de_obra">M&atilde;o de obra</option>
+                    <option value="kit">Kit</option>
+                    <option value="acabamento">Acabamento</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </label>
+            <label>
+                <span>Status</span>
+                <select id="filtroProdutoStatus">
+                    <option value="">Todos</option>
+                    <option value="ativo">Ativos</option>
+                    <option value="inativo">Inativos</option>
+                </select>
+            </label>
+        </section>
+
+        <div id="produtosAviso" class="cadastro-aviso" aria-live="polite"></div>
+
+        <section class="cadastro-grid">
+            <div class="cadastro-painel cadastro-lista-painel">
+                <div class="cadastro-painel-topo">
+                    <div>
+                        <h2>Lista de produtos</h2>
+                        <p id="produtosResumo">0 produtos cadastrados</p>
+                    </div>
+                </div>
+
+                <div class="cadastro-tabela-wrap">
+                    <table class="cadastro-tabela">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th>Unidade</th>
+                                <th>Custo unit&aacute;rio</th>
+                                <th>Status</th>
+                                <th>A&ccedil;&otilde;es</th>
+                            </tr>
+                        </thead>
+                        <tbody id="produtosTabelaCorpo">
+                            <tr>
+                                <td colspan="6" class="cadastro-estado-vazio">Nenhum produto cadastrado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>🪞 Espelhos</h3>
-                <p>Espelhos sob medida para banheiros, quartos, salas e academias.</p>
+            <aside class="cadastro-painel cadastro-form-painel">
+                <div class="cadastro-painel-topo">
+                    <div>
+                        <h2 id="produtoFormTitulo">Cadastro de produto</h2>
+                        <p>Materiais, insumos, acess&oacute;rios, ferragens, vidros e m&atilde;o de obra usados nos servi&ccedil;os.</p>
+                    </div>
+                </div>
+
+                <form id="formProduto" class="cadastro-form" novalidate>
+                    <input type="hidden" id="produtoId" name="id">
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Nome</span>
+                        <input type="text" id="produtoNome" name="nome" required>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Categoria</span>
+                        <select id="produtoCategoria" name="categoria" required>
+                            <option value="vidro">Vidro</option>
+                            <option value="aluminio_perfil">Alum&iacute;nio/perfil</option>
+                            <option value="ferragem">Ferragem</option>
+                            <option value="acessorio">Acess&oacute;rio</option>
+                            <option value="insumo">Insumo</option>
+                            <option value="mao_de_obra">M&atilde;o de obra</option>
+                            <option value="kit">Kit</option>
+                            <option value="acabamento">Acabamento</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Unidade de c&aacute;lculo</span>
+                        <select id="produtoUnidade" name="unidade" required>
+                            <option value="m2">m&sup2;</option>
+                            <option value="metro_linear">Metro linear</option>
+                            <option value="unidade">Unidade</option>
+                            <option value="kit">Kit</option>
+                            <option value="hora">Hora</option>
+                        </select>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Regra de c&aacute;lculo</span>
+                        <select id="produtoRegraCalculo" name="regraCalculo" required>
+                            <option value="area_m2">&Aacute;rea</option>
+                            <option value="linear_m">Largura</option>
+                            <option value="linear_altura">Altura</option>
+                            <option value="perimetro">Per&iacute;metro</option>
+                            <option value="quantidade_fixa">Quantidade fixa</option>
+                            <option value="unidade">Por unidade</option>
+                            <option value="hora">Tempo m&eacute;dio</option>
+                        </select>
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Custo unit&aacute;rio</span>
+                        <input type="number" id="produtoCusto" name="custo" min="0" step="0.01" inputmode="decimal">
+                    </label>
+
+                    <label class="cadastro-campo">
+                        <span>Status</span>
+                        <select id="produtoAtivo" name="ativo">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </label>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Descri&ccedil;&atilde;o</span>
+                        <textarea id="produtoDescricao" name="descricao" rows="3"></textarea>
+                    </label>
+
+                    <label class="cadastro-campo cadastro-campo-cheio">
+                        <span>Observa&ccedil;&otilde;es</span>
+                        <textarea id="produtoObservacoes" name="observacoes" rows="3"></textarea>
+                    </label>
+
+                    <div class="cadastro-form-acoes cadastro-campo-cheio">
+                        <button type="submit" class="botao cadastro-btn-principal">Salvar produto</button>
+                        <button type="reset" class="botao botao-claro">Limpar</button>
+                    </div>
+                </form>
+            </aside>
+        </section>
+
+        <section class="cadastro-painel cadastro-detalhe-painel" aria-labelledby="produtoDetalheTitulo">
+            <div class="cadastro-painel-topo">
+                <div>
+                    <span class="cadastro-label">Resumo de custo</span>
+                    <h2 id="produtoDetalheTitulo">Produto selecionado</h2>
+                    <p id="produtoDetalheResumo">Selecione um produto para visualizar.</p>
+                </div>
             </div>
-
-            <div class="card">
-                <h3>🚪 Portas de Vidro</h3>
-                <p>Portas temperadas para ambientes residenciais e comerciais.</p>
-            </div>
-
-            <div class="card">
-                <h3>🏢 Fachadas de Vidro</h3>
-                <p>Fachadas modernas que valorizam seu comércio ou empresa.</p>
-            </div>
-
-            <div class="card">
-                <h3>🪟 Janelas de Alumínio e Vidro</h3>
-                <p>Modelos sob medida com excelente acabamento.</p>
-            </div>
-
-        </div>
-
+            <div id="produtoDetalheConteudo" class="cadastro-detalhe-conteudo"></div>
+        </section>
     </div>
-</section>
+</main>
 
 <footer>
-    <p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p>
-    <p>📞 (73) 9981-9768 | 📍 Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
-    <script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
-    <script src="../js/app-install.js?v=3.2.0"></script>
+<script src="../js/config.js?v=5.4.0"></script>
+<script src="../js/storage/storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/local-storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/memory-adapter.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-model.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-validator.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-factory.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-repository.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-service.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/criar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/buscar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/listar-produtos-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/atualizar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/excluir-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-ui.js?v=5.4.0"></script>
+<script src="../js/produtos/produto-controller.js?v=5.4.0"></script>
+<script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
 </body>
 </html>

@@ -6,7 +6,7 @@
     <script src="../js/shared/rk-auth.js?v=5.3.1" data-rk-auth="protected"></script>
     <title>Or&ccedil;amento Inteligente - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.2.6">
+    <link rel="stylesheet" href="../css/style.css?v=5.5.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -53,7 +53,7 @@
             </button>
         </section>
 
-        <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoInteligenteEtapasTitulo">
+        <section class="orcamento-inteligente-painel orcamento-inteligente-etapas-painel" aria-labelledby="orcamentoInteligenteEtapasTitulo">
             <div class="orcamento-inteligente-painel-topo">
                 <div>
                     <h2 id="orcamentoInteligenteEtapasTitulo">Etapas</h2>
@@ -65,7 +65,7 @@
 
         <section class="orcamento-inteligente-layout">
             <div class="orcamento-inteligente-principal">
-                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoClienteTitulo">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoClienteTitulo" data-orcamento-secao="cliente">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
                             <span class="orcamento-inteligente-label">Cliente</span>
@@ -75,7 +75,7 @@
                     <div id="orcamentoInteligenteCliente" class="orcamento-inteligente-placeholder"></div>
                 </section>
 
-                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProjetoTitulo">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProjetoTitulo" data-orcamento-secao="projeto">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
                             <span class="orcamento-inteligente-label">Projeto</span>
@@ -85,7 +85,7 @@
                     <div id="orcamentoInteligenteProjeto" class="orcamento-inteligente-placeholder"></div>
                 </section>
 
-                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoServicoTitulo">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoServicoTitulo" data-orcamento-secao="servico">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
                             <span class="orcamento-inteligente-label">Servi&ccedil;os</span>
@@ -95,17 +95,27 @@
                     <div id="orcamentoInteligenteServico" class="orcamento-inteligente-placeholder"></div>
                 </section>
 
-                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProdutosTitulo">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProdutosTitulo" data-orcamento-secao="produtos">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
                             <span class="orcamento-inteligente-label">Itens</span>
-                            <h2 id="orcamentoProdutosTitulo">Itens do projeto</h2>
+                            <h2 id="orcamentoProdutosTitulo">Adicionar itens</h2>
                         </div>
                     </div>
                     <div id="orcamentoInteligenteProdutos" class="orcamento-inteligente-placeholder"></div>
                 </section>
 
-                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoCalculoTitulo">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoRevisaoTitulo" data-orcamento-secao="revisao">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Revis&atilde;o</span>
+                            <h2 id="orcamentoRevisaoTitulo">Revis&atilde;o dos itens</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteRevisao" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoCalculoTitulo" data-orcamento-secao="calculo">
                     <div class="orcamento-inteligente-painel-topo">
                         <div>
                             <span class="orcamento-inteligente-label">C&aacute;lculo</span>
@@ -116,12 +126,15 @@
                 </section>
             </div>
 
-            <aside class="orcamento-inteligente-painel orcamento-inteligente-resumo-painel" aria-labelledby="orcamentoResumoTitulo">
+            <aside class="orcamento-inteligente-painel orcamento-inteligente-resumo-painel" aria-labelledby="orcamentoResumoTitulo" data-orcamento-secao="resumo">
                 <div class="orcamento-inteligente-painel-topo">
                     <div>
                         <span class="orcamento-inteligente-label">Resumo</span>
                         <h2 id="orcamentoResumoTitulo">Resumo final</h2>
                     </div>
+                    <button type="button" class="botao orcamento-inteligente-btn-principal orcamento-inteligente-btn-resumo" data-orcamento-action="novo-orcamento">
+                        Novo or&ccedil;amento
+                    </button>
                 </div>
                 <div id="orcamentoInteligenteResumo" class="orcamento-inteligente-resumo"></div>
             </aside>
@@ -138,6 +151,7 @@
 <script src="../js/storage.js?v=3.9.1"></script>
 <script src="../js/util.js?v=3.9.1"></script>
 <script src="../js/storage/storage-adapter.js?v=3.9.1"></script>
+<script src="../js/storage/local-storage-adapter.js?v=5.4.0"></script>
 <script src="../js/storage/memory-adapter.js?v=3.9.1"></script>
 <script src="../js/core/event-types.js?v=5.1A"></script>
 <script src="../js/core/event-bus.js?v=5.1A"></script>
@@ -187,8 +201,8 @@
 <script src="../js/documentos/document-service.js?v=5.3.0"></script>
 <script src="../js/documentos/document-pdf-repository.js?v=5.3.1"></script>
 <script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
-<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=5.2.6"></script>
-<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=5.3.2"></script>
+<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=5.3.5"></script>
+<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=5.3.5"></script>
 <script src="../js/shared/rk-navigation.js?v=5.2.3"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
 </body>

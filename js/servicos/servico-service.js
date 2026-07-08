@@ -137,9 +137,16 @@ const ServicoService = {
         const busca = String(filtros.busca || "").trim().toLowerCase();
         const categoria = filtros.categoria ? ServicoModel.normalizarCategoria(filtros.categoria) : "";
         const tipoCalculo = filtros.tipoCalculo ? ServicoModel.normalizarTipoCalculo(filtros.tipoCalculo) : "";
-        const ativo = typeof filtros.ativo === "boolean" ? filtros.ativo : null;
+        const ativo = typeof filtros.ativo === "boolean"
+            ? filtros.ativo
+            : filtros.status === "ativo"
+                ? true
+                : filtros.status === "inativo"
+                    ? false
+                    : null;
 
         return servicos.filter(servico => {
+            const dependencias = this.textosDependencias(servico.dependenciasPadrao);
             const categoriaOk = !categoria || servico.categoria === categoria;
             const tipoOk = !tipoCalculo || servico.tipoCalculo === tipoCalculo;
             const ativoOk = ativo === null || servico.ativo === ativo;
@@ -150,11 +157,39 @@ const ServicoService = {
                 servico.descricao,
                 servico.tipoCalculo,
                 ServicoModel.rotuloTipoCalculo(servico.tipoCalculo),
-                servico.unidadeVenda
+                servico.unidadeVenda,
+                ...dependencias,
+                ...(Array.isArray(servico.tiposItem) ? servico.tiposItem.flatMap(tipo => [
+                    tipo.nome,
+                    tipo.descricao,
+                    tipo.observacoesTecnicas,
+                    ...(tipo.subtipos || []),
+                    ...this.textosDependencias(tipo.dependencias || tipo.dependenciasPadrao)
+                ]) : [])
             ].some(valor => String(valor || "").toLowerCase().includes(busca));
 
             return categoriaOk && tipoOk && ativoOk && buscaOk;
         });
+    },
+
+    textosDependencias(dependencias = []) {
+        if (!Array.isArray(dependencias)) {
+            return [];
+        }
+
+        return dependencias.flatMap(dependencia => {
+            if (typeof dependencia === "string") {
+                return [dependencia];
+            }
+
+            return [
+                dependencia.produtoNome,
+                dependencia.categoria,
+                dependencia.unidadeCalculo,
+                dependencia.regraCalculo,
+                dependencia.observacao
+            ];
+        }).filter(Boolean);
     },
 
     respostaErro(erro, mensagemPadrao) {

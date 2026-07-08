@@ -7,76 +7,67 @@ segue a arquitetura Core v1: Use Cases -> Services -> Repository -> Adapter.
 
 ## Objetivo
 
-Representar produtos comerciais que futuramente poderao alimentar o Catalogo de
-Produtos e o Orcamento Inteligente, sem implementar interface, HTML, CSS,
-Firebase ou alteracoes no modulo de Orcamentos nesta sprint.
+Representar materiais, insumos, acessorios, ferragens, vidros e mao de obra
+usados nos tipos de instalacao/manutencao. Nesta sprint, Produto serve como
+cadastro tecnico de custo, nao como precificacao comercial.
 
 ## Arquivos
 
-- `produto-model.js`: modelo, normalizacao, categorias, subcategorias,
-  atributos preparados e tipos de calculo.
+- `produto-model.js`: modelo, normalizacao, categorias, unidades e regras de
+  consumo/calculo.
 - `produto-validator.js`: validacoes de nome, categoria, unidade, tipo de
-  calculo, precos, margem, status e atributos.
+  calculo, custo unitario e status.
 - `produto-factory.js`: criacao de Produtos e objeto padrao.
 - `produto-repository.js`: persistencia via `StorageAdapter`, sem acesso direto
   a Firestore.
 - `produto-service.js`: fachada de aplicacao para criar, buscar, listar,
   atualizar e desativar Produtos.
+- `produto-ui.js`: renderizacao da tela interna de cadastro de Produtos.
+- `produto-controller.js`: orquestracao da tela via Use Cases e
+  `ProdutoService`.
 
-## Estrutura do Produto
+## Campos ativos nesta sprint
 
 ```text
 id
 nome
 categoria
-subcategoria
 descricao
-unidadeVenda
-tipoCalculo
-precoCusto
-precoVenda
-margem
+unidadeCalculo
+regraCalculo
+custoUnitario
 ativo
-atributos
 observacoes
 criadoEm
 atualizadoEm
 ```
 
+`unidade`, `unidadeVenda`, `tipoCalculo`, `custo` e `precoCusto` podem aparecer
+como aliases de compatibilidade, mas a tela deve trabalhar com
+`unidadeCalculo`, `regraCalculo` e `custoUnitario`.
+
 ## Categorias iniciais
 
 ```text
 vidro
+aluminio_perfil
 ferragem
-perfil
 acessorio
 insumo
-servico_complementar
-```
-
-## Subcategorias de vidro
-
-```text
-comum
-temperado
-laminado
-espelho
-reflecta
-canelado
-```
-
-## Atributos preparados
-
-```text
-espessura
-cor
+mao_de_obra
+kit
 acabamento
-marca
-modelo
-peso
-largura
-altura
-comprimento
+outro
+```
+
+## Unidades de calculo
+
+```text
+m2
+metro_linear
+unidade
+kit
+hora
 ```
 
 ## Tipos de calculo
@@ -84,22 +75,31 @@ comprimento
 ```text
 area_m2
 linear_m
+linear_altura
+perimetro
+quantidade_fixa
 unidade
-quantidade
-peso_kg
-personalizado
+hora
 ```
 
 ## Ordem sugerida de scripts
 
 ```html
 <script src="../js/storage/storage-adapter.js"></script>
+<script src="../js/storage/local-storage-adapter.js"></script>
 <script src="../js/storage/memory-adapter.js"></script>
 <script src="../js/produtos/produto-model.js"></script>
 <script src="../js/produtos/produto-validator.js"></script>
 <script src="../js/produtos/produto-factory.js"></script>
 <script src="../js/produtos/produto-repository.js"></script>
 <script src="../js/produtos/produto-service.js"></script>
+<script src="../js/usecases/produtos/criar-produto-usecase.js"></script>
+<script src="../js/usecases/produtos/buscar-produto-usecase.js"></script>
+<script src="../js/usecases/produtos/listar-produtos-usecase.js"></script>
+<script src="../js/usecases/produtos/atualizar-produto-usecase.js"></script>
+<script src="../js/usecases/produtos/excluir-produto-usecase.js"></script>
+<script src="../js/produtos/produto-ui.js"></script>
+<script src="../js/produtos/produto-controller.js"></script>
 ```
 
 ## Fluxo
@@ -110,16 +110,18 @@ Use Case -> ProdutoService -> ProdutoRepository -> StorageAdapter
 
 ## Integracao futura com Orcamento Inteligente
 
-O dominio Produtos prepara os dados que poderao orientar o orcamento no futuro:
+O dominio Produtos prepara a base tecnica usada pelos Servicos:
 
-- `tipoCalculo` indica se o produto usa area, metro linear, unidade, quantidade,
-  peso ou regra personalizada;
-- `precoCusto`, `precoVenda` e `margem` poderao apoiar precificacao;
-- `atributos` prepara dimensoes, acabamento, marca e modelo;
-- `categoria` e `subcategoria` poderao orientar filtros do Catalogo de Produtos.
+- `tipoCalculo`/`regraCalculo` indica se o produto usa area, largura, altura,
+  perimetro, quantidade fixa, unidade ou tempo medio;
+- `custoUnitario` e seus aliases de custo (`custo`, `precoCusto`) preparam
+  controle futuro de caixa e custo da obra;
+- `categoria` orienta filtros do cadastro de Produtos;
+- somente Produtos ativos cadastrados podem ser selecionados como dependencias
+  em Servicos/Tipos de servico.
 
-Nesta sprint, esses campos sao apenas estrutura de dominio. Eles nao alteram o
-orcamento atual.
+Nesta sprint, Produto nao trabalha com margem, lucro, markup, preco de venda,
+comissoes, impostos ou precificacao final.
 
 ## Regra arquitetural
 

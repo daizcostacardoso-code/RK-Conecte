@@ -6,6 +6,7 @@ const ProjetoModel = {
         aprovado: "Aprovado",
         em_producao: "Em producao",
         em_instalacao: "Em instalacao",
+        finalizado: "Finalizado",
         concluido: "Concluido",
         cancelado: "Cancelado"
     },
@@ -38,7 +39,7 @@ const ProjetoModel = {
     criar(dados = {}) {
         const agora = this.agoraISO();
         const numero = dados.numero || dados.codigo || this.criarNumero();
-        const status = dados.status || this.statusPadrao();
+        const status = this.normalizarStatus(dados.status || this.statusPadrao());
         const projeto = this.normalizar({
             ...dados,
             id: dados.id || this.criarId("prj"),
@@ -65,22 +66,40 @@ const ProjetoModel = {
     normalizar(dados = {}) {
         const agora = this.agoraISO();
         const numero = dados.numero || dados.codigo || this.criarNumero();
-        const status = dados.status || this.statusPadrao();
+        const status = this.normalizarStatus(dados.status || this.statusPadrao());
         const etapaAtual = dados.etapaAtual || dados.etapa || this.etapaPorStatus(status);
         const datasEntrada = dados.datas || {};
+        const cliente = this.normalizarCliente(dados.cliente || dados);
+        const obra = this.normalizarObra(dados.obra || dados);
+        const titulo = dados.titulo || dados.nome || this.criarTitulo({
+            ...dados,
+            cliente,
+            obra
+        });
 
         return {
             id: dados.id || this.criarId("prj"),
             numero,
             codigo: dados.codigo || numero,
-            titulo: dados.titulo || this.criarTitulo(dados),
+            nome: titulo,
+            titulo,
+            clienteId: cliente.id,
+            clienteNome: cliente.nome,
+            descricao: this.texto(dados.descricao),
+            enderecoObra: obra.endereco,
+            cidade: obra.cidade,
+            tipoProjeto: this.texto(dados.tipoProjeto),
+            observacoes: this.texto(dados.observacoes || dados.observacoesGerais),
             origem: dados.origem || "manual",
+            padrao: dados.padrao === true || dados.projetoPadrao === true || this.slug(dados.nome || dados.titulo) === "projeto_padrao",
+            generico: dados.generico === true || dados.projetoGenerico === true || false,
+            ativo: dados.ativo === undefined ? status !== "cancelado" : this.normalizarAtivo(dados.ativo),
             status,
             etapaAtual,
             etapa: etapaAtual,
             prioridade: dados.prioridade || "media",
-            cliente: this.normalizarCliente(dados.cliente || dados),
-            obra: this.normalizarObra(dados.obra || dados),
+            cliente,
+            obra,
             orcamento: this.normalizarOrcamento(dados.orcamento || {}),
             comercial: this.normalizarComercial(dados.comercial || dados),
             operacional: this.normalizarOperacional(dados.operacional || {}),
@@ -100,7 +119,9 @@ const ProjetoModel = {
             },
             criadoPor: dados.criadoPor || "",
             atualizadoPor: dados.atualizadoPor || "",
-            tags: Array.isArray(dados.tags) ? dados.tags : []
+            tags: Array.isArray(dados.tags) ? dados.tags : [],
+            criadoEm: datasEntrada.criacao || dados.criadoEm || dados.criadoEmISO || agora,
+            atualizadoEm: datasEntrada.atualizacao || dados.atualizadoEm || dados.atualizadoEmISO || agora
         };
     },
 
@@ -307,6 +328,7 @@ const ProjetoModel = {
             aprovado: "comercial",
             em_producao: "producao",
             em_instalacao: "instalacao",
+            finalizado: "finalizado",
             concluido: "finalizado",
             cancelado: "finalizado"
         };
@@ -325,7 +347,8 @@ const ProjetoModel = {
             return ProjetoStatus.rotulo(status);
         }
 
-        return this.status[status] || status || "";
+        const normalizado = this.normalizarStatus(status);
+        return this.status[normalizado] || status || "";
     },
 
     rotuloEtapa(etapa) {
@@ -338,6 +361,48 @@ const ProjetoModel = {
 
     statusOrcamento() {
         return typeof STATUS_PROJETO !== "undefined" ? STATUS_PROJETO.EM_ORCAMENTO : "em_orcamento";
+    },
+
+    normalizarStatus(status) {
+        const valor = this.slug(status);
+        const aliases = {
+            rascunho: "rascunho",
+            em_orcamento: "em_orcamento",
+            orcamento: "em_orcamento",
+            enviado: "enviado",
+            aprovado: "aprovado",
+            em_producao: "em_producao",
+            producao: "em_producao",
+            em_instalacao: "em_instalacao",
+            instalacao: "em_instalacao",
+            finalizado: "finalizado",
+            concluido: "finalizado",
+            cancelado: "cancelado"
+        };
+
+        return aliases[valor] || valor || this.statusPadrao();
+    },
+
+    normalizarAtivo(valor) {
+        if (valor === undefined || valor === null || valor === "") {
+            return true;
+        }
+
+        if (typeof valor === "boolean") {
+            return valor;
+        }
+
+        const texto = this.slug(valor);
+
+        if (["ativo", "sim", "true", "1"].includes(texto)) {
+            return true;
+        }
+
+        if (["inativo", "nao", "false", "0"].includes(texto)) {
+            return false;
+        }
+
+        return Boolean(valor);
     },
 
     criarId(prefixo = "id") {
@@ -366,6 +431,19 @@ const ProjetoModel = {
     arredondar(valor, casas = 2) {
         if (typeof Util !== "undefined" && Util.arredondar) return Util.arredondar(valor, casas);
         return Number(Number(valor || 0).toFixed(casas));
+    },
+
+    texto(valor) {
+        return String(valor || "").trim();
+    },
+
+    slug(valor) {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "");
     }
 };
 

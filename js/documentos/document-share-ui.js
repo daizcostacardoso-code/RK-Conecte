@@ -154,13 +154,29 @@ const DocumentShareUI = {
 
     renderizarPreview(estado = {}) {
         if (estado.pdfUrl) {
+            const pdfUrl = this.escaparAtributo(estado.pdfUrl);
+            const nomeArquivo = this.escaparAtributo(estado.pdfNomeArquivo || "documento-comercial.pdf");
+
             return [
                 `<section class="document-share-preview document-share-preview-pdf" aria-label="Preview do PDF">`,
                 `<div class="document-share-pdf-toolbar">`,
+                `<div>`,
                 `<strong>${this.escapar(estado.pdfNomeArquivo || "documento-comercial.pdf")}</strong>`,
                 `<span>Visualizacao sem download</span>`,
                 `</div>`,
-                `<iframe title="Preview do PDF" src="${this.escaparAtributo(estado.pdfUrl)}"></iframe>`,
+                `<div class="document-share-pdf-toolbar-actions">`,
+                `<a href="${pdfUrl}" target="_blank" rel="noopener">Abrir PDF</a>`,
+                `<a href="${pdfUrl}" download="${nomeArquivo}">Baixar</a>`,
+                `</div>`,
+                `</div>`,
+                `<object class="document-share-pdf-object" title="Preview do PDF" data="${pdfUrl}#view=FitH" type="application/pdf">`,
+                `<div class="document-share-pdf-fallback">`,
+                `<strong>O navegador nao exibiu o PDF aqui.</strong>`,
+                `<p>No celular, abra em tela cheia ou baixe o arquivo para visualizar.</p>`,
+                `<a href="${pdfUrl}" target="_blank" rel="noopener">Abrir PDF</a>`,
+                `<a href="${pdfUrl}" download="${nomeArquivo}">Baixar PDF</a>`,
+                `</div>`,
+                `</object>`,
                 `</section>`
             ].join("");
         }

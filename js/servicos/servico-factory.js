@@ -13,6 +13,9 @@ const ServicoFactory = {
             tipoCalculo: "personalizado",
             unidadeVenda: "servico",
             ativo: true,
+            tiposItem: [],
+            dependenciasPadrao: [],
+            tamanhosPadrao: [],
             ...dados
         });
     },

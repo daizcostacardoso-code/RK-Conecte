@@ -7,13 +7,13 @@ segue a arquitetura Core v1: Use Cases -> Services -> Repository -> Adapter.
 
 ## Objetivo
 
-Representar servicos comerciais que futuramente poderao alimentar o Catalogo de
-Servicos e o Orcamento Inteligente.
+Representar macro servicos comerciais que organizam os tipos de servico e suas
+dependencias tecnicas para o Orcamento Inteligente.
 
-Na Sprint 3.5, o modulo recebeu a primeira interface do Catalogo Comercial de
-Servicos em `paginas/servicos.html`. A tela consome Use Cases e
-`ServicoService`, mantendo cadastro, edicao e inicio real de orcamento como
-etapas futuras.
+Na Sprint de Cadastros Base, `paginas/servicos.html` passou a permitir
+cadastro, edicao, listagem, pesquisa e inativacao logica de Servicos. A tela
+consome Use Cases e `ServicoService`, sem acesso direto a Repository ou
+Firestore pela interface.
 
 ## Arquivos
 
@@ -25,7 +25,7 @@ etapas futuras.
   a Firestore.
 - `servico-service.js`: fachada de aplicacao para criar, buscar, listar,
   atualizar e desativar Servicos.
-- `servico-ui.js`: renderizacao da tela do Catalogo Comercial de Servicos.
+- `servico-ui.js`: renderizacao da tela interna de cadastro guiado de Servicos.
 - `servico-controller.js`: orquestracao da interface via Use Cases e
   `ServicoService`.
 
@@ -41,6 +41,9 @@ unidadeVenda
 camposObrigatorios
 produtosSugeridos
 ferragensSugeridas
+tiposItem/tiposServico
+dependenciasPadrao
+tamanhosPadrao
 tempoEstimado
 ativo
 observacoes
@@ -51,17 +54,35 @@ atualizadoEm
 ## Categorias iniciais
 
 ```text
-box
-espelho
-guarda_corpo
-cobertura
-fachada
-janela
-porta
-fechamento
+instalacao
 manutencao
-projeto_personalizado
+limpeza
+medicao_tecnica
+remocao
+outros
 ```
+
+## Dependencias
+
+Dependencias de Servicos e Tipos de servico devem vir apenas de Produtos ativos
+cadastrados. Cada dependencia guarda:
+
+```text
+produtoId
+produtoNome
+categoria
+unidadeCalculo
+regraCalculo
+quantidadePadrao
+custoUnitario
+custoEstimado
+obrigatoria
+observacao
+```
+
+Dependencia digitada livremente nao e aceita nesta sprint. A interface deve
+sempre selecionar um Produto ativo cadastrado e salvar um snapshot com nome,
+categoria, unidade, regra e custos.
 
 ## Tipos de calculo
 
@@ -77,6 +98,7 @@ personalizado
 
 ```html
 <script src="../js/storage/storage-adapter.js"></script>
+<script src="../js/storage/local-storage-adapter.js"></script>
 <script src="../js/storage/memory-adapter.js"></script>
 <script src="../js/servicos/servico-model.js"></script>
 <script src="../js/servicos/servico-validator.js"></script>
@@ -85,6 +107,8 @@ personalizado
 <script src="../js/servicos/servico-service.js"></script>
 <script src="../js/usecases/servicos/buscar-servico-usecase.js"></script>
 <script src="../js/usecases/servicos/listar-servicos-usecase.js"></script>
+<script src="../js/usecases/servicos/atualizar-servico-usecase.js"></script>
+<script src="../js/usecases/servicos/excluir-servico-usecase.js"></script>
 <script src="../js/servicos/servico-ui.js"></script>
 <script src="../js/servicos/servico-controller.js"></script>
 ```
@@ -97,20 +121,19 @@ Use Case -> ServicoService -> ServicoRepository -> StorageAdapter
 
 ## Integracao futura com Orcamento Inteligente
 
-O dominio Servicos prepara os dados que poderao orientar o orcamento no futuro:
+O dominio Servicos prepara os dados que orientam os cadastros guiados:
 
-- `tipoCalculo` indica se o servico usa area, metro linear, unidade, quantidade
-  ou regra personalizada;
-- `camposObrigatorios` pode orientar quais medidas a interface deve solicitar;
-- `produtosSugeridos` e `ferragensSugeridas` podem apoiar montagem de itens;
-- `tempoEstimado` pode apoiar planejamento comercial e operacional.
+- `categoria` representa a macro categoria do servico;
+- `tiposItem` guarda tipos editaveis, tempo medio, unidade de tempo,
+  observacoes tecnicas e dependencias;
+- `dependenciasPadrao` guarda produtos tecnicos selecionados do cadastro de
+  Produtos, incluindo custo unitario e custo estimado;
+- `tamanhosPadrao` guarda medidas em centimetros vinculadas ao modelo correto,
+  como Porta de abrir, Porta de correr, Janela 2 folhas, Janela 4 folhas e Box
+  frontal.
 
-Nesta sprint, esses campos sao apenas estrutura de dominio. Eles nao alteram o
-orcamento atual.
-
-Na interface da Sprint 3.5, esses campos aparecem apenas como areas preparadas:
-produtos sugeridos, ferragens sugeridas, campos obrigatorios e fluxo do
-orcamento. Nenhum comportamento de Orcamento Inteligente foi implementado.
+Nesta sprint, esses cadastros nao alteram calculo, PDF, preview ou fluxo atual
+do Orcamento Inteligente.
 
 ## Regra arquitetural
 

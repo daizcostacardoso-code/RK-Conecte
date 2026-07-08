@@ -11,6 +11,54 @@ const RKNavigation = {
         { rotulo: "Conversao", pagina: "converter-projeto.html" },
         { rotulo: "Producao", pagina: "producao.html" }
     ],
+    atalhosSistema: [
+        {
+            chave: "clientes",
+            titulo: "Novo Cliente",
+            descricao: "Cadastrar contato",
+            pagina: "clientes.html",
+            fallback: "+"
+        },
+        {
+            chave: "orcamento",
+            titulo: "Novo Orcamento",
+            tituloHtml: "Novo Or&ccedil;amento",
+            descricao: "Criar proposta",
+            pagina: "orcamento-inteligente.html",
+            fallback: "R$"
+        },
+        {
+            chave: "aprovacao",
+            titulo: "Aprovacoes",
+            tituloHtml: "Aprova&ccedil;&otilde;es",
+            descricao: "Revisar respostas",
+            pagina: "aprovacao-comercial.html",
+            fallback: "OK"
+        },
+        {
+            chave: "producao",
+            titulo: "Producao",
+            tituloHtml: "Produ&ccedil;&atilde;o",
+            descricao: "Acompanhar OPs",
+            pagina: "producao.html",
+            fallback: "OP"
+        }
+    ],
+    arquivosIconesAtalho: [
+        "Aprovacao-atalho.json",
+        "Caixa-atalho.json",
+        "Clientes-atalho.json",
+        "Orcamento-atalho.json",
+        "Producao-atalho.json"
+    ],
+    paginasSemAtalhos: [
+        "orcamento.html",
+        "orcamento-inteligente.html",
+        "novo-orcamento.html",
+        "funcionario.html",
+        "login.html",
+        "loading.html"
+    ],
 
     iniciar() {
         const lista = document.querySelector("header nav ul");
@@ -37,6 +85,7 @@ const RKNavigation = {
             ...this.links.map(link => this.renderizarLink(link)),
             this.renderizarSair()
         ].join("");
+        this.renderizarAtalhosSistema();
         this.protegerLinksInternos(lista);
 
         return true;
@@ -129,6 +178,206 @@ const RKNavigation = {
         assinatura.className = "rk-version-signature";
         assinatura.textContent = `RK Conecte \u2022 ${this.obterVersao()}`;
         footer.insertAdjacentElement("afterend", assinatura);
+    },
+
+    renderizarAtalhosSistema() {
+        if (this.deveOmitirAtalhosSistema() || document.querySelector(".rk-system-shortcuts")) {
+            return false;
+        }
+
+        const header = document.querySelector("body > header");
+        if (!header) {
+            return false;
+        }
+
+        const secoes = document.createElement("section");
+        secoes.className = "rk-system-shortcuts";
+        secoes.setAttribute("aria-label", "Atalhos do sistema");
+        secoes.innerHTML = [
+            `<div class="container rk-system-shortcuts__inner">`,
+            ...this.atalhosSistema.map(atalho => this.renderizarAtalhoSistema(atalho)),
+            `</div>`
+        ].join("");
+
+        header.insertAdjacentElement("afterend", secoes);
+        this.prepararMidiasAtalhos(secoes);
+        return true;
+    },
+
+    deveOmitirAtalhosSistema() {
+        const pagina = this.obterPaginaAtual();
+        return this.paginasSemAtalhos.includes(pagina) || !this.linkProtegido({ getAttribute: () => pagina });
+    },
+
+    renderizarAtalhoSistema(atalho) {
+        return [
+            `<a class="rk-system-shortcut" href="${this.escaparAtributo(this.criarHref(atalho.pagina))}" data-rk-shortcut="${this.escaparAtributo(atalho.chave)}" aria-label="${this.escaparAtributo(atalho.titulo)}">`,
+            this.renderizarMidiaAtalho(atalho),
+            `<span class="rk-system-shortcut__copy">`,
+            `<strong>${atalho.tituloHtml || this.escapar(atalho.titulo)}</strong>`,
+            `<small>${this.escapar(atalho.descricao)}</small>`,
+            `</span>`,
+            `</a>`
+        ].join("");
+    },
+
+    renderizarMidiaAtalho(atalho) {
+        const arquivo = this.obterArquivoIconeAtalho(atalho.chave);
+        const tipo = this.obterTipoMidia(arquivo);
+        const src = arquivo ? `${this.obterPrefixoRaiz()}Icones/${this.codificarCaminho(arquivo)}` : "";
+        const fallback = `<span class="rk-system-shortcut__fallback" aria-hidden="true">${this.escapar(atalho.fallback)}</span>`;
+
+        if (!src) {
+            return `<span class="rk-system-shortcut__media rk-system-shortcut__media--fallback">${fallback}</span>`;
+        }
+
+        if (tipo === "json") {
+            return `<span class="rk-system-shortcut__media" data-rk-icon-type="json" data-rk-icon-src="${this.escaparAtributo(src)}">${fallback}</span>`;
+        }
+
+        if (tipo === "mp4") {
+            return [
+                `<span class="rk-system-shortcut__media" data-rk-icon-type="mp4">`,
+                `<video src="${this.escaparAtributo(src)}" muted autoplay loop playsinline aria-hidden="true"></video>`,
+                fallback,
+                `</span>`
+            ].join("");
+        }
+
+        return [
+            `<span class="rk-system-shortcut__media" data-rk-icon-type="${this.escaparAtributo(tipo || "image")}">`,
+            `<img src="${this.escaparAtributo(src)}" alt="" loading="lazy" decoding="async" onerror="this.closest('.rk-system-shortcut__media').classList.add('rk-system-shortcut__media--erro')">`,
+            fallback,
+            `</span>`
+        ].join("");
+    },
+
+    obterArquivoIconeAtalho(chave) {
+        const chaveNormalizada = this.normalizarTexto(chave);
+        return this.arquivosIconesAtalho.find(arquivo => this.normalizarTexto(arquivo).startsWith(chaveNormalizada)) || "";
+    },
+
+    obterTipoMidia(arquivo = "") {
+        const extensao = String(arquivo).split(".").pop().toLowerCase();
+
+        if (["json", "webp", "gif", "apng", "png", "jpg", "jpeg", "svg", "mp4"].includes(extensao)) {
+            return extensao;
+        }
+
+        return "";
+    },
+
+    prepararMidiasAtalhos(root) {
+        const reduzMovimento = this.movimentoReduzido();
+
+        root.querySelectorAll(".rk-system-shortcut").forEach((atalho, indice) => {
+            atalho.style.setProperty("--rk-shortcut-index", String(indice));
+        });
+
+        root.querySelectorAll(".rk-system-shortcut__media[data-rk-icon-type='json']").forEach(media => {
+            if (reduzMovimento) {
+                return;
+            }
+
+            this.carregarLottiePlayer(() => this.hidratarLottieAtalho(media));
+        });
+
+        root.querySelectorAll(".rk-system-shortcut").forEach(atalho => {
+            const animar = () => this.animarAtalho(atalho);
+            atalho.addEventListener("pointerdown", animar);
+            atalho.addEventListener("focusin", animar);
+        });
+    },
+
+    carregarLottiePlayer(callback) {
+        if (window.customElements?.get("lottie-player")) {
+            callback();
+            return;
+        }
+
+        const existente = document.querySelector("script[data-rk-lottie-player='true']");
+        if (existente) {
+            existente.addEventListener("load", callback, { once: true });
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/@lottiefiles/lottie-player@2.0.12/dist/lottie-player.js";
+        script.async = true;
+        script.dataset.rkLottiePlayer = "true";
+        script.addEventListener("load", callback, { once: true });
+        document.head.appendChild(script);
+    },
+
+    hidratarLottieAtalho(media) {
+        if (!window.customElements?.get("lottie-player") || media.querySelector("lottie-player")) {
+            return;
+        }
+
+        const player = document.createElement("lottie-player");
+        player.setAttribute("src", media.dataset.rkIconSrc || "");
+        player.setAttribute("background", "transparent");
+        player.setAttribute("speed", "1");
+        player.setAttribute("loop", "");
+        player.setAttribute("aria-hidden", "true");
+        media.appendChild(player);
+        media.classList.add("rk-system-shortcut__media--loaded");
+
+        const atalho = media.closest(".rk-system-shortcut");
+        if (!atalho) {
+            return;
+        }
+
+        const tocar = () => {
+            if (this.movimentoReduzido()) {
+                return;
+            }
+
+            player.stop?.();
+            player.play?.();
+        };
+        const parar = () => player.stop?.();
+
+        atalho.addEventListener("pointerenter", tocar);
+        atalho.addEventListener("pointerleave", parar);
+        atalho.addEventListener("focusin", tocar);
+        atalho.addEventListener("blur", parar);
+        atalho.addEventListener("pointerdown", () => {
+            tocar();
+            window.setTimeout(parar, 1200);
+        });
+    },
+
+    animarAtalho(atalho) {
+        if (this.movimentoReduzido()) {
+            return;
+        }
+
+        atalho.classList.remove("rk-system-shortcut--pulse");
+        void atalho.offsetWidth;
+        atalho.classList.add("rk-system-shortcut--pulse");
+    },
+
+    movimentoReduzido() {
+        return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches || false;
+    },
+
+    obterPrefixoRaiz() {
+        return this.estaEmPaginas() ? "../" : "";
+    },
+
+    codificarCaminho(caminho = "") {
+        return String(caminho).split("/").map(parte => encodeURIComponent(parte)).join("/");
+    },
+
+    normalizarTexto(valor = "") {
+        return String(valor)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\.[^.]+$/, "")
+            .replace(/-atalho$/i, "")
+            .replace(/[^a-z0-9]+/gi, "")
+            .toLowerCase();
     },
 
     obterVersao() {

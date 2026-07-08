@@ -1,5 +1,42 @@
 # Changelog
 
+## v0.4.1 - Cadastros Guiados para Orcamento Inteligente
+- Projetos agora garantem `Projeto padrao` e projetos genericos sugeridos, preservando o padrao sempre disponivel para orcamentos rapidos.
+- Produtos passaram a funcionar como cadastro tecnico de materiais, insumos, acessorios, ferragens, vidros e mao de obra, mantendo apenas unidade/regra de calculo, custo unitario, status e observacoes no fluxo da sprint.
+- Servicos foram reorganizados como macro categorias (`Instalacao`, `Manutencao`, `Limpeza`, `Medicao tecnica`, `Remocao` e `Outros`), com tipos editaveis.
+- Dependencias de Servicos/Tipos agora sao selecionadas apenas de Produtos ativos cadastrados e salvas com `produtoId`, nome, categoria, unidade, regra, quantidade padrao, custo unitario, custo estimado, obrigatoriedade e observacao.
+- Margem, lucro, markup, preco de venda, comissoes, impostos e precificacao final ficaram fora do cadastro de Produtos desta sprint.
+- Tamanhos padrao continuam editaveis e vinculados ao modelo relacionado, incluindo Porta de abrir, Porta de correr, Janela 2 folhas, Janela 4 folhas e Box frontal.
+- O Orçamento Inteligente mantem o fluxo visual atual, mas passa a ter `Projeto padrao` como apoio pre-selecionado quando um cliente e escolhido.
+- Atualizados estilos e documentacao dos cadastros sem alterar calculo, preview, PDF, producao, aprovacao, conversao ou area publica.
+
+## v0.4.0 - Sprint Cadastros Base para Orcamento Inteligente
+- Criados cadastros internos funcionais para Projetos, Produtos e Servicos, com listagem, busca, criacao, edicao e inativacao logica.
+- Adicionado `LocalStorageAdapter` em `js/storage/local-storage-adapter.js`, mantendo persistencia pelo fluxo Repository/Adapter sem API, MySQL ou acesso direto da interface a Firestore.
+- Produtos passam a suportar `valorUnitario`, `custo`, `unidade`, dependencias e tamanhos padrao com area em m2, preservando aliases legados `precoVenda`, `precoCusto` e `unidadeVenda`.
+- Servicos passam a suportar tipos/modelos de item, dependencias padrao e tamanhos padrao; a base inicial inclui Porta, Janela, Box, Espelho, Vidro fixo, Fachada, Guarda-corpo e Outros.
+- Projetos passam a ter CRUD interno com nome, cliente, descricao, endereco da obra, cidade, status, tipo e observacoes, alem de selecao para uso futuro no Orcamento Inteligente.
+- Adicionados use cases de listagem, atualizacao e inativacao para Projetos, Produtos e Servicos.
+- `OrcamentoInteligenteController` passou a configurar catalogos pelo adapter local quando houver cadastros salvos, mantendo os fallbacks atuais e sem alterar calculo, preview ou PDF.
+- Atualizado `css/style.css` com estilos compartilhados para os cadastros internos, preservando a identidade visual do painel.
+
+## v0.4.0 - Ajustes visuais PDF e Orcamento Inteligente
+- PDF Comercial do cliente deixa de renderizar as secoes de Servico e Condicoes Comerciais, mantendo esses dados no Documento Comercial para controle interno.
+- PDF Comercial recebeu ajuste de espacamento vertical em campos e assinaturas para reduzir respiros excessivos entre nomes e linhas.
+- Central de Compartilhamento passa a usar preview de PDF com fallback para mobile, exibindo acoes de abrir em tela cheia e baixar quando o navegador nao renderizar o PDF embutido.
+- Orcamento Inteligente recebeu melhorias visuais de clareza nas etapas, estados, opcoes de servico, campos numericos, unidades e botoes, sem mudar layout principal ou funcionalidades.
+- Criado `docs/VISAO_FUTURA_ORCAMENTO_VIDRACARIA.md` com ideias futuras de visualizacao, logica de orcamento e layout, sem implementacao nesta etapa.
+
+## v0.4.0 - Sprint 5.3 Preparacao MySQL/API
+- Criada a base isolada da API em `api/`, com estrutura `src/config`, `src/database`, `src/routes`, `src/controllers`, `src/services`, `src/repositories`, `src/models` e `src/migrations`.
+- Adicionado `api/package.json` com Express, mysql2, CORS, dotenv e nodemon para subir a API separadamente do frontend.
+- Criada conexao MySQL em `api/src/database/mysql.js`, usando `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` e `DB_NAME`.
+- Adicionado `api/.env.example` com configuracao local padrao para `rk_conecte`.
+- Adicionados health checks `GET /api/health` e `GET /api/db-health`; o banco retorna erro controlado quando o MySQL ainda nao estiver configurado.
+- Criado schema inicial em `api/src/migrations/001_schema_inicial.sql` com clientes, orcamentos, itens, caixa, agenda, PDFs comerciais, projetos, ordens de producao e usuarios.
+- Criado `js/storage/api-adapter.js` como placeholder seguro para futura API, sem substituir Firebase, Firestore, localStorage ou adapters atuais.
+- Criado `docs/MYSQL_MIGRATION_PLAN.md` documentando migracao gradual, Repository Pattern e regra de frontend falar somente com API, nunca direto com banco.
+
 ## v0.4.0 - Sprint 5.2.2 Orcamento Inteligente + Preview/PDF
 - Orcamento Inteligente passa a selecionar multiplos tipos de servico no mesmo contexto: Porta, Janela, Box, Espelho, Vidro fixo, Fachada, Guarda-corpo e Outros.
 - Criado `js/orcamentos/orcamento-item-config.js` para centralizar tipos, subtipos, tamanhos padrao e dependencias demonstrativas dos itens de vidracaria.
