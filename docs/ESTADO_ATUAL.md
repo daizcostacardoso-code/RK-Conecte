@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.7.0`.
+- Versão: `v0.8.0`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -71,3 +71,14 @@ A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGU
 - Rascunhos de medição são locais e isolados por projeto.
 - O cancelamento comercial encerra o projeto relacionado sem excluir seus registros.
 - Projetos não podem ser excluídos definitivamente pelas regras do Firestore.
+
+## Execução operacional consolidada na Sprint 2
+
+- Cada projeto possui uma medição canônica determinística na coleção `medicoes`.
+- Rascunhos continuam locais; salvar e concluir criam revisões e histórico no Firestore.
+- A conclusão da medição libera uma única ordem de serviço vinculada ao projeto.
+- A ordem de serviço conduz o projeto por produção, instalação e finalização.
+- Repetições da mesma ação não duplicam documentos nem eventos operacionais.
+- Cancelamentos preservam medições, ordens, projetos e seus históricos.
+- O dashboard inclui pendências de medição, produção e instalação.
+- Regras impedem exclusão definitiva e troca dos vínculos operacionais.

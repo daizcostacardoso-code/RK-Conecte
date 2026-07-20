@@ -1,7 +1,21 @@
 const NotaServicoModel = {
     chaveRascunho: "rk_nota_servico_rascunho",
+    chaveRascunhoBase: "rk_nota_servico_rascunho",
     chaveHistorico: "rk_notas_servico_emitidas",
     chaveSequencia: "rk_nota_servico_sequencia",
+    contexto: { projetoId: "", medicaoId: "" },
+
+    configurarContexto(contexto = {}) {
+        this.contexto = {
+            projetoId: this.texto(contexto.projetoId, 120),
+            medicaoId: this.texto(contexto.medicaoId, 120)
+        };
+        const escopo = this.contexto.projetoId
+            ? this.contexto.projetoId.replace(/[^a-zA-Z0-9_-]+/g, "_")
+            : "avulsa";
+        this.chaveRascunho = `${this.chaveRascunhoBase}:${escopo}`;
+        return this.contexto;
+    },
 
     dataHoje() { const partes = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Bahia", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()); const valor = tipo => partes.find(parte => parte.type === tipo)?.value; return `${valor("year")}-${valor("month")}-${valor("day")}`; },
     texto(valor, limite = 1200) { return String(valor ?? "").trim().slice(0, limite); },
@@ -28,8 +42,14 @@ const NotaServicoModel = {
         return this.proximoNumero();
     },
     estadoVazio() {
+        const projetoId = this.contexto.projetoId;
         return {
-            id: `nota-${Date.now()}-${Math.random().toString(16).slice(2)}`, numeroNota: this.proximoNumero(), dataEmissao: this.dataHoje(), dataConclusao: this.dataHoje(), status: "Concluído",
+            id: projetoId ? `os_${projetoId.replace(/[^a-zA-Z0-9_-]+/g, "_")}`.slice(0, 120) : `nota-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            projetoId,
+            medicaoId: this.contexto.medicaoId,
+            orcamentoId: "",
+            origem: projetoId ? "projeto_operacional" : "avulsa",
+            numeroNota: this.proximoNumero(), dataEmissao: this.dataHoje(), dataConclusao: "", status: "rascunho",
             responsavel: "", localServico: "", clienteNome: "", clienteDocumento: "", clienteTelefone: "", clienteEndereco: "", clienteEmail: "", servicos: [], desconto: 0,
             formaPagamento: "Pix", condicaoPagamento: "", garantia: "", referencia: "", observacoes: "", emitidaEm: "", atualizadoEm: new Date().toISOString()
         };
@@ -55,9 +75,33 @@ const NotaServicoModel = {
         if (desconto !== null && desconto > this.subtotal(estado)) erros.push("O desconto não pode ser maior que o subtotal.");
         return erros;
     },
-    normalizar(estado) { return { ...this.estadoVazio(), ...estado, servicos: Array.isArray(estado?.servicos) ? estado.servicos : [], desconto: Number(estado?.desconto || 0) }; },
+    normalizarStatus(status = "") {
+        const chave = this.texto(status, 40).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+        return { concluido: "concluido", concluida: "concluido", em_andamento: "em_producao", producao: "em_producao", em_producao: "em_producao", instalacao: "em_instalacao", em_instalacao: "em_instalacao", cancelado: "cancelado", pendente: "rascunho", rascunho: "rascunho" }[chave] || "rascunho";
+    },
+    rotuloStatus(status = "") { return { rascunho: "Rascunho", em_producao: "Em produção", em_instalacao: "Em instalação", concluido: "Concluído", cancelado: "Cancelado" }[this.normalizarStatus(status)] || "Rascunho"; },
+    normalizar(estado) {
+        const base = { ...this.estadoVazio(), ...estado };
+        return {
+            ...base,
+            projetoId: this.texto(base.projetoId || this.contexto.projetoId, 120),
+            medicaoId: this.texto(base.medicaoId || this.contexto.medicaoId, 120),
+            status: this.normalizarStatus(base.status),
+            servicos: Array.isArray(estado?.servicos) ? estado.servicos : [],
+            desconto: Number(estado?.desconto || 0)
+        };
+    },
     salvarRascunho(estado) { try { estado.atualizadoEm = new Date().toISOString(); localStorage.setItem(this.chaveRascunho, JSON.stringify(estado)); return true; } catch (_) { return false; } },
-    carregarRascunho() { try { const salvo = JSON.parse(localStorage.getItem(this.chaveRascunho) || "null"); return salvo ? this.normalizar(salvo) : this.estadoVazio(); } catch (_) { return this.estadoVazio(); } },
+    carregarRascunho() {
+        try {
+            const atual = localStorage.getItem(this.chaveRascunho);
+            const legado = !this.contexto.projetoId ? localStorage.getItem(this.chaveRascunhoBase) : null;
+            const salvo = JSON.parse(atual || legado || "null");
+            const normalizado = salvo ? this.normalizar(salvo) : this.estadoVazio();
+            if (!atual && legado) this.salvarRascunho(normalizado);
+            return normalizado;
+        } catch (_) { return this.estadoVazio(); }
+    },
     limparRascunho() { try { localStorage.removeItem(this.chaveRascunho); } catch (_) {} },
     historico() { try { const itens = JSON.parse(localStorage.getItem(this.chaveHistorico) || "[]"); return Array.isArray(itens) ? itens.map(item => this.normalizar(item)) : []; } catch (_) { return []; } },
     registrarEmissao(estado) {

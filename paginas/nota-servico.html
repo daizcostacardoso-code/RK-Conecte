@@ -34,6 +34,7 @@
         </section>
 
         <div id="notaAviso" class="nota-aviso" role="status" aria-live="polite"></div>
+        <div id="notaContexto" class="nota-aviso nota-aviso--sucesso" role="status" hidden></div>
 
         <section class="nota-painel" aria-labelledby="dadosNotaTitulo">
             <div class="nota-painel-topo"><div><h2 id="dadosNotaTitulo">Dados da nota</h2><p>O número é gerado automaticamente e pode ser ajustado.</p></div><span class="nota-status-rascunho" id="estadoDocumento">Rascunho salvo</span></div>
@@ -41,7 +42,7 @@
                 <label><span>Número da nota *</span><input id="numeroNota" maxlength="30" required></label>
                 <label><span>Data de emissão *</span><input id="dataEmissao" type="date" required></label>
                 <label><span>Data de conclusão</span><input id="dataConclusao" type="date"></label>
-                <label><span>Status</span><select id="status"><option value="Concluído">Concluído</option><option value="Em andamento">Em andamento</option><option value="Pendente">Pendente</option><option value="Cancelado">Cancelado</option></select></label>
+                <label><span>Status</span><select id="status"><option value="rascunho">Rascunho</option><option value="em_producao">Em produção</option><option value="em_instalacao">Em instalação</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></label>
                 <label class="nota-campo-duplo"><span>Responsável pelo serviço</span><input id="responsavel" maxlength="100" placeholder="Nome do técnico ou responsável"></label>
                 <label class="nota-campo-duplo"><span>Local do serviço</span><input id="localServico" maxlength="180" placeholder="Endereço onde o serviço foi realizado"></label>
             </div>
@@ -94,6 +95,8 @@
         <div class="nota-acoes-finais">
             <button class="botao" id="btnGerarPdf" type="button">Emitir e gerar PDF</button>
             <button class="botao-claro" id="btnSalvarRascunho" type="button">Salvar rascunho</button>
+            <button class="botao" id="btnIniciarInstalacao" type="button" hidden>Iniciar instalação</button>
+            <button class="botao" id="btnConcluirOrdem" type="button" hidden>Concluir ordem</button>
         </div>
 
         <section class="nota-painel nota-historico" aria-labelledby="historicoTitulo">
@@ -106,13 +109,17 @@
 <script src="../js/vendor/pdf-lib.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="../js/firebase-config.js?v=3.0.0"></script>
-<script src="../js/shared/rk-firestore-store.js?v=0.7.0"></script>
-<script src="../js/notas-servico/nota-servico-model.js?v=1.0.1"></script>
+<script src="../js/shared/rk-firestore-store.js?v=0.8.0"></script>
+<script src="../js/projetos/projeto-model.js?v=0.8.0"></script>
+<script src="../js/medicoes/medicao-operacional-model.js?v=0.8.0"></script>
+<script src="../js/notas-servico/nota-servico-model.js?v=0.8.0"></script>
+<script src="../js/notas-servico/ordem-servico-operacional-model.js?v=0.8.0"></script>
+<script src="../js/notas-servico/ordem-servico-operacional-repository.js?v=0.8.0"></script>
 <script src="../js/notas-servico/nota-servico-repository.js?v=1.0.0"></script>
-<script src="../js/notas-servico/nota-servico-pdf.js?v=1.0.0"></script>
-<script src="../js/notas-servico/nota-servico-ui.js?v=1.0.0"></script>
-<script src="../js/notas-servico/nota-servico-controller.js?v=1.1.1"></script>
-<script src="../js/shared/rk-navigation.js?v=0.7.0"></script>
+<script src="../js/notas-servico/nota-servico-pdf.js?v=0.8.0"></script>
+<script src="../js/notas-servico/nota-servico-ui.js?v=0.8.0"></script>
+<script src="../js/notas-servico/nota-servico-controller.js?v=0.8.0"></script>
+<script src="../js/shared/rk-navigation.js?v=0.8.0"></script>
   <script src="../js/conecte-signature.js?v=20260718"></script>
 </body>
 </html>

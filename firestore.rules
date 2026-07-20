@@ -107,6 +107,56 @@ service cloud.firestore {
         && anterior.orcamento.id == projeto.orcamento.id;
     }
 
+    function medicaoOperacionalValida() {
+      let medicao = request.resource.data;
+      return medicao.keys().hasAll(['projetoId', 'status', 'medidas'])
+        && textoEntre(medicao.projetoId, 1, 120)
+        && medicao.status in ['rascunho', 'concluida']
+        && medicao.medidas is list
+        && medicao.medidas.size() > 0
+        && medicao.medidas.size() <= 200
+        && exists(/databases/$(database)/documents/projetos/$(medicao.projetoId))
+        && get(/databases/$(database)/documents/projetos/$(medicao.projetoId)).data.status != 'cancelado';
+    }
+
+    function vinculoMedicaoPreservado() {
+      return resource.data.keys().hasAll(['projetoId'])
+        && request.resource.data.keys().hasAll(['projetoId'])
+        && resource.data.projetoId == request.resource.data.projetoId;
+    }
+
+    function ordemServicoOperacionalValida() {
+      let ordem = request.resource.data;
+      return !ordem.keys().hasAny(['origem'])
+        || ordem.origem != 'projeto_operacional'
+        || (
+          ordem.keys().hasAll(['projetoId', 'medicaoId', 'status'])
+          && textoEntre(ordem.projetoId, 1, 120)
+          && textoEntre(ordem.medicaoId, 1, 120)
+          && ordem.status in ['rascunho', 'em_producao', 'em_instalacao', 'concluido', 'cancelado']
+          && exists(/databases/$(database)/documents/projetos/$(ordem.projetoId))
+          && exists(/databases/$(database)/documents/medicoes/$(ordem.medicaoId))
+          && get(/databases/$(database)/documents/medicoes/$(ordem.medicaoId)).data.projetoId == ordem.projetoId
+          && get(/databases/$(database)/documents/medicoes/$(ordem.medicaoId)).data.status == 'concluida'
+        );
+    }
+
+    function vinculoOrdemServicoPreservado() {
+      return resource.data.keys().hasAll(['projetoId', 'medicaoId'])
+        && request.resource.data.keys().hasAll(['projetoId', 'medicaoId'])
+        && resource.data.projetoId == request.resource.data.projetoId
+        && resource.data.medicaoId == request.resource.data.medicaoId;
+    }
+
+    function transicaoOrdemServicoValida() {
+      let anterior = resource.data.status;
+      let destino = request.resource.data.status;
+      return anterior == destino
+        || (anterior == 'rascunho' && destino in ['em_producao', 'cancelado'])
+        || (anterior == 'em_producao' && destino in ['em_instalacao', 'cancelado'])
+        || (anterior == 'em_instalacao' && destino in ['concluido', 'cancelado']);
+    }
+
     // O formulário público usa apenas os valores de cálculo publicados.
     match /configuracoes/valores {
       allow read: if true;
@@ -152,6 +202,13 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /medicoes/{documento} {
+      allow read: if autorizado();
+      allow create: if autorizado() && medicaoOperacionalValida();
+      allow update: if autorizado() && medicaoOperacionalValida() && vinculoMedicaoPreservado();
+      allow delete: if false;
+    }
+
     match /servicos/{documento} {
       allow read, write: if autorizado();
     }
@@ -193,7 +250,13 @@ service cloud.firestore {
     }
 
     match /notas_servico/{documento} {
-      allow read, write: if autorizado();
+      allow read: if autorizado();
+      allow create: if autorizado() && ordemServicoOperacionalValida();
+      allow update: if autorizado() && ordemServicoOperacionalValida()
+        && (!resource.data.keys().hasAny(['origem'])
+          || resource.data.origem != 'projeto_operacional'
+          || (vinculoOrdemServicoPreservado() && transicaoOrdemServicoValida()));
+      allow delete: if false;
     }
 
     // Coleções novas ou caminhos não mapeados começam bloqueados.

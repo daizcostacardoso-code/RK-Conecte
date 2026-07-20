@@ -50,15 +50,22 @@
 - levar cliente, obra e orçamento para a medição contextual;
 - preservar projetos e cancelamentos no histórico.
 
+### Patch 7 — execução operacional — concluído
+
+- persistir uma medição canônica e revisável por projeto;
+- liberar a ordem de serviço somente após a conclusão da medição;
+- conduzir produção, instalação e conclusão pela ordem vinculada;
+- preservar vínculos, cancelamentos e histórico sem exclusão definitiva;
+- apresentar pendências operacionais no dashboard.
+
 ### Próximos passos
 
 - vincular os recebimentos do caixa ao orçamento aprovado;
-- persistir medições concluídas e notas de serviço vinculadas ao projeto;
 - remover módulos antigos que permanecerem sem uso após a migração.
 
 ### Continuação da Sprint 2
 
-- integrar medição, nota de serviço e caixa ao projeto operacional;
+- integrar o caixa ao projeto operacional;
 - validar o fluxo completo no mobile e no desktop.
 
 ## Sprint 3 — lançamento

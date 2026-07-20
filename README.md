@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.7.0`
+`v0.8.0`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -23,6 +23,11 @@ Quando um orçamento é aprovado, o sistema abre ou reutiliza um único projeto
 operacional no Firestore e grava o vínculo nos dois registros. Projetos abertos
 por aprovação preservam histórico, não aceitam exclusão definitiva e levam o
 contexto do cliente e da obra para um rascunho de medição isolado por projeto.
+
+Medições concluídas são persistidas na coleção `medicoes`, com documento único
+por projeto, revisão e histórico. A conclusão libera uma ordem de serviço
+vinculada na coleção `notas_servico`; essa ordem conduz o projeto pelas etapas
+de produção, instalação e finalização sem apagar registros anteriores.
 
 ## Validação local
 

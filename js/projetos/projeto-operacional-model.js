@@ -175,6 +175,7 @@ const ProjetoOperacionalModel = {
             operacional: {
                 ...atual.operacional,
                 status: "cancelado",
+                ordemServicoStatus: atual.operacional?.notaServicoId ? "cancelado" : atual.operacional?.ordemServicoStatus || "",
                 observacoes: this.texto(observacao) || atual.operacional?.observacoes || ""
             },
             datas: { ...atual.datas, cancelamento: agora }

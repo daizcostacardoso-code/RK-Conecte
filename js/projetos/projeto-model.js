@@ -13,6 +13,7 @@ const ProjetoModel = {
 
     etapas: {
         comercial: "Comercial",
+        medicao: "Medicao",
         producao: "Producao",
         instalacao: "Instalacao",
         financeiro: "Financeiro",
@@ -182,6 +183,8 @@ const ProjetoModel = {
             abertoPor: dados.abertoPor || null,
             medicaoId: dados.medicaoId || "",
             notaServicoId: dados.notaServicoId || "",
+            medicaoStatus: dados.medicaoStatus || "",
+            ordemServicoStatus: dados.ordemServicoStatus || "",
             observacoes: dados.observacoes || ""
         };
     },

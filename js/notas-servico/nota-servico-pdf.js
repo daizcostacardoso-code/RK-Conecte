@@ -27,7 +27,7 @@ const NotaServicoPDF = {
     titulo(c, texto) { c.pagina.drawText(texto, { x: 32, y: c.y, size: 9, font: c.negrito, color: c.rgb(.03,.24,.40) }); c.y -= 16; },
     blocoCliente(c, d) {
         this.titulo(c, "DADOS DO CLIENTE E DO SERVIÇO");
-        const linhas = [[`Cliente: ${d.clienteNome || "-"}`,`CPF/CNPJ: ${d.clienteDocumento || "-"}`],[`Telefone: ${d.clienteTelefone || "-"}`,`E-mail: ${d.clienteEmail || "-"}`],[`Endereço: ${d.clienteEndereco || "-"}`,`Emissão: ${this.dataBr(d.dataEmissao)}`],[`Local do serviço: ${d.localServico || "-"}`,`Conclusão: ${this.dataBr(d.dataConclusao)}`],[`Responsável: ${d.responsavel || "-"}`,`Status: ${d.status || "-"}`]];
+        const linhas = [[`Cliente: ${d.clienteNome || "-"}`,`CPF/CNPJ: ${d.clienteDocumento || "-"}`],[`Telefone: ${d.clienteTelefone || "-"}`,`E-mail: ${d.clienteEmail || "-"}`],[`Endereço: ${d.clienteEndereco || "-"}`,`Emissão: ${this.dataBr(d.dataEmissao)}`],[`Local do serviço: ${d.localServico || "-"}`,`Conclusão: ${this.dataBr(d.dataConclusao)}`],[`Responsável: ${d.responsavel || "-"}`,`Status: ${NotaServicoModel.rotuloStatus(d.status)}`]];
         linhas.forEach(par => { c.pagina.drawText(this.cortar(par[0],321,c.fonte,8.3),{x:38,y:c.y,size:8.3,font:c.fonte}); c.pagina.drawText(this.cortar(par[1],185,c.fonte,8.3),{x:370,y:c.y,size:8.3,font:c.fonte}); c.y-=14; }); c.y-=14;
     },
     tabelaCabecalho(c) { c.pagina.drawRectangle({x:32,y:c.y-5,width:531,height:23,color:c.rgb(.03,.24,.40)}); [["Descrição",39],["Quant.",330],["Unid.",374],["Valor unit.",414],["Total",500]].forEach(([texto,x])=>c.pagina.drawText(texto,{x,y:c.y+3,size:7.8,font:c.negrito,color:c.rgb(1,1,1)})); c.y-=18; },
