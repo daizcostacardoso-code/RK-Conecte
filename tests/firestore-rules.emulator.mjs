@@ -137,7 +137,6 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
     const caminhos = [
         "configuracoes/sistema",
         "solicitacoes_site/solicitacao-1",
-        "projetos/projeto-1",
         "servicos/servico-1",
         "caixa_empresa/lancamento-1",
         "clientes/cliente-1",
@@ -158,6 +157,39 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
         await assertSucceeds(updateDoc(referencia, { atualizado: true }));
         await assertSucceeds(deleteDoc(referencia));
     }
+});
+
+test("projeto operacional exige orçamento aprovado e preserva histórico", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    const orcamento = doc(equipe, "orcamentos_emitidos", "orcamento-1");
+    const projeto = doc(equipe, "projetos", "prj_orc_orcamento-1");
+
+    await assertSucceeds(setDoc(orcamento, { numero: "000001", status: "aprovado" }));
+    await assertSucceeds(setDoc(projeto, {
+        origem: "orcamento_aprovado",
+        status: "aprovado",
+        orcamento: { id: "orcamento-1", numero: "000001" },
+        historico: [{ tipo: "operacao_aberta" }]
+    }));
+    await assertSucceeds(updateDoc(projeto, { status: "em_producao" }));
+    await assertSucceeds(updateDoc(orcamento, { status: "cancelado" }));
+    await assertSucceeds(updateDoc(projeto, { status: "cancelado" }));
+    await assertFails(deleteDoc(projeto));
+});
+
+test("projeto operacional não abre para orçamento sem aprovação", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    await assertSucceeds(setDoc(doc(equipe, "orcamentos_emitidos", "orcamento-2"), {
+        numero: "000002",
+        status: "enviado"
+    }));
+    await assertFails(setDoc(doc(equipe, "projetos", "prj_orc_orcamento-2"), {
+        origem: "orcamento_aprovado",
+        status: "aprovado",
+        orcamento: { id: "orcamento-2", numero: "000002" }
+    }));
 });
 
 test("orçamento canônico pode ser atualizado sem exclusão definitiva", async () => {

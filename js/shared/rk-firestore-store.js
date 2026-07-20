@@ -207,7 +207,7 @@
                 clienteId: vinculos.clienteId,
                 projetoId: vinculos.projetoId,
                 status: registro.status || entrada.status || "emitido",
-                schemaVersion: Math.max(3, Number.parseInt(entrada.schemaVersion, 10) || 0),
+                schemaVersion: Math.max(4, Number.parseInt(entrada.schemaVersion, 10) || 0),
                 fonteCanonica: "orcamentos_emitidos",
                 atualizado_em: agora,
                 criado_em: entrada.criado_em || agora

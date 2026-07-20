@@ -19,6 +19,7 @@ const paginasComAuth = [
     "paginas/orcamento-inteligente.html",
     "paginas/orcamento.html",
     "paginas/produtos.html",
+    "paginas/projetos.html",
     "paginas/valores.html"
 ];
 

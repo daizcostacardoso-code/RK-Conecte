@@ -10,7 +10,7 @@ const OrcamentoAprovacaoStatus = Object.freeze({
 
 const OrcamentoAprovacaoModel = {
     status: OrcamentoAprovacaoStatus,
-    schemaVersion: 3,
+    schemaVersion: 4,
     colecaoCanonica: "orcamentos_emitidos",
 
     normalizarRegistro(registro = {}) {
@@ -32,6 +32,7 @@ const OrcamentoAprovacaoModel = {
         );
         const id = this.texto(base.id || base.orcamento_id || numero);
         const vinculos = this.normalizarVinculos(base, cliente, projeto, metadados);
+        const operacao = this.normalizarOperacao(base.operacao, vinculos);
         const status = this.normalizarStatus(base.status || base.aprovacao?.status);
         const aprovacao = this.normalizarAprovacao({
             ...(base.aprovacao || {}),
@@ -79,6 +80,7 @@ const OrcamentoAprovacaoModel = {
             solicitacaoId: vinculos.solicitacaoId,
             clienteId: vinculos.clienteId,
             projetoId: vinculos.projetoId,
+            operacao,
             revisao: aprovacao.versaoOrcamento,
             schemaVersion: Math.max(this.schemaVersion, Number.parseInt(base.schemaVersion, 10) || 0),
             fonteCanonica: this.colecaoCanonica,
@@ -109,10 +111,23 @@ const OrcamentoAprovacaoModel = {
             projetoId: this.texto(
                 vinculos.projetoId
                 || registro.projetoId
+                || registro.operacao?.projetoId
                 || projeto.id
                 || projeto.projeto_id
                 || metadados.projetoId
             )
+        };
+    },
+
+    normalizarOperacao(operacao = {}, vinculos = {}) {
+        const origem = operacao && typeof operacao === "object" ? operacao : {};
+        const projetoId = this.texto(origem.projetoId || vinculos.projetoId);
+        return {
+            ...origem,
+            projetoId,
+            status: this.texto(origem.status),
+            abertaEm: this.dataISO(origem.abertaEm) || null,
+            abertaPor: this.normalizarUsuario(origem.abertaPor)
         };
     },
 
@@ -189,7 +204,9 @@ const OrcamentoAprovacaoModel = {
             observacao: this.texto(dados.observacao),
             realizadoEm: this.dataISO(dados.realizadoEm) || this.agoraISO(),
             realizadoPor: this.normalizarUsuario(dados.realizadoPor),
-            origem: this.texto(dados.origem) || "sistema"
+            origem: this.texto(dados.origem) || "sistema",
+            projetoId: this.texto(dados.projetoId || dados.dados?.projetoId),
+            dados: dados.dados && typeof dados.dados === "object" ? this.copiar(dados.dados) : {}
         };
     },
 

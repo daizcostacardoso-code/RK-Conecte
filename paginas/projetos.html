@@ -1,16 +1,110 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projetos - RK Vidra&ccedil;aria</title>
-    <meta http-equiv="refresh" content="0; url=produtos.html#projetos">
-    <script>
-        window.location.replace("produtos.html#projetos");
-    </script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
+    <title>Projetos operacionais - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+    <meta name="theme-color" content="#083d67">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+    <style>
+        .projetos-page .cadastro-modulo { padding: 24px 0 40px; }
+        .projetos-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+        .projetos-topo h1 { margin: 0; color: #061b34; }
+        .projetos-topo p { margin: 6px 0 0; color: #53657a; }
+        .projetos-page .cadastro-grid { grid-template-columns: minmax(0, 1.7fr) minmax(300px, .9fr); }
+        .projetos-page .cadastro-tabela { min-width: 820px; }
+        .projetos-page .cadastro-tabela strong, .projetos-page .cadastro-tabela small { display: block; }
+        .projetos-page .cadastro-tabela small { color: #61758a; margin-top: 3px; }
+        .projeto-status { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #e8f1f8; color: #083d67; font-size: .78rem; font-weight: 800; }
+        .projeto-status.is-aprovado { background: #dcfce7; color: #166534; }
+        .projeto-status.is-em_producao, .projeto-status.is-em_instalacao { background: #dbeafe; color: #1d4ed8; }
+        .projeto-status.is-cancelado { background: #fee2e2; color: #991b1b; }
+        .projeto-detalhe-grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .projeto-detalhe-grade div { padding: 10px; border-radius: 9px; background: #f5f9fd; }
+        .projeto-detalhe-grade span, .projeto-detalhe-grade strong { display: block; }
+        .projeto-detalhe-grade span { color: #60758a; font-size: .76rem; text-transform: uppercase; font-weight: 800; }
+        .projeto-detalhe-grade strong { color: #17324d; margin-top: 4px; }
+        .cadastro-tabela-acoes a { text-decoration: none; }
+        @media (max-width: 940px) { .projetos-page .cadastro-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 620px) { .projetos-topo { flex-direction: column; } .projeto-detalhe-grade { grid-template-columns: 1fr; } }
+    </style>
 </head>
-<body>
-    <p>Projetos agora ficam na tela de Produtos. <a href="produtos.html#projetos">Abrir aba Projetos</a>.</p>
-  <script src="../js/conecte-signature.js?v=20260718"></script>
+<body class="cadastro-page projetos-page">
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta"><img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria"><div><strong>RK Vidraçaria</strong><small>Centro Comercial</small></div></div>
+        <nav><ul><li><a href="../index.html">Início</a></li><li><a href="clientes.html">Clientes</a></li><li><a href="arquivos.html">Arquivos</a></li><li><a class="login" href="login.html">Login</a></li></ul></nav>
+    </div>
+</header>
+<main class="cadastro-modulo">
+    <div class="container">
+        <section class="projetos-topo">
+            <div><h1>Projetos operacionais</h1><p>Obras abertas a partir de orçamentos aprovados e projetos cadastrados manualmente.</p></div>
+            <button class="botao" id="btnNovoProjeto" type="button">Novo projeto</button>
+        </section>
+        <section class="cadastro-filtros cadastro-filtros-duas" aria-label="Filtros de projetos">
+            <label><span>Pesquisar</span><input id="buscaProjeto" type="search" placeholder="Cliente, obra, orçamento ou descrição"></label>
+            <label><span>Status</span><select id="filtroProjetoStatus"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="em_orcamento">Em orçamento</option><option value="aprovado">Aprovado</option><option value="em_producao">Em produção</option><option value="em_instalacao">Em instalação</option><option value="finalizado">Finalizado</option><option value="cancelado">Cancelado</option></select></label>
+        </section>
+        <div class="cadastro-aviso" id="projetosAviso" aria-live="polite"></div>
+        <section class="cadastro-grid">
+            <div class="cadastro-painel cadastro-lista-painel">
+                <div class="cadastro-painel-topo"><div><h2>Operações</h2><p id="projetosResumo">Carregando projetos...</p></div></div>
+                <div class="cadastro-tabela-wrap">
+                    <table class="cadastro-tabela"><thead><tr><th>Projeto</th><th>Cliente</th><th>Status</th><th>Atualizado</th><th>Ações</th></tr></thead><tbody id="projetosTabelaCorpo"><tr><td colspan="5" class="cadastro-estado-vazio">Carregando projetos do Firestore...</td></tr></tbody></table>
+                </div>
+            </div>
+            <aside class="cadastro-painel cadastro-form-painel">
+                <div class="cadastro-painel-topo"><div><h2 id="projetoFormTitulo">Cadastro de projeto</h2><p>Use este formulário apenas para projetos manuais ou ajustes operacionais.</p></div></div>
+                <form class="cadastro-form" id="formProjeto" novalidate>
+                    <input id="projetoId" name="id" type="hidden">
+                    <input id="projetoClienteId" name="clienteId" type="hidden">
+                    <label class="cadastro-campo cadastro-campo-cheio"><span>Descrição *</span><input id="projetoDescricao" name="descricao" maxlength="200" required></label>
+                    <label class="cadastro-campo cadastro-campo-cheio"><span>Cliente</span><input id="projetoClienteNome" name="clienteNome" maxlength="120"></label>
+                    <label class="cadastro-campo cadastro-campo-cheio"><span>Endereço da obra</span><input id="projetoEnderecoObra" name="enderecoObra" maxlength="180"></label>
+                    <label class="cadastro-campo"><span>Cidade</span><input id="projetoCidade" name="cidade" maxlength="100" value="Porto Seguro"></label>
+                    <label class="cadastro-campo"><span>Status</span><select id="projetoStatus" name="status"><option value="rascunho">Rascunho</option><option value="em_orcamento">Em orçamento</option><option value="aprovado">Aprovado</option><option value="em_producao">Em produção</option><option value="em_instalacao">Em instalação</option><option value="finalizado">Finalizado</option><option value="cancelado">Cancelado</option></select></label>
+                    <label class="cadastro-campo cadastro-campo-cheio"><span>Tipo de projeto</span><input id="projetoTipoProjeto" name="tipoProjeto" maxlength="100"></label>
+                    <label class="cadastro-campo cadastro-campo-cheio"><span>Observações</span><textarea id="projetoObservacoes" name="observacoes" rows="3" maxlength="1000"></textarea></label>
+                    <div class="cadastro-form-acoes cadastro-campo-cheio"><button class="botao" type="submit">Salvar projeto</button><button class="botao botao-claro" type="reset">Limpar</button></div>
+                </form>
+                <section class="cadastro-detalhe" aria-labelledby="projetoDetalheTitulo"><h2 id="projetoDetalheTitulo">Projeto selecionado</h2><p id="projetoDetalheResumo">Selecione um projeto para visualizar.</p><div id="projetoDetalheConteudo"></div></section>
+            </aside>
+        </section>
+    </div>
+</main>
+<footer><p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p><p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p></footer>
+<script src="../js/config.js?v=0.7.0"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=3.0.0"></script>
+<script src="../js/storage.js?v=0.7.0"></script>
+<script src="../js/storage/storage-adapter.js?v=0.7.0"></script>
+<script src="../js/storage/firestore-adapter.js?v=0.7.0"></script>
+<script src="../js/core/event-types.js?v=0.7.0"></script>
+<script src="../js/core/event-bus.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-status.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-historico.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-model.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-validator.js?v=0.7.0"></script>
+<script src="../js/repositories/projeto-repository.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-storage.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-service.js?v=0.7.0"></script>
+<script src="../js/usecases/projetos/criar-projeto-usecase.js?v=0.7.0"></script>
+<script src="../js/usecases/projetos/listar-projetos-usecase.js?v=0.7.0"></script>
+<script src="../js/usecases/projetos/atualizar-projeto-usecase.js?v=0.7.0"></script>
+<script src="../js/usecases/projetos/excluir-projeto-usecase.js?v=0.7.0"></script>
+<script src="../js/shared/rk-draft-state.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-ui.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-controller.js?v=0.7.0"></script>
+<script src="../js/shared/rk-navigation.js?v=0.7.0"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+<script src="../js/conecte-signature.js?v=20260718"></script>
 </body>
 </html>

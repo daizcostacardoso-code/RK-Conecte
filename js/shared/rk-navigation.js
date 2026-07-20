@@ -2,6 +2,7 @@ const RKNavigation = {
     links: [
         { rotulo: "Dashboard", pagina: "dashboard-comercial.html" },
         { rotulo: "Clientes", pagina: "clientes.html" },
+        { rotulo: "Projetos", pagina: "projetos.html" },
         { rotulo: "Produtos", pagina: "produtos.html" },
         { rotulo: "Orcamento", pagina: "orcamento-inteligente.html" },
         { rotulo: "Medições", pagina: "medicao-obra.html" },

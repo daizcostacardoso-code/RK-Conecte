@@ -33,6 +33,7 @@ const ProjetoModel = {
         indicacao: "Indicacao",
         presencial: "Presencial",
         cliente_antigo: "Cliente antigo",
+        orcamento_aprovado: "Orcamento aprovado",
         manual: "Manual"
     },
 
@@ -152,6 +153,7 @@ const ProjetoModel = {
             numero: dados.numero || "",
             status: dados.status || "",
             total: this.numero(dados.total ?? dados.totalFinal),
+            revisao: Math.max(1, Number.parseInt(dados.revisao, 10) || 1),
             pdfUrl: dados.pdfUrl || ""
         };
     },
@@ -176,6 +178,10 @@ const ProjetoModel = {
             status: dados.status || "",
             previsaoProducao: dados.previsaoProducao || "",
             previsaoInstalacao: dados.previsaoInstalacao || "",
+            abertoEm: dados.abertoEm || "",
+            abertoPor: dados.abertoPor || null,
+            medicaoId: dados.medicaoId || "",
+            notaServicoId: dados.notaServicoId || "",
             observacoes: dados.observacoes || ""
         };
     },
@@ -456,3 +462,6 @@ const ProjetoModel = {
 function criarProjetoBase(dados = {}) {
     return ProjetoModel.criar(dados);
 }
+
+if (typeof window !== "undefined") window.ProjetoModel = ProjetoModel;
+if (typeof module !== "undefined" && module.exports) module.exports = { ProjetoModel, criarProjetoBase };

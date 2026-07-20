@@ -11,12 +11,15 @@ const ProjetoVisualController = {
         ProjetoVisualUI.configurar(this);
         ProjetoVisualUI.iniciar({
             aoFiltrarProjetos: filtros => this.agendarBusca(filtros),
+            aoSelecionarProjeto: id => this.selecionarProjeto(id),
             aoSalvarProjeto: dados => this.salvarProjeto(dados),
             aoEditarProjeto: id => this.editarProjeto(id),
             aoInativarProjeto: id => this.inativarProjeto(id)
         });
 
         await this.listarProjetos();
+        const projetoId = new URLSearchParams(window.location.search || "").get("projetoId");
+        if (projetoId) await this.selecionarProjeto(projetoId);
     },
 
     configurarProjetoService() {

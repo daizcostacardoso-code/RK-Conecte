@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.6.0`.
+- Versão: `v0.7.0`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -60,3 +60,14 @@ A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGU
 - Dashboard, arquivos e detalhes do cliente leem os mesmos registros comerciais.
 - Cancelamentos preservam o documento e acrescentam um evento ao histórico.
 - A coleção legada `orcamentos` permanece somente para leitura durante a compatibilização.
+
+## Abertura operacional consolidada na Sprint 2
+
+- Aprovar um orçamento abre ou reutiliza um projeto na coleção canônica `projetos`.
+- O identificador do projeto é estável para o orçamento e evita duplicidades em tentativas repetidas.
+- Orçamento e projeto mantêm vínculo bidirecional, usuário responsável e histórico auditável.
+- Aprovações antigas sem projeto podem ser reparadas pela tela de arquivos.
+- A tela de projetos permite acompanhar a operação e iniciar a medição vinculada.
+- Rascunhos de medição são locais e isolados por projeto.
+- O cancelamento comercial encerra o projeto relacionado sem excluir seus registros.
+- Projetos não podem ser excluídos definitivamente pelas regras do Firestore.

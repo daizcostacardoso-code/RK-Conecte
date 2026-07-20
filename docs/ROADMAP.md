@@ -40,16 +40,25 @@
 - sincronizar Dashboard, arquivos e histórico do cliente;
 - trocar exclusão definitiva por cancelamento auditável.
 
-### Próximos passos
-
-- conectar aprovação comercial à abertura da operação;
-- vincular os recebimentos do caixa ao orçamento aprovado;
-- remover módulos antigos que permanecerem sem uso após a migração.
-
 ## Sprint 2 — fluxo operacional
 
-- conectar solicitação, cliente, orçamento e aprovação;
-- integrar medição, nota de serviço e caixa;
+### Patch 6 — abertura operacional — concluído
+
+- abrir ou reutilizar um projeto quando o orçamento for aprovado;
+- manter vínculo bidirecional e impedir duplicidade por orçamento;
+- oferecer reparo para aprovações anteriores sem projeto;
+- levar cliente, obra e orçamento para a medição contextual;
+- preservar projetos e cancelamentos no histórico.
+
+### Próximos passos
+
+- vincular os recebimentos do caixa ao orçamento aprovado;
+- persistir medições concluídas e notas de serviço vinculadas ao projeto;
+- remover módulos antigos que permanecerem sem uso após a migração.
+
+### Continuação da Sprint 2
+
+- integrar medição, nota de serviço e caixa ao projeto operacional;
 - validar o fluxo completo no mobile e no desktop.
 
 ## Sprint 3 — lançamento
