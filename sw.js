@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.7.0';
+const RK_CACHE = 'rk-conecte-v0.8.0';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -26,10 +26,14 @@ const APP_SHELL = [
   '/js/projetos/projeto-operacional-service.js',
   '/js/storage/firestore-adapter.js',
   '/js/medicoes/medicao-model.js',
+  '/js/medicoes/medicao-operacional-model.js',
+  '/js/medicoes/medicao-operacional-repository.js',
   '/js/medicoes/medicao-ui.js',
   '/js/medicoes/medicao-controller.js',
   '/js/medicoes/medicao-pdf.js',
   '/js/notas-servico/nota-servico-model.js',
+  '/js/notas-servico/ordem-servico-operacional-model.js',
+  '/js/notas-servico/ordem-servico-operacional-repository.js',
   '/js/notas-servico/nota-servico-ui.js',
   '/js/notas-servico/nota-servico-controller.js',
   '/js/notas-servico/nota-servico-pdf.js',

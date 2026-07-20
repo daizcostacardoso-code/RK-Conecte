@@ -14,7 +14,7 @@
         "categorias-itens": { colecao: "categorias_item", id: "categoria_item_id", somenteLeitura: true },
         caixa: { colecao: "caixa_empresa", id: "caixa_id", excluir: "cancelar" },
         orcamentos: { colecao: "orcamentos_emitidos", id: "orcamento_id", excluir: "cancelar" },
-        notas: { colecao: "notas_servico", id: "nota_id", excluir: "remover" }
+        notas: { colecao: "notas_servico", id: "nota_id", excluir: "cancelar" }
     };
 
     function banco() {
@@ -278,14 +278,29 @@
                         origem: "RKFirestoreStore"
                     });
                 }
-                lote.set(doc.ref, {
-                    status: "cancelado",
-                    historicoStatus,
+                const historicoOperacional = Array.isArray(atual.historicoOperacional) ? [...atual.historicoOperacional] : [];
+                if (rota.recurso === "notas" && atual.status !== "cancelado") {
+                    historicoOperacional.push({
+                        tipo: "ordem_servico_cancelada",
+                        status: "cancelado",
+                        descricao: "Nota de serviço cancelada com histórico preservado.",
+                        data: agora,
+                        usuario: "RKFirestoreStore"
+                    });
+                }
+                const aprovacao = rota.recurso === "orcamentos" ? {
                     aprovacao: {
                         ...(atual.aprovacao || {}),
                         status: "cancelado",
                         canceladoEm: agora
-                    },
+                    }
+                } : {};
+                lote.set(doc.ref, {
+                    status: "cancelado",
+                    historicoStatus,
+                    historicoOperacional,
+                    ativo: false,
+                    ...aprovacao,
                     atualizado_em: agora,
                     atualizadoEmISO: agora
                 }, { merge: true });

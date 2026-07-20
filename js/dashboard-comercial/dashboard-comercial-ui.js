@@ -58,7 +58,7 @@ const DashboardComercialUI = {
     renderizarAtalhos() {
         const atalhos = [
             { rotulo: "Novo or&ccedil;amento", descricao: "Montar proposta", icone: "file", href: "orcamento-inteligente.html", destaque: true },
-            { rotulo: "Nova nota", descricao: "Emitir nota de servi&ccedil;o", icone: "note", href: "nota-servico.html" },
+            { rotulo: "Ordens de servi&ccedil;o", descricao: "Produ&ccedil;&atilde;o e instala&ccedil;&atilde;o", icone: "note", href: "nota-servico.html" },
             { rotulo: "Medir obra", descricao: "Registrar medidas", icone: "measure", href: "medicao-obra.html" },
             { rotulo: "Clientes", descricao: "Consultar cadastro", icone: "users", href: "clientes.html" },
             { rotulo: "Caixa", descricao: "Ver movimenta&ccedil;&otilde;es", icone: "wallet", href: "caixa.html" }
@@ -234,7 +234,7 @@ const DashboardComercialUI = {
     formatarDataCurta(valor) { if (!valor) return "agora"; const data = new Date(valor); return Number.isNaN(data.getTime()) ? String(valor) : data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); },
     formatarDataSimples(valor) { if (!valor) return "-"; const data = new Date(`${String(valor).slice(0, 10)}T12:00:00`); return Number.isNaN(data.getTime()) ? String(valor) : data.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }); },
     formatarMes(referencia) { if (!referencia) return "M&ecirc;s atual"; const [ano, mes] = String(referencia).split("-"); const data = new Date(Number(ano), Number(mes) - 1, 1); return data.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }); },
-    rotuloStatus(status = "") { const chave = this.slug(status); const rotulos = { vazio: "Sem status", em_orcamento: "Em orçamento", em_producao: "Em produção", em_instalacao: "Em instalação", finalizado: "Finalizado", concluido: "Concluído", aprovado: "Aprovado", enviado: "Enviado", rascunho: "Rascunho", pendente: "Pendente", pronto: "Pronto", proximo: "Próximo", ok: "Em dia" }; return rotulos[chave] || String(status || "Sem status").replace(/_/g, " "); },
+    rotuloStatus(status = "") { const chave = this.slug(status); const rotulos = { vazio: "Sem status", em_orcamento: "Em orçamento", medicao: "Aguardando medição", medicao_concluida: "Medição concluída", em_producao: "Em produção", em_instalacao: "Em instalação", finalizado: "Finalizado", concluido: "Concluído", aprovado: "Aprovado", enviado: "Enviado", rascunho: "Rascunho", pendente: "Pendente", pronto: "Pronto", proximo: "Próximo", ok: "Em dia" }; return rotulos[chave] || String(status || "Sem status").replace(/_/g, " "); },
     slug(valor) { const slug = String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); return slug || "vazio"; },
     escapar(valor) { return String(valor === undefined || valor === null ? "" : valor).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); },
     escaparAtributo(valor) { return this.escapar(valor).replace(/`/g, "&#096;"); }

@@ -33,7 +33,7 @@ const DashboardComercialController = {
             resumoCaixa,
             orcamentos: this.ordenarPorData(orcamentos).slice(0, 8),
             atividades: this.montarAtividades(orcamentos),
-            acoes: this.montarAcoes(orcamentos)
+            acoes: this.montarAcoes(orcamentos, projetos)
         };
         return this.estado;
     },
@@ -180,7 +180,7 @@ const DashboardComercialController = {
         return this.ordenarPorData(atividades, "data").slice(0, 8);
     },
 
-    montarAcoes(orcamentos = []) {
+    montarAcoes(orcamentos = [], projetos = []) {
         const enviados = orcamentos.filter(item => item.status === "enviado").length;
         const emitidos = orcamentos.filter(item => item.status === "emitido").length;
         const recusados = orcamentos.filter(item => item.status === "recusado").length;
@@ -188,7 +188,16 @@ const DashboardComercialController = {
         if (enviados) acoes.push({ titulo: `${enviados} orçamento(s) aguardando decisão`, status: "enviado" });
         if (emitidos) acoes.push({ titulo: `${emitidos} orçamento(s) prontos para envio`, status: "emitido" });
         if (recusados) acoes.push({ titulo: `${recusados} orçamento(s) recusados para revisão`, status: "recusado" });
-        return acoes.length ? acoes : [{ titulo: "Sem pendências comerciais", status: "ok" }];
+        const operacionais = projetos.filter(item => !item.padrao && !item.generico && item.ativo !== false);
+        const aguardandoMedicao = operacionais.filter(item => item.status === "aprovado" && !item.operacional?.medicaoId).length;
+        const medicaoEmAndamento = operacionais.filter(item => ["medicao_em_andamento", "medicao_concluida", "ordem_em_preparacao"].includes(item.operacional?.status)).length;
+        const emProducao = operacionais.filter(item => item.status === "em_producao").length;
+        const emInstalacao = operacionais.filter(item => item.status === "em_instalacao").length;
+        if (aguardandoMedicao) acoes.push({ titulo: `${aguardandoMedicao} obra(s) aguardando medição`, status: "medicao" });
+        if (medicaoEmAndamento) acoes.push({ titulo: `${medicaoEmAndamento} medição(ões) aguardando ordem de serviço`, status: "medicao_concluida" });
+        if (emProducao) acoes.push({ titulo: `${emProducao} obra(s) em produção`, status: "em_producao" });
+        if (emInstalacao) acoes.push({ titulo: `${emInstalacao} obra(s) em instalação`, status: "em_instalacao" });
+        return acoes.length ? acoes : [{ titulo: "Sem pendências comerciais ou operacionais", status: "ok" }];
     },
 
     montarResumoObras(projetos = []) {

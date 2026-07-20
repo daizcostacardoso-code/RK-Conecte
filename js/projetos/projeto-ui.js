@@ -188,6 +188,7 @@ const ProjetoVisualUI = {
                 <td>
                     <div class="cadastro-tabela-acoes">
                         <a class="btn-pequeno botao" href="medicao-obra.html?projetoId=${encodeURIComponent(projeto.id)}&orcamentoId=${encodeURIComponent(projeto.orcamento?.id || "")}">Medição</a>
+                        ${projeto.operacional?.medicaoId && projeto.operacional?.medicaoStatus === "concluida" ? `<a class="btn-pequeno botao-claro" href="nota-servico.html?projetoId=${encodeURIComponent(projeto.id)}&medicaoId=${encodeURIComponent(projeto.operacional.medicaoId)}">Ordem de serviço</a>` : ""}
                         <button type="button" class="btn-pequeno botao-claro" data-projeto-acao="detalhes" data-projeto-id="${this.escaparAtributo(projeto.id)}">Detalhes</button>
                         <button type="button" class="btn-pequeno botao-claro" data-projeto-acao="editar" data-projeto-id="${this.escaparAtributo(projeto.id)}">Editar</button>
                         <button type="button" class="btn-pequeno botao-claro" data-projeto-acao="inativar" data-projeto-id="${this.escaparAtributo(projeto.id)}">Inativar</button>
@@ -226,6 +227,8 @@ const ProjetoVisualUI = {
                     ${this.renderizarCampo("Cliente", projeto.cliente?.nome || projeto.clienteNome || "Não informado")}
                     ${this.renderizarCampo("Orçamento", projeto.orcamento?.numero || "Não vinculado")}
                     ${this.renderizarCampo("Status operacional", String(projeto.operacional?.status || "Não informado").replace(/_/g, " "))}
+                    ${this.renderizarCampo("Medição", projeto.operacional?.medicaoId || "Não iniciada")}
+                    ${this.renderizarCampo("Ordem de serviço", projeto.operacional?.notaServicoId || "Não emitida")}
                     ${this.renderizarCampo("Valor aprovado", this.formatarMoeda(projeto.financeiro?.valorTotal || projeto.orcamento?.total))}
                 </div>
                 <section class="cadastro-detalhe-bloco">
@@ -234,6 +237,7 @@ const ProjetoVisualUI = {
                 </section>
                 <div class="cadastro-form-acoes">
                     <a class="botao" href="medicao-obra.html?projetoId=${encodeURIComponent(projeto.id)}&orcamentoId=${encodeURIComponent(projeto.orcamento?.id || "")}">Abrir medição</a>
+                    ${projeto.operacional?.medicaoId && projeto.operacional?.medicaoStatus === "concluida" ? `<a class="botao botao-claro" href="nota-servico.html?projetoId=${encodeURIComponent(projeto.id)}&medicaoId=${encodeURIComponent(projeto.operacional.medicaoId)}">Abrir ordem de serviço</a>` : ""}
                     ${projeto.orcamento?.id ? `<a class="botao botao-claro" href="arquivos.html?numero=${encodeURIComponent(projeto.orcamento.numero || projeto.orcamento.id)}">Ver orçamento</a>` : ""}
                 </div>
             `;

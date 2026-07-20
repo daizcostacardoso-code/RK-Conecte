@@ -110,7 +110,9 @@ async function executar() {
     assert.equal(resposta.ok, true);
     resposta = await RKFirestoreStore.fetch("/notas");
     notas = (await resposta.json()).dados;
-    assert.equal(notas.length, 0);
+    assert.equal(notas.length, 1);
+    assert.equal(notas[0].status, "cancelado");
+    assert.equal(notas[0].historicoOperacional.at(-1).tipo, "ordem_servico_cancelada");
 
     console.log("Firestore CRUD: OK");
 }

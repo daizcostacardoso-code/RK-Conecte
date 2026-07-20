@@ -1,6 +1,7 @@
 const MedicaoController = {
     estado: null,
     projeto: null,
+    medicaoRemota: null,
     editandoId: null,
 
     async iniciar() {
@@ -13,6 +14,7 @@ const MedicaoController = {
         await this.carregarProjetoContexto();
         MedicaoUI.preencherGerais(this.estado);
         MedicaoUI.renderizarMedidas(this.estado.medidas);
+        this.atualizarAcoesOperacionais();
         this.registrarEventos();
     },
 
@@ -31,12 +33,29 @@ const MedicaoController = {
             }
             this.projeto = { id: snapshot.id, ...snapshot.data() };
             this.aplicarProjeto(this.projeto);
+            await this.carregarMedicaoRemota();
             MedicaoModel.salvar(this.estado);
             this.renderizarContexto();
         } catch (erro) {
             console.error(erro);
             MedicaoUI.mensagem("Não foi possível carregar o projeto operacional.");
         }
+    },
+
+    async carregarMedicaoRemota() {
+        if (!this.projeto || typeof MedicaoOperacionalRepository === "undefined") return null;
+        const resultado = await MedicaoOperacionalRepository.buscarPorProjeto(this.projeto.id);
+        if (!resultado.sucesso || !resultado.medicao) return null;
+        this.medicaoRemota = resultado.medicao;
+        if (!Array.isArray(this.estado.medidas) || !this.estado.medidas.length) {
+            this.estado = {
+                ...this.estado,
+                ...resultado.medicao,
+                projetoId: this.projeto.id,
+                orcamentoId: resultado.medicao.orcamentoId || this.estado.orcamentoId || ""
+            };
+        }
+        return this.medicaoRemota;
     },
 
     aplicarProjeto(projeto = {}) {
@@ -62,7 +81,8 @@ const MedicaoController = {
         }
         const numeroProjeto = this.projeto.numero || this.projeto.id;
         const numeroOrcamento = this.projeto.orcamento?.numero || this.estado.orcamentoId || "não informado";
-        elemento.textContent = `Projeto ${numeroProjeto} · Orçamento ${numeroOrcamento} · rascunho salvo somente neste dispositivo.`;
+        const status = this.medicaoRemota?.status === "concluida" ? "medição concluída" : (this.medicaoRemota ? "medição salva no Firestore" : "rascunho local");
+        elemento.textContent = `Projeto ${numeroProjeto} · Orçamento ${numeroOrcamento} · ${status}.`;
         elemento.hidden = false;
     },
 
@@ -72,7 +92,80 @@ const MedicaoController = {
         MedicaoUI.elemento("medidasCorpo").addEventListener("click", e => { const b = e.target.closest("button[data-acao]"); if (b) this.acaoMedida(b.dataset.acao, b.dataset.id); });
         MedicaoUI.ids.forEach(id => MedicaoUI.elemento(id).addEventListener("input", () => this.salvarGerais()));
         MedicaoUI.elemento("btnGerarPdf").addEventListener("click", () => this.gerarPdf());
+        MedicaoUI.elemento("btnSalvarFirestore")?.addEventListener("click", () => this.salvarNoFirestore(false));
+        MedicaoUI.elemento("btnConcluirMedicao")?.addEventListener("click", () => this.salvarNoFirestore(true));
         MedicaoUI.elemento("btnLimparTudo").addEventListener("click", () => this.limparTudo());
+    },
+
+    async salvarNoFirestore(concluir = false) {
+        this.salvarGerais();
+        if (!this.projeto) {
+            MedicaoUI.mensagem("Abra a medição a partir de um projeto operacional.");
+            return null;
+        }
+        if (typeof MedicaoOperacionalRepository === "undefined") {
+            MedicaoUI.mensagem("Repositório de medições indisponível.");
+            return null;
+        }
+        if (concluir && !window.confirm("Concluir esta medição e liberar a ordem de serviço?")) return null;
+        const botao = MedicaoUI.elemento(concluir ? "btnConcluirMedicao" : "btnSalvarFirestore");
+        if (botao) {
+            botao.disabled = true;
+            botao.textContent = concluir ? "Concluindo..." : "Salvando...";
+        }
+        try {
+            const resultado = await MedicaoOperacionalRepository.salvar(this.projeto.id, this.estado, {
+                concluir,
+                usuario: this.usuarioAtual()
+            });
+            if (!resultado.sucesso) {
+                MedicaoUI.mensagem((resultado.erros || ["Não foi possível salvar a medição."]).join(" "));
+                return resultado;
+            }
+            this.medicaoRemota = resultado.medicao;
+            this.projeto = resultado.projeto || this.projeto;
+            this.estado = { ...this.estado, ...resultado.medicao, medidas: resultado.medicao.medidas };
+            MedicaoModel.salvar(this.estado);
+            MedicaoUI.preencherGerais(this.estado);
+            MedicaoUI.renderizarMedidas(this.estado.medidas);
+            this.renderizarContexto();
+            this.atualizarAcoesOperacionais();
+            MedicaoUI.mensagem(
+                concluir ? "Medição concluída. A ordem de serviço já pode ser preparada." : "Medição salva no Firestore.",
+                "sucesso"
+            );
+            return resultado;
+        } catch (erro) {
+            console.error(erro);
+            MedicaoUI.mensagem("Não foi possível salvar a medição no Firestore.");
+            return null;
+        } finally {
+            if (botao) {
+                botao.disabled = false;
+                botao.textContent = concluir ? "Concluir medição" : "Salvar no Firestore";
+            }
+        }
+    },
+
+    atualizarAcoesOperacionais() {
+        const salvar = MedicaoUI.elemento("btnSalvarFirestore");
+        const concluir = MedicaoUI.elemento("btnConcluirMedicao");
+        const ordem = MedicaoUI.elemento("btnAbrirOrdemServico");
+        const possuiProjeto = !!this.projeto;
+        const concluida = this.medicaoRemota?.status === "concluida";
+        if (salvar) salvar.hidden = !possuiProjeto;
+        if (concluir) concluir.hidden = !possuiProjeto || concluida;
+        if (ordem) {
+            ordem.hidden = !possuiProjeto || !concluida;
+            if (possuiProjeto && concluida) {
+                ordem.href = `nota-servico.html?projetoId=${encodeURIComponent(this.projeto.id)}&medicaoId=${encodeURIComponent(this.medicaoRemota.id)}`;
+            }
+        }
+    },
+
+    usuarioAtual() {
+        const sessao = typeof RKAuth !== "undefined" && typeof RKAuth.obterSessao === "function" ? RKAuth.obterSessao() : null;
+        return sessao ? { uid: sessao.uid || "", nome: sessao.nomeUsuario || sessao.nome || sessao.email || "", email: sessao.email || "" } : null;
     },
 
     salvarGerais() {
@@ -147,7 +240,7 @@ const MedicaoController = {
         MedicaoUI.limparMedida();
         MedicaoUI.modoEdicao(false);
         MedicaoUI.renderizarMedidas([]);
-        MedicaoUI.mensagem("Medição limpa. Os dados do projeto foram preservados.", "sucesso");
+        MedicaoUI.mensagem("Rascunho local limpo. A medição já salva no Firestore foi preservada.", "sucesso");
     }
 };
 

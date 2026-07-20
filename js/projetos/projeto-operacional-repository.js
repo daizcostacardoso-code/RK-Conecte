@@ -1,6 +1,7 @@
 const ProjetoOperacionalRepository = {
     colecaoOrcamentos: "orcamentos_emitidos",
     colecaoProjetos: "projetos",
+    colecaoOrdens: "notas_servico",
 
     firestoreDisponivel() {
         return typeof db !== "undefined" && !!db && typeof db.runTransaction === "function";
@@ -71,20 +72,43 @@ const ProjetoOperacionalRepository = {
                 const referenciaProjeto = db.collection(this.colecaoProjetos).doc(projetoId);
                 const snapshotProjeto = await transacao.get(referenciaProjeto);
                 if (!snapshotProjeto.exists) return { sucesso: true, erros: [], projeto: null, orcamento, idempotente: true };
+                const projetoAtual = { ...snapshotProjeto.data(), id: snapshotProjeto.id };
+                const ordemId = String(projetoAtual.operacional?.notaServicoId || "").trim();
+                const referenciaOrdem = ordemId ? db.collection(this.colecaoOrdens).doc(ordemId) : null;
+                const snapshotOrdem = referenciaOrdem ? await transacao.get(referenciaOrdem) : null;
 
                 const resultado = ProjetoOperacionalModel.cancelarProjeto(
                     orcamento,
-                    { ...snapshotProjeto.data(), id: snapshotProjeto.id },
+                    projetoAtual,
                     opcoes.usuario,
                     opcoes.observacao
                 );
+                let ordem = snapshotOrdem?.exists ? { ...snapshotOrdem.data(), id: snapshotOrdem.id } : null;
+                let ordemAlterada = false;
+                if (ordem && !["cancelado", "concluido"].includes(String(ordem.status || "").toLowerCase())) {
+                    const agora = new Date().toISOString();
+                    const historicoOperacional = Array.isArray(ordem.historicoOperacional) ? [...ordem.historicoOperacional] : [];
+                    if (!historicoOperacional.some(item => item.tipo === "ordem_servico_cancelada")) {
+                        historicoOperacional.push({
+                            tipo: "ordem_servico_cancelada",
+                            status: "cancelado",
+                            descricao: "Ordem de serviço cancelada após o cancelamento do orçamento.",
+                            data: agora,
+                            usuario: opcoes.usuario?.nome || opcoes.usuario?.email || "Sistema"
+                        });
+                    }
+                    ordem = { ...ordem, status: "cancelado", ativo: false, historicoOperacional, atualizadoEmISO: agora, atualizadoEm: agora };
+                    ordemAlterada = true;
+                }
                 if (resultado.alterado) transacao.set(referenciaProjeto, resultado.projeto, { merge: true });
+                if (ordemAlterada) transacao.set(referenciaOrdem, ordem, { merge: true });
                 return {
                     sucesso: true,
                     erros: [],
                     projeto: resultado.projeto,
+                    ordem,
                     orcamento,
-                    idempotente: !resultado.alterado
+                    idempotente: !resultado.alterado && !ordemAlterada
                 };
             });
         } catch (erro) {

@@ -77,6 +77,19 @@ test("repositório abre projeto e vincula orçamento na mesma transação", asyn
     assert.equal(repetido.orcamento.historicoStatus.filter(item => item.acao === "operacao_aberta").length, 1);
 
     const salvo = firestore.mapa("orcamentos_emitidos").get("orcamento-91");
+    const projetoComOrdem = firestore.mapa("projetos").get("prj_orc_orcamento-91");
+    firestore.mapa("projetos").set("prj_orc_orcamento-91", {
+        ...projetoComOrdem,
+        operacional: { ...projetoComOrdem.operacional, notaServicoId: "os_prj_orc_orcamento-91" }
+    });
+    firestore.mapa("notas_servico").set("os_prj_orc_orcamento-91", {
+        id: "os_prj_orc_orcamento-91",
+        projetoId: "prj_orc_orcamento-91",
+        medicaoId: "med_prj_orc_orcamento-91",
+        origem: "projeto_operacional",
+        status: "em_producao",
+        historicoOperacional: []
+    });
     firestore.mapa("orcamentos_emitidos").set("orcamento-91", {
         ...salvo,
         status: "cancelado",
@@ -91,12 +104,15 @@ test("repositório abre projeto e vincula orçamento na mesma transação", asyn
     assert.equal(cancelado.projeto.status, "cancelado");
     assert.equal(cancelado.projeto.ativo, false);
     assert.equal(cancelado.projeto.historico.filter(item => item.tipo === "operacao_cancelada").length, 1);
+    assert.equal(firestore.mapa("notas_servico").get("os_prj_orc_orcamento-91").status, "cancelado");
+    assert.equal(firestore.mapa("notas_servico").get("os_prj_orc_orcamento-91").historicoOperacional.filter(item => item.tipo === "ordem_servico_cancelada").length, 1);
 
     const canceladoNovamente = await ProjetoOperacionalRepository.cancelarDeOrcamento("orcamento-91", {
         usuario: { uid: "admin-1", nome: "Admin RK" }
     });
     assert.equal(canceladoNovamente.idempotente, true);
     assert.equal(canceladoNovamente.projeto.historico.filter(item => item.tipo === "operacao_cancelada").length, 1);
+    assert.equal(firestore.mapa("notas_servico").get("os_prj_orc_orcamento-91").historicoOperacional.filter(item => item.tipo === "ordem_servico_cancelada").length, 1);
 });
 
 test("repositório bloqueia abertura antes da aprovação", async () => {

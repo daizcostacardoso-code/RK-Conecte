@@ -1,5 +1,19 @@
 # Histórico de alterações
 
+## v0.8.0 — execução operacional canônica
+
+- Persistida uma medição determinística por projeto na coleção `medicoes`.
+- Mantidos rascunhos locais com salvamento, revisão e conclusão explícitos no Firestore.
+- Liberada a ordem de serviço somente para medições concluídas.
+- Reutilizada uma única ordem por projeto para impedir duplicidades.
+- Conectadas as etapas de produção, instalação e conclusão ao status do projeto.
+- Adicionados atalhos entre projeto, medição e ordem de serviço.
+- Incluídas pendências operacionais no dashboard comercial.
+- Substituída a exclusão de notas por cancelamento com histórico preservado.
+- Propagado o cancelamento comercial para ordens operacionais ativas.
+- Reforçadas as regras para preservar os vínculos de medições e ordens.
+- Adicionados testes de modelo, repositório, integração, compatibilidade e regras.
+
 ## v0.7.0 — abertura do fluxo operacional
 
 - Conectada a aprovação comercial à abertura automática de um projeto operacional.

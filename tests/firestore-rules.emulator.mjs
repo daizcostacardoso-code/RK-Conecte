@@ -146,8 +146,7 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
         "tamanhos_padrao/tamanho-1",
         "unidades_medida/unidade-1",
         "categorias_produto/categoria-1",
-        "categorias_item/categoria-1",
-        "notas_servico/nota-1"
+        "categorias_item/categoria-1"
     ];
 
     for (const caminho of caminhos) {
@@ -157,6 +156,15 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
         await assertSucceeds(updateDoc(referencia, { atualizado: true }));
         await assertSucceeds(deleteDoc(referencia));
     }
+});
+
+test("notas de serviço legadas continuam editáveis sem exclusão definitiva", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    const nota = doc(equipe, "notas_servico", "nota-legada");
+    await assertSucceeds(setDoc(nota, { numeroNota: "NS-LEGADA", status: "rascunho" }));
+    await assertSucceeds(updateDoc(nota, { status: "cancelado" }));
+    await assertFails(deleteDoc(nota));
 });
 
 test("projeto operacional exige orçamento aprovado e preserva histórico", async () => {
@@ -190,6 +198,72 @@ test("projeto operacional não abre para orçamento sem aprovação", async () =
         status: "aprovado",
         orcamento: { id: "orcamento-2", numero: "000002" }
     }));
+});
+
+test("medição canônica exige projeto ativo e preserva o vínculo", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    const orcamento = doc(equipe, "orcamentos_emitidos", "orcamento-medicao");
+    const projeto = doc(equipe, "projetos", "projeto-medicao");
+    const medicao = doc(equipe, "medicoes", "med_projeto-medicao");
+
+    await assertSucceeds(setDoc(orcamento, { numero: "000010", status: "aprovado" }));
+    await assertSucceeds(setDoc(projeto, {
+        origem: "orcamento_aprovado",
+        status: "aprovado",
+        orcamento: { id: "orcamento-medicao" },
+        historico: [{ tipo: "operacao_aberta" }]
+    }));
+    await assertSucceeds(setDoc(medicao, {
+        projetoId: "projeto-medicao",
+        status: "rascunho",
+        medidas: [{ quantidade: 1, altura: 100, largura: 80 }]
+    }));
+    await assertSucceeds(updateDoc(medicao, { status: "concluida" }));
+    await assertFails(updateDoc(medicao, { projetoId: "outro-projeto" }));
+    await assertFails(deleteDoc(medicao));
+
+    await assertSucceeds(updateDoc(projeto, { status: "cancelado" }));
+    await assertFails(updateDoc(medicao, { observacoesGerais: "Alteração posterior ao cancelamento." }));
+
+    await assertFails(setDoc(doc(equipe, "medicoes", "med-sem-projeto"), {
+        projetoId: "sem-projeto",
+        status: "rascunho",
+        medidas: [{ quantidade: 1, altura: 10, largura: 10 }]
+    }));
+});
+
+test("ordem operacional exige medição concluída e mantém os vínculos", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    await assertSucceeds(setDoc(doc(equipe, "orcamentos_emitidos", "orcamento-os"), { numero: "000011", status: "aprovado" }));
+    await assertSucceeds(setDoc(doc(equipe, "projetos", "projeto-os"), {
+        origem: "orcamento_aprovado",
+        status: "aprovado",
+        orcamento: { id: "orcamento-os" },
+        historico: [{ tipo: "operacao_aberta" }]
+    }));
+    const medicao = doc(equipe, "medicoes", "med_projeto-os");
+    await assertSucceeds(setDoc(medicao, {
+        projetoId: "projeto-os",
+        status: "rascunho",
+        medidas: [{ quantidade: 1, altura: 100, largura: 80 }]
+    }));
+    const ordem = doc(equipe, "notas_servico", "os_projeto-os");
+    const dadosOrdem = {
+        origem: "projeto_operacional",
+        projetoId: "projeto-os",
+        medicaoId: "med_projeto-os",
+        status: "em_producao"
+    };
+    await assertFails(setDoc(ordem, dadosOrdem));
+    await assertSucceeds(updateDoc(medicao, { status: "concluida" }));
+    await assertSucceeds(setDoc(ordem, dadosOrdem));
+    await assertFails(updateDoc(ordem, { status: "rascunho" }));
+    await assertSucceeds(updateDoc(ordem, { status: "em_instalacao" }));
+    await assertSucceeds(updateDoc(ordem, { status: "concluido" }));
+    await assertFails(updateDoc(ordem, { projetoId: "outro-projeto" }));
+    await assertFails(deleteDoc(ordem));
 });
 
 test("orçamento canônico pode ser atualizado sem exclusão definitiva", async () => {
