@@ -122,12 +122,12 @@ const AcessoController = {
         corpo.innerHTML = itens.map(item => {
             const proprio = item.uid === uidAtual;
             return `<tr>
-                <td><strong>${this.escapar(item.nome)}</strong><small>${this.escapar(item.email)}</small></td>
-                <td><select data-acesso-perfil="${this.escapar(item.uid)}" ${proprio ? "disabled" : ""}><option value="funcionario" ${item.perfil === "funcionario" ? "selected" : ""}>Funcionário</option><option value="admin" ${item.perfil === "admin" ? "selected" : ""}>Administrador</option></select></td>
-                <td><span class="acesso-status ${item.ativo ? "ativo" : "inativo"}">${item.ativo ? "Ativo" : "Desativado"}</span></td>
-                <td>${this.escapar(this.dataHora(item.ultimoAcessoEm))}</td>
-                <td>${this.escapar(this.dataHora(item.atualizadoEmISO || item.criadoEmISO))}</td>
-                <td><div class="acesso-acoes"><button type="button" data-acesso-acao="recuperar" data-acesso-uid="${this.escapar(item.uid)}">Recuperar senha</button><button type="button" class="${item.ativo ? "perigo" : ""}" data-acesso-acao="alternar" data-acesso-uid="${this.escapar(item.uid)}" ${proprio ? "disabled" : ""}>${item.ativo ? "Desativar" : "Ativar"}</button></div></td>
+                <td data-label="Usuário"><strong>${this.escapar(item.nome)}</strong><small>${this.escapar(item.email)}</small></td>
+                <td data-label="Perfil"><select data-acesso-perfil="${this.escapar(item.uid)}" ${proprio ? "disabled" : ""}><option value="funcionario" ${item.perfil === "funcionario" ? "selected" : ""}>Funcionário</option><option value="admin" ${item.perfil === "admin" ? "selected" : ""}>Administrador</option></select></td>
+                <td data-label="Situação"><span class="acesso-status ${item.ativo ? "ativo" : "inativo"}">${item.ativo ? "Ativo" : "Desativado"}</span></td>
+                <td data-label="Último acesso">${this.escapar(this.dataHora(item.ultimoAcessoEm))}</td>
+                <td data-label="Atualizado">${this.escapar(this.dataHora(item.atualizadoEmISO || item.criadoEmISO))}</td>
+                <td data-label="Ações"><div class="acesso-acoes"><button type="button" data-acesso-acao="recuperar" data-acesso-uid="${this.escapar(item.uid)}">Recuperar senha</button><button type="button" class="${item.ativo ? "perigo" : ""}" data-acesso-acao="alternar" data-acesso-uid="${this.escapar(item.uid)}" ${proprio ? "disabled" : ""}>${item.ativo ? "Desativar" : "Ativar"}</button></div></td>
             </tr>`;
         }).join("");
     },

@@ -94,7 +94,7 @@ const RKNavigation = {
         }
 
         lista.innerHTML = [
-            ...this.links.map(link => this.renderizarLink(link)),
+            ...this.obterLinksVisiveis().map(link => this.renderizarLink(link)),
             this.renderizarSair()
         ].join("");
         lista.classList.add("rk-nav-principal");
@@ -103,6 +103,15 @@ const RKNavigation = {
         this.protegerLinksInternos(lista);
 
         return true;
+    },
+
+    obterLinksVisiveis() {
+        const links = [...this.links];
+        const sessao = window.RKAuth?.obterSessao?.();
+        if (sessao?.perfil === "admin") {
+            links.push({ rotulo: "Acessos", pagina: "acessos.html" });
+        }
+        return links;
     },
 
     removerAtalhosSistema() {

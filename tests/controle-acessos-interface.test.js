@@ -17,17 +17,27 @@ test("tela administrativa controla criação, perfil, situação e recuperação
     assert.match(repositorio, /appSecundario/);
 });
 
-test("dashboard principal exibe o controle de acessos somente para administrador", () => {
+test("controle de acessos aparece somente no cabeçalho do administrador", () => {
     const interfaceDashboard = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-ui.js"), "utf8");
     const controller = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-controller.js"), "utf8");
     const estilos = readFileSync(resolve(raiz, "css/dashboard-comercial.css"), "utf8");
-    assert.match(interfaceDashboard, /renderizarAtalhos\(estado\.sessao/);
-    assert.match(interfaceDashboard, /sessao\?\.perfil === "admin"/);
-    assert.match(interfaceDashboard, /href: "acessos\.html"/);
-    assert.match(interfaceDashboard, /Controle de acessos/);
+    const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
+    assert.doesNotMatch(interfaceDashboard, /acessos\.html|Controle de acessos/);
+    assert.match(navegacao, /sessao\?\.perfil === "admin"/);
+    assert.match(navegacao, /rotulo: "Acessos", pagina: "acessos\.html"/);
     assert.match(controller, /this\.sessao = await this\.aguardarSessao\(\)/);
-    assert.match(estilos, /shortcuts\.has-admin-access[\s\S]*repeat\(3/);
+    assert.match(estilos, /dashboard-comercial-shortcuts[\s\S]*repeat\(5/);
     assert.doesNotMatch(estilos, /grid-template-columns:\s*repeat\(auto-fit/);
+});
+
+test("controle de acessos transforma a tabela em cartões no celular", () => {
+    const estilos = readFileSync(resolve(raiz, "css/acessos.css"), "utf8");
+    const controller = readFileSync(resolve(raiz, "js/acessos/acesso-controller.js"), "utf8");
+    assert.match(estilos, /@media\s*\(max-width:\s*720px\)/);
+    assert.match(estilos, /\.acesso-tabela thead\s*\{\s*display:\s*none/);
+    assert.match(estilos, /content:\s*attr\(data-label\)/);
+    assert.match(controller, /data-label="Usuário"/);
+    assert.match(controller, /data-label="Ações"/);
 });
 
 test("dashboard usa metatag atual e configuração sem persistência obsoleta", () => {
