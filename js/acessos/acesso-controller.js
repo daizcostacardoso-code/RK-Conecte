@@ -20,16 +20,21 @@ const AcessoController = {
     },
 
     async carregar() {
+        const token = window.RKLoading?.start("Carregando os acessos da equipe...");
         this.mostrarAviso("Carregando acessos...");
-        const resultado = await AcessoRepository.listar();
-        if (!resultado.sucesso) {
-            this.bloquear((resultado.erros || ["Não foi possível abrir esta área."]).join(" "));
-            return;
+        try {
+            const resultado = await AcessoRepository.listar();
+            if (!resultado.sucesso) {
+                this.bloquear((resultado.erros || ["Não foi possível abrir esta área."]).join(" "));
+                return;
+            }
+            this.perfis = resultado.perfis;
+            this.administrador = resultado.administrador;
+            this.mostrarAviso("");
+            this.renderizar();
+        } finally {
+            if (token) window.RKLoading?.finish(token);
         }
-        this.perfis = resultado.perfis;
-        this.administrador = resultado.administrador;
-        this.mostrarAviso("");
-        this.renderizar();
     },
 
     async criar(evento) {

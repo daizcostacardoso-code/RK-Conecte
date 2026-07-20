@@ -5,7 +5,12 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.9.0`
+`v0.9.1`
+
+A navegação usa uma tela de carregamento padronizada antes da primeira pintura
+da interface. Ela informa conexão, horário e progresso, permanece disponível no
+cache offline do aplicativo e pode acompanhar consultas longas por meio da API
+`RKLoading`.
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.

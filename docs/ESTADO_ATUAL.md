@@ -2,11 +2,12 @@
 
 ## Base técnica
 
-- Versão: `v0.9.0`.
+- Versão: `v0.9.1`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
 - Aplicativo instalável: PWA com service worker.
+- Tela de carregamento crítica disponível antes dos estilos e no cache offline.
 
 ## Funcionalidades existentes
 

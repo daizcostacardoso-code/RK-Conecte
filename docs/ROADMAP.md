@@ -67,6 +67,14 @@
 - exigir perfil ativo antes de liberar as telas internas;
 - ocultar da interface as referências à infraestrutura técnica.
 
+### Patch 9 — carregamento padrão e offline — concluído
+
+- cobrir a interface antes do carregamento dos estilos;
+- exibir progresso, conexão, horário e dicas operacionais;
+- manter a estrutura visual disponível no aparelho;
+- acompanhar consultas explícitas do dashboard e dos acessos;
+- servir páginas armazenadas rapidamente durante conexões lentas.
+
 ### Próximos passos
 
 - validar o fluxo completo no mobile e no desktop;

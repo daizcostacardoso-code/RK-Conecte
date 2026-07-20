@@ -1,5 +1,15 @@
 # Histórico de alterações
 
+## v0.9.1 — carregamento padrão e experiência offline
+
+- Adicionada tela crítica de carregamento antes da renderização das páginas.
+- Incluídos progresso, situação da conexão, horário e dicas do fluxo operacional.
+- Posicionadas as marcas RK Vidraçaria e Conecte na apresentação inicial.
+- Persistidas preferências e mensagens da tela no armazenamento do aparelho.
+- Incluídos a tela, as páginas e seus recursos essenciais no cache offline.
+- Mantido o carregamento visível enquanto Dashboard e Acessos consultam dados.
+- Atualizada a estratégia do Service Worker para responder rapidamente em conexões lentas.
+
 ## v0.9.0 — financeiro operacional e controle de acessos
 
 - Exposto o controle de acessos no menu superior das telas internas para administradores.

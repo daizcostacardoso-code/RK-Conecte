@@ -1,13 +1,25 @@
-const RK_CACHE = 'rk-conecte-v0.9.0';
+const RK_CACHE = 'rk-conecte-v0.9.1-loading-v1';
 const APP_SHELL = [
   '/',
   '/index.html',
+  '/404.html',
+  '/paginas/login.html',
+  '/paginas/loading.html',
+  '/paginas/dashboard-comercial.html',
+  '/paginas/clientes.html',
+  '/paginas/funcionario.html',
+  '/paginas/orcamento-inteligente.html',
+  '/paginas/novo-orcamento.html',
+  '/paginas/orcamento.html',
+  '/paginas/projetos.html',
+  '/paginas/produtos.html',
+  '/paginas/valores.html',
+  '/paginas/arquivos.html',
+  '/paginas/compartilhar-documento.html',
   '/paginas/servicos-publico.html',
   '/paginas/produtos-publico.html',
   '/paginas/galeria.html',
   '/paginas/contato.html',
-  '/paginas/orcamento.html',
-  '/paginas/projetos.html',
   '/paginas/medicao-obra.html',
   '/paginas/nota-servico.html',
   '/paginas/caixa.html',
@@ -20,6 +32,7 @@ const APP_SHELL = [
   '/js/public-site.js',
   '/js/app-install.js',
   '/js/conecte-signature.js',
+  '/js/shared/rk-loading-screen.js',
   '/js/shared/rk-navigation.js',
   '/js/shared/rk-firestore-store.js',
   '/js/shared/rk-draft-state.js',
@@ -62,7 +75,7 @@ const APP_SHELL = [
 
 self.addEventListener('install', event => {
   self.skipWaiting();
-  event.waitUntil(caches.open(RK_CACHE).then(cache => cache.addAll(APP_SHELL).catch(() => null)));
+  event.waitUntil(caches.open(RK_CACHE).then(cache => Promise.allSettled(APP_SHELL.map(item => cache.add(item)))));
 });
 
 self.addEventListener('activate', event => {
@@ -83,6 +96,31 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  if (url.pathname === '/js/shared/rk-loading-screen.js' || url.pathname === '/imagens/logo.jpeg' || url.pathname === '/assets/conecte-logo.png') {
+    const atualizacao = fetch(request).then(response => {
+      if (response && response.ok) caches.open(RK_CACHE).then(cache => cache.put(request, response.clone())).catch(() => null);
+      return response;
+    });
+    event.waitUntil(atualizacao.catch(() => null));
+    event.respondWith(caches.match(request, { ignoreSearch: true }).then(cached => cached || atualizacao));
+    return;
+  }
+
+  if (request.mode === 'navigate') {
+    const atualizacao = fetch(request).then(response => {
+      if (response && response.ok) caches.open(RK_CACHE).then(cache => cache.put(request, response.clone())).catch(() => null);
+      return response;
+    });
+    event.waitUntil(atualizacao.catch(() => null));
+    event.respondWith(caches.match(request, { ignoreSearch: true }).then(cached => {
+      if (!cached) return atualizacao.catch(() => caches.match('/index.html'));
+      const redeSegura = atualizacao.then(response => response?.ok ? response : cached).catch(() => cached);
+      const limite = new Promise(resolve => setTimeout(() => resolve(cached), 550));
+      return Promise.race([redeSegura, limite]);
+    }));
+    return;
+  }
+
   event.respondWith(
     fetch(request).then(response => {
       if (response && response.ok) {
@@ -91,11 +129,7 @@ self.addEventListener('fetch', event => {
       }
       return response;
     }).catch(() => {
-      if (request.mode === 'navigate') {
-        return caches.match(request).then(cached => cached || caches.match('/index.html'));
-      }
-
-      return caches.match(request);
+      return caches.match(request, { ignoreSearch: true });
     })
   );
 });

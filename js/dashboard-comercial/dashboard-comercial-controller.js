@@ -41,8 +41,13 @@ const DashboardComercialController = {
     },
 
     async atualizar() {
-        await this.carregar();
-        return this.renderizar();
+        const token = window.RKLoading?.start("Atualizando indicadores do dashboard...");
+        try {
+            await this.carregar();
+            return this.renderizar();
+        } finally {
+            if (token) window.RKLoading?.finish(token);
+        }
     },
 
     renderizar() {
@@ -52,10 +57,15 @@ const DashboardComercialController = {
     },
 
     async iniciar() {
-        this.sessao = await this.aguardarSessao();
-        if (!this.sessao) return false;
-        await this.carregar();
-        return this.renderizar();
+        const token = window.RKLoading?.start("Reunindo orçamentos, obras e movimentações...");
+        try {
+            this.sessao = await this.aguardarSessao();
+            if (!this.sessao) return false;
+            await this.carregar();
+            return this.renderizar();
+        } finally {
+            if (token) window.RKLoading?.finish(token);
+        }
     },
 
     async aguardarSessao() {
