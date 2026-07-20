@@ -16,7 +16,7 @@
 - proteger as telas internas pelo estado real da autenticação;
 - preparar perfis `admin` e `funcionario`.
 
-### Patch 3 — autorização e regras
+### Patch 3 — autorização e regras — concluído
 
 - fechar as coleções internas;
 - validar a criação de solicitações públicas;

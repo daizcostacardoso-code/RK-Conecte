@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.4.2`
+`v0.4.3`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -15,6 +15,7 @@ Não existe API Node ou sincronização com MySQL nesta base.
 Requisitos:
 
 - Node.js 22 ou superior;
+- Java 21 ou superior para o emulador do Firestore;
 - dependências instaladas com `npm install`.
 
 Execute antes de aplicar novas alterações ou publicar:
@@ -23,17 +24,25 @@ Execute antes de aplicar novas alterações ou publicar:
 npm run check
 ```
 
-O comando valida a sintaxe dos módulos JavaScript e executa todos os testes
-automatizados do projeto.
+O comando valida a sintaxe dos módulos JavaScript, executa os testes unitários e
+inicia temporariamente o emulador local para testar as regras do Firestore. Os
+testes de regras usam o projeto isolado `demo-rk-conecte` e não acessam produção.
+
+Para executar somente os testes das regras:
+
+```powershell
+npm run test:rules
+```
 
 ## Publicação
 
 O Firebase Hosting está configurado para não publicar testes, scripts de
-manutenção, documentação, backups temporários ou arquivos de configuração.
+manutenção, documentação, backups temporários ou arquivos de configuração. As
+coleções operacionais exigem Firebase Authentication e um perfil ativo vinculado
+ao UID em `usuarios_autorizados`; visitantes podem apenas ler os valores do
+orçamento público e criar solicitações dentro do contrato validado pelas regras.
 
-> Atenção: o login já utiliza Firebase Authentication, mas o fechamento das
-> regras do Firestore será implementado no Patch 3. Não publique as regras atuais
-> em um ambiente com dados reais antes de concluir essa etapa.
+Antes de publicar, siga [docs/PUBLICACAO_SEGURA.md](docs/PUBLICACAO_SEGURA.md).
 
 ## Estrutura principal
 

@@ -1,5 +1,16 @@
 # Histórico de alterações
 
+## v0.4.3 — regras seguras do Firestore
+
+- Fechadas para visitantes todas as coleções operacionais e financeiras.
+- Exigido perfil ativo por UID; autenticação sem autorização não libera dados.
+- Permitida ao perfil `admin` a gestão segura de funcionários autorizados.
+- Mantido acesso público somente à configuração de valores do orçamento.
+- Permitida apenas a criação validada de solicitações pelo formulário público.
+- Adicionado bloqueio padrão para coleções não mapeadas.
+- Adicionados testes reais das regras com Firebase Emulator e projeto isolado.
+- Criado checklist para publicação e verificação após o deploy.
+
 ## v0.4.2 — Firebase Authentication
 
 - Substituído o login local por autenticação real com e-mail e senha.

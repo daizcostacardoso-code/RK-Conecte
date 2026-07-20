@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.4.2`.
+- Versão: `v0.4.3`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -23,17 +23,19 @@
 ## Validação automatizada
 
 O projeto possui testes para clientes, numeração de orçamento, orçamento
-inteligente, PDFs, notas de serviço e operações do adaptador Firestore.
+inteligente, PDFs, notas de serviço, operações do adaptador Firestore e regras
+de segurança executadas no Firebase Emulator.
 
 Use `npm run check` para validar a sintaxe e executar todos os testes.
 
-## Pendências críticas da Sprint 0
+## Segurança concluída na Sprint 0
 
-1. Exigir usuário autorizado nas coleções internas do Firestore.
-2. Permitir ao público somente a criação validada de solicitações.
-3. Criar testes automatizados para as regras do Firestore.
+- Firebase Authentication substitui o login local.
+- Coleções internas exigem usuário autenticado e perfil ativo autorizado por UID.
+- O público lê somente `configuracoes/valores`.
+- Solicitações públicas aceitam apenas criação com estrutura e limites válidos.
+- Caminhos desconhecidos são negados por padrão.
+- Contas autenticadas sem autorização explícita continuam sem acesso interno.
+- Os testes usam um projeto de demonstração e não acessam dados de produção.
 
-O login local foi substituído pelo Firebase Authentication no Patch 2.
-
-Até a conclusão dessas etapas, as regras atuais não devem ser tratadas como
-seguras para operação com dados reais.
+A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGURA.md).
