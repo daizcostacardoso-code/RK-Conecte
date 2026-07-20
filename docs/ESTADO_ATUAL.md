@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.4.1`.
+- Versão: `v0.4.2`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -29,10 +29,11 @@ Use `npm run check` para validar a sintaxe e executar todos os testes.
 
 ## Pendências críticas da Sprint 0
 
-1. Substituir o login local pelo Firebase Authentication.
-2. Exigir usuário autorizado nas coleções internas do Firestore.
-3. Permitir ao público somente a criação validada de solicitações.
-4. Criar testes automatizados para as regras do Firestore.
+1. Exigir usuário autorizado nas coleções internas do Firestore.
+2. Permitir ao público somente a criação validada de solicitações.
+3. Criar testes automatizados para as regras do Firestore.
+
+O login local foi substituído pelo Firebase Authentication no Patch 2.
 
 Até a conclusão dessas etapas, as regras atuais não devem ser tratadas como
 seguras para operação com dados reais.

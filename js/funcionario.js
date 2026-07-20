@@ -1,7 +1,6 @@
 const Funcionario = {
     chaveSolicitacoes: Config.storage.solicitacoesSite,
     chaveConfig: Config.storage.configuracoesSistema || "vidracaria_configuracoes_sistema",
-    chaveSessao: "vidracaria_sessao_funcionario",
     chaveAnotacoes: "vidracaria_anotacoes_funcionario",
     chaveLembretes: Config.storage.lembretes || "vidracaria_lembretes",
     solicitacoes: [],
@@ -28,7 +27,10 @@ const Funcionario = {
     },
 
     async iniciar() {
-        if (!this.verificarSessao()) return;
+        const sessao = window.RKAuth
+            ? await RKAuth.aguardarAutenticacao()
+            : this.verificarSessao();
+        if (!sessao) return;
         this.carregarPerfilUsuario();
         this.prepararAbas();
         this.carregarConfiguracoesNaTela();
@@ -940,7 +942,7 @@ const Funcionario = {
 
 
     verificarSessao() {
-        const sessao = window.RKAuth ? RKAuth.obterSessao() : Storage.carregar(this.chaveSessao, null);
+        const sessao = window.RKAuth ? RKAuth.obterSessao() : null;
         if (!sessao || !sessao.logado) {
             if (window.RKAuth) {
                 RKAuth.redirecionarLogin();
@@ -959,7 +961,6 @@ const Funcionario = {
             return;
         }
 
-        Storage.remover(this.chaveSessao);
         localStorage.removeItem("usuarioLogado");
         sessionStorage.removeItem("usuarioLogado");
         window.location.href = "login.html";
@@ -967,8 +968,6 @@ const Funcionario = {
 
     obterConfiguracoesSistema() {
         const padrao = {
-            usuario: "admin",
-            senha: "1234",
             nomeUsuario: "Funcionário RK",
             fotoUsuario: "",
             nomeEmpresa: Config.empresa?.nome || "RK Vidraçaria",
@@ -980,8 +979,10 @@ const Funcionario = {
             lembreteIntervaloMinutos: "5",
             lembreteQuantidadeAviso: "3"
         };
-        const salvas = Storage.carregar(this.chaveConfig, {});
-        return { ...padrao, ...(salvas || {}) };
+        const salvas = { ...(Storage.carregar(this.chaveConfig, {}) || {}) };
+        delete salvas.usuario;
+        delete salvas.senha;
+        return { ...padrao, ...salvas };
     },
 
     salvarConfiguracoesSistema(config) {
@@ -993,11 +994,17 @@ const Funcionario = {
 
     carregarPerfilUsuario() {
         const config = this.obterConfiguracoesSistema();
-        this.texto("nomeUsuarioTopo", config.nomeUsuario || "Funcionário RK");
-        this.texto("loginUsuarioTopo", config.usuario || "admin");
-        this.aplicarFotoUsuario("fotoUsuarioTopo", config);
-        this.aplicarFotoUsuario("fotoUsuarioPreview", config);
-        this.texto("nomeUsuarioPreview", config.nomeUsuario || "Funcionário RK");
+        const sessao = window.RKAuth?.obterSessao() || {};
+        const perfil = {
+            ...config,
+            nomeUsuario: config.nomeUsuario || sessao.nomeUsuario || "Funcionário RK",
+            fotoUsuario: config.fotoUsuario || sessao.fotoUsuario || ""
+        };
+        this.texto("nomeUsuarioTopo", perfil.nomeUsuario);
+        this.texto("loginUsuarioTopo", sessao.email || "Firebase Authentication");
+        this.aplicarFotoUsuario("fotoUsuarioTopo", perfil);
+        this.aplicarFotoUsuario("fotoUsuarioPreview", perfil);
+        this.texto("nomeUsuarioPreview", perfil.nomeUsuario);
     },
 
     aplicarFotoUsuario(id, config) {
@@ -1008,7 +1015,7 @@ const Funcionario = {
             el.classList.add("com-imagem");
             return;
         }
-        const nome = (config.nomeUsuario || config.usuario || "RK").trim();
+        const nome = (config.nomeUsuario || "RK").trim();
         const partes = nome.split(/\s+/).filter(Boolean);
         el.textContent = (partes[0]?.[0] || "R") + (partes[1]?.[0] || "K");
         el.classList.remove("com-imagem");
@@ -1031,10 +1038,10 @@ const Funcionario = {
 
     carregarConfiguracoesNaTela() {
         const c = this.obterConfiguracoesSistema();
+        const sessao = window.RKAuth?.obterSessao() || {};
         const campos = {
             cfgNomeUsuario: c.nomeUsuario,
-            cfgUsuario: c.usuario,
-            cfgSenha: c.senha,
+            cfgEmailUsuario: sessao.email || "",
             cfgNomeEmpresa: c.nomeEmpresa,
             cfgTelefoneEmpresa: c.telefoneEmpresa,
             cfgEnderecoEmpresa: c.enderecoEmpresa,
@@ -1065,7 +1072,7 @@ const Funcionario = {
         if (reset && !reset.dataset.registrado) {
             reset.dataset.registrado = "1";
             reset.addEventListener("click", () => {
-                if (!confirm("Restaurar login, perfil e configurações para o padrão?")) return;
+                if (!confirm("Restaurar perfil e configurações para o padrão?")) return;
                 Storage.remover(this.chaveConfig);
                 this.carregarConfiguracoesNaTela();
                 this.mensagemConfig("Configurações restauradas.");
@@ -1095,17 +1102,10 @@ const Funcionario = {
     },
 
     async salvarConfiguracoesDaTela() {
-        const usuario = (Util.$("cfgUsuario")?.value || "admin").trim();
-        const senha = Util.$("cfgSenha")?.value || "1234";
         const nomeUsuario = (Util.$("cfgNomeUsuario")?.value || "Funcionário RK").trim();
-
-        if (!usuario) return this.mensagemConfig("Informe o login do usuário.", true);
-        if (!senha || senha.length < 4) return this.mensagemConfig("A senha deve ter pelo menos 4 caracteres.", true);
 
         const atual = this.obterConfiguracoesSistema();
         const config = this.salvarConfiguracoesSistema({
-            usuario,
-            senha,
             nomeUsuario,
             fotoUsuario: this._fotoUsuarioTemporaria || atual.fotoUsuario || "",
             nomeEmpresa: (Util.$("cfgNomeEmpresa")?.value || "").trim(),
@@ -1118,25 +1118,16 @@ const Funcionario = {
             lembreteQuantidadeAviso: Util.$("cfgLembreteQuantidade")?.value || "3"
         });
 
-        Storage.salvar(this.chaveSessao, {
-            logado: true,
-            usuario: config.usuario,
-            nomeUsuario: config.nomeUsuario,
-            fotoUsuario: config.fotoUsuario,
-            entradaEm: new Date().toISOString()
-        });
-
         this._fotoUsuarioTemporaria = null;
         this.carregarConfiguracoesNaTela();
         this.carregarPerfilUsuario();
-        this.mensagemConfig("Configurações salvas. O novo login já está valendo.");
+        this.mensagemConfig("Configurações salvas. O acesso continua protegido pelo Firebase Authentication.");
         this.iniciarAvisosDeLembretes();
 
         try {
             if (typeof db !== "undefined" && db) {
                 await db.collection("configuracoes").doc("sistema").set({
                     nomeUsuario: config.nomeUsuario,
-                    usuario: config.usuario,
                     nomeEmpresa: config.nomeEmpresa,
                     telefoneEmpresa: config.telefoneEmpresa,
                     enderecoEmpresa: config.enderecoEmpresa,

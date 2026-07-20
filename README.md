@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.4.1`
+`v0.4.2`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -31,9 +31,9 @@ automatizados do projeto.
 O Firebase Hosting está configurado para não publicar testes, scripts de
 manutenção, documentação, backups temporários ou arquivos de configuração.
 
-> Atenção: o login definitivo e o fechamento das regras do Firestore serão
-> implementados nos próximos patches da Sprint 0. Não publique as regras atuais
-> em um ambiente com dados reais antes de concluir essas etapas.
+> Atenção: o login já utiliza Firebase Authentication, mas o fechamento das
+> regras do Firestore será implementado no Patch 3. Não publique as regras atuais
+> em um ambiente com dados reais antes de concluir essa etapa.
 
 ## Estrutura principal
 

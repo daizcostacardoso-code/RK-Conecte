@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <script src="../js/shared/rk-auth.js?v=5.3.4" data-rk-auth="protected"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
     <title>Painel RK Vidraçaria</title>
     <link rel="stylesheet" href="../css/style.css?v=5.9.2">
     <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
@@ -382,7 +385,7 @@
             <div class="box-cabecalho">
                 <div>
                     <h3>Configurações do sistema</h3>
-                    <p>Personalize usuário, login, senha, foto, dados da empresa e valores usados no orçamento.</p>
+                    <p>Personalize o perfil visual, os dados da empresa e os valores usados no orçamento.</p>
                 </div>
                 <a href="valores.html" class="botao botao-claro">Abrir valores detalhados</a>
             </div>
@@ -399,8 +402,7 @@
                     </div>
                     <div class="grid-2">
                         <div class="campo"><label for="cfgNomeUsuario">Nome do usuário</label><input type="text" id="cfgNomeUsuario" placeholder="Ex: Caio"></div>
-                        <div class="campo"><label for="cfgUsuario">Login</label><input type="text" id="cfgUsuario" placeholder="admin"></div>
-                        <div class="campo"><label for="cfgSenha">Senha</label><input type="password" id="cfgSenha" placeholder="1234"></div>
+                        <div class="campo"><label for="cfgEmailUsuario">E-mail de acesso</label><input type="email" id="cfgEmailUsuario" readonly></div>
                         <div class="campo"><label for="cfgFotoUsuario">Foto do usuário</label><input type="file" id="cfgFotoUsuario" accept="image/*"></div>
                     </div>
                 </div>
@@ -476,7 +478,6 @@
     </div>
 </footer>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="../js/firebase-config.js?v=2.6.0"></script>
 <script src="../js/config.js?v=2.6.0"></script>

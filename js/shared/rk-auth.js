@@ -1,136 +1,289 @@
 const RKAuth = {
     chaveSessao: "vidracaria_sessao_funcionario",
     chaveCompatibilidade: "usuarioLogado",
+    chaveConfig: "vidracaria_configuracoes_sistema",
+    eventoEstado: "rk:auth-state-changed",
+    eventoErro: "rk:auth-error",
     modoAtual: "protected",
+    usuarioAtual: null,
+    resolvido: false,
+    erroInicializacao: null,
+    _promessaAutenticacao: null,
+    _resolverAutenticacao: null,
+    _cancelarObservacao: null,
+    _timerInicializacao: null,
     paginasProtegidas: [
         "dashboard-comercial.html",
         "clientes.html",
         "orcamento-inteligente.html",
         "arquivos.html",
+        "compartilhar-documento.html",
         "medicao-obra.html",
         "nota-servico.html",
         "caixa.html",
-        
-        
-        
+        "loading.html",
+        "projetos.html",
         "funcionario.html",
         "novo-orcamento.html",
         "valores.html",
         "produtos.html"
     ],
 
-    obterSessao() {
-        const sessao = this.lerJSON(localStorage.getItem(this.chaveSessao));
+    inicializar(opcoes = {}) {
+        this.modoAtual = opcoes.modo || this.obterModoAtual();
+        this.prepararEstiloInterno();
+        this.limparDadosLegados();
+        this.garantirPromessa();
 
-        if (sessao && sessao.logado) {
-            return sessao;
-        }
-
-        const usuarioCompatibilidade = this.lerJSON(localStorage.getItem(this.chaveCompatibilidade));
-        if (usuarioCompatibilidade && usuarioCompatibilidade.logado) {
-            return usuarioCompatibilidade;
-        }
-
-        return null;
-    },
-
-    estaAutenticado() {
-        return Boolean(this.obterSessao());
-    },
-
-    salvarSessao(dados = {}) {
-        const sessao = {
-            logado: true,
-            usuario: dados.usuario || "admin",
-            nomeUsuario: dados.nomeUsuario || dados.usuario || "Funcionario RK",
-            fotoUsuario: dados.fotoUsuario || "",
-            entradaEm: dados.entradaEm || new Date().toISOString()
-        };
-
-        localStorage.setItem(this.chaveSessao, JSON.stringify(sessao));
-        localStorage.setItem(this.chaveCompatibilidade, JSON.stringify(sessao));
-        return sessao;
-    },
-
-    limparSessao() {
-        localStorage.removeItem(this.chaveSessao);
-        localStorage.removeItem(this.chaveCompatibilidade);
-        sessionStorage.removeItem(this.chaveSessao);
-        sessionStorage.removeItem(this.chaveCompatibilidade);
-    },
-
-    verificarAutenticacao(opcoes = {}) {
-        const modo = opcoes.modo || this.obterModoAtual();
-        const sessao = this.obterSessao();
-        this.modoAtual = modo;
-
-        if (modo === "login") {
-            if (sessao) {
-                this.redirecionarDashboard();
+        const autenticacao = this.obterInstanciaFirebase();
+        if (!autenticacao) {
+            if (["home", "public"].includes(this.modoAtual)) {
+                this.processarEstado(null, { redirecionar: false });
+            } else {
+                this.falharAutenticacao(new Error("Firebase Authentication indisponível."));
             }
+            return this._promessaAutenticacao;
+        }
+
+        if (typeof window !== "undefined") {
+            this._timerInicializacao = window.setTimeout(() => {
+                if (!this.resolvido) {
+                    this.falharAutenticacao(new Error("Tempo limite ao restaurar a autenticação."));
+                }
+            }, 12000);
+        }
+
+        this._cancelarObservacao = autenticacao.onAuthStateChanged(
+            usuario => this.processarEstado(usuario),
+            erro => this.falharAutenticacao(erro)
+        );
+
+        return this._promessaAutenticacao;
+    },
+
+    garantirPromessa() {
+        if (!this._promessaAutenticacao) {
+            this._promessaAutenticacao = new Promise(resolve => {
+                this._resolverAutenticacao = resolve;
+            });
+        }
+        return this._promessaAutenticacao;
+    },
+
+    aguardarAutenticacao() {
+        if (this.resolvido) {
+            return Promise.resolve(this.obterSessao());
+        }
+        return this.garantirPromessa();
+    },
+
+    obterInstanciaFirebase() {
+        if (typeof window === "undefined") return null;
+        return window.RKFirebaseAuth
+            || window.RKFirebase?.auth
+            || (typeof window.firebase?.auth === "function" ? window.firebase.auth() : null);
+    },
+
+    processarEstado(usuario, opcoes = {}) {
+        if (this._timerInicializacao && typeof window !== "undefined") {
+            window.clearTimeout(this._timerInicializacao);
+            this._timerInicializacao = null;
+        }
+
+        this.usuarioAtual = usuario || null;
+        this.resolvido = true;
+        this.erroInicializacao = null;
+        const sessao = this.obterSessao();
+
+        if (this._resolverAutenticacao) {
+            this._resolverAutenticacao(sessao);
+            this._resolverAutenticacao = null;
+        }
+
+        this.notificarEstado(sessao);
+
+        if (opcoes.redirecionar === false) {
+            this.liberarInterface();
             return sessao;
         }
 
-        if (modo === "home" || modo === "public") {
+        if (this.modoAtual === "login") {
+            if (sessao) this.redirecionarDashboard();
+            else this.liberarInterface();
             return sessao;
         }
 
-        if (!this.paginaAtualProtegida()) {
+        if (["home", "public"].includes(this.modoAtual)) {
+            this.liberarInterface();
             return sessao;
         }
 
-        if (!sessao) {
-            this.redirecionarLogin();
+        if (this.paginaAtualProtegida() && !sessao) {
+            this.redirecionarLogin("sessao_expirada");
             return null;
         }
 
+        this.liberarInterface();
         return sessao;
     },
 
-    prepararEstiloInterno() {
-        const modo = this.obterModoAtual();
+    falharAutenticacao(erro) {
+        if (this.resolvido) return;
+        this.erroInicializacao = erro || new Error("Falha de autenticação.");
+        this.resolvido = true;
 
-        if (modo === "protected" && this.paginaAtualProtegida()) {
-            document.documentElement.classList.add("rk-app-interna-preload");
-            this.injetarProtecaoMenuInicial();
+        if (this._resolverAutenticacao) {
+            this._resolverAutenticacao(null);
+            this._resolverAutenticacao = null;
         }
-    },
 
-    injetarProtecaoMenuInicial() {
-        if (document.getElementById("rkMenuPreloadStyle")) {
+        this.notificarErro(this.erroInicializacao);
+
+        if (this.modoAtual === "protected" && this.paginaAtualProtegida()) {
+            this.redirecionarLogin("auth_indisponivel");
             return;
         }
 
+        this.liberarInterface();
+    },
+
+    obterSessao() {
+        if (!this.usuarioAtual) return null;
+        const preferencias = this.obterPreferenciasUsuario();
+        const email = String(this.usuarioAtual.email || "").trim();
+        const nomeEmail = email.split("@")[0].replace(/[._-]+/g, " ").trim();
+
+        return {
+            logado: true,
+            uid: String(this.usuarioAtual.uid || ""),
+            usuario: email,
+            email,
+            nomeUsuario: this.usuarioAtual.displayName || preferencias.nomeUsuario || nomeEmail || "Funcionário RK",
+            fotoUsuario: this.usuarioAtual.photoURL || preferencias.fotoUsuario || "",
+            entradaEm: this.usuarioAtual.metadata?.lastSignInTime || new Date().toISOString()
+        };
+    },
+
+    estaAutenticado() {
+        return Boolean(this.resolvido && this.usuarioAtual);
+    },
+
+    salvarSessao() {
+        return this.obterSessao();
+    },
+
+    limparSessao() {
+        this.removerChave(this.chaveSessao);
+        this.removerChave(this.chaveCompatibilidade);
+    },
+
+    limparDadosLegados() {
+        this.limparSessao();
+        const armazenamento = this.obterLocalStorage();
+        if (!armazenamento) return;
+
+        try {
+            const configuracoes = this.lerJSON(armazenamento.getItem(this.chaveConfig));
+            if (!configuracoes || typeof configuracoes !== "object") return;
+            const possuiaCredenciais = Object.prototype.hasOwnProperty.call(configuracoes, "usuario")
+                || Object.prototype.hasOwnProperty.call(configuracoes, "senha");
+            if (!possuiaCredenciais) return;
+            delete configuracoes.usuario;
+            delete configuracoes.senha;
+            armazenamento.setItem(this.chaveConfig, JSON.stringify(configuracoes));
+        } catch (erro) {
+            console.warn("Não foi possível remover credenciais locais antigas:", erro);
+        }
+    },
+
+    obterPreferenciasUsuario() {
+        const armazenamento = this.obterLocalStorage();
+        if (!armazenamento) return {};
+        return this.lerJSON(armazenamento.getItem(this.chaveConfig)) || {};
+    },
+
+    obterLocalStorage() {
+        try {
+            return typeof localStorage !== "undefined" ? localStorage : null;
+        } catch (erro) {
+            return null;
+        }
+    },
+
+    removerChave(chave) {
+        try { if (typeof localStorage !== "undefined") localStorage.removeItem(chave); } catch (erro) {}
+        try { if (typeof sessionStorage !== "undefined") sessionStorage.removeItem(chave); } catch (erro) {}
+    },
+
+    verificarAutenticacao() {
+        if (!this.resolvido) return null;
+        return this.processarEstado(this.usuarioAtual);
+    },
+
+    prepararEstiloInterno() {
+        if (typeof document === "undefined") return;
+        const deveAguardar = this.modoAtual === "login"
+            || (this.modoAtual === "protected" && this.paginaAtualProtegida());
+        if (!deveAguardar) return;
+
+        document.documentElement.classList.add("rk-auth-pending");
+        if (this.modoAtual === "protected") {
+            document.documentElement.classList.add("rk-app-interna-preload");
+        }
+
+        if (document.getElementById("rkAuthPendingStyle")) return;
         const estilo = document.createElement("style");
-        estilo.id = "rkMenuPreloadStyle";
-        estilo.textContent = "html.rk-app-interna-preload body > header nav ul:not(.rk-nav-principal){visibility:hidden!important;opacity:0!important;pointer-events:none!important}";
+        estilo.id = "rkAuthPendingStyle";
+        estilo.textContent = "html.rk-auth-pending body{visibility:hidden!important}html.rk-auth-pending{background:#f4f7fb}";
         document.head.appendChild(estilo);
     },
 
-    sair(event) {
-        if (event && typeof event.preventDefault === "function") {
-            event.preventDefault();
-        }
-
-        this.limparSessao();
-        this.redirecionarLogin();
+    liberarInterface() {
+        if (typeof document === "undefined") return;
+        document.documentElement.classList.remove("rk-auth-pending");
     },
 
-    redirecionarLogin() {
-        const destino = this.criarHref("login.html");
-        this.redirecionar(destino);
+    notificarEstado(sessao) {
+        if (typeof window === "undefined" || typeof CustomEvent === "undefined") return;
+        window.dispatchEvent(new CustomEvent(this.eventoEstado, {
+            detail: { autenticado: Boolean(sessao), sessao }
+        }));
+    },
+
+    notificarErro(erro) {
+        if (typeof window === "undefined" || typeof CustomEvent === "undefined") return;
+        window.dispatchEvent(new CustomEvent(this.eventoErro, {
+            detail: { mensagem: erro?.message || "Falha de autenticação." }
+        }));
+    },
+
+    async sair(event) {
+        if (event && typeof event.preventDefault === "function") event.preventDefault();
+        if (typeof document !== "undefined") document.documentElement.classList.add("rk-auth-pending");
+
+        try {
+            const autenticacao = this.obterInstanciaFirebase();
+            if (autenticacao) await autenticacao.signOut();
+        } catch (erro) {
+            console.error("Não foi possível encerrar a sessão:", erro);
+        } finally {
+            this.usuarioAtual = null;
+            this.limparSessao();
+            this.redirecionarLogin();
+        }
+    },
+
+    redirecionarLogin(motivo = "") {
+        const pagina = motivo ? `login.html?erro=${encodeURIComponent(motivo)}` : "login.html";
+        this.redirecionar(this.criarHref(pagina));
     },
 
     redirecionarDashboard() {
-        const destino = this.criarHref("dashboard-comercial.html");
-        this.redirecionar(destino);
+        this.redirecionar(this.criarHref("dashboard-comercial.html"));
     },
 
     redirecionar(destino) {
-        if (!destino || this.mesmaPagina(destino)) {
-            return;
-        }
-
+        if (typeof window === "undefined" || !destino || this.mesmaPagina(destino)) return;
         window.location.replace(destino);
     },
 
@@ -139,25 +292,25 @@ const RKAuth = {
     },
 
     estaEmPaginas() {
+        if (typeof window === "undefined") return false;
         return /\/paginas\//.test(window.location.pathname.replace(/\\/g, "/"));
     },
 
     mesmaPagina(destino) {
+        if (typeof document === "undefined" || typeof window === "undefined") return false;
         const link = document.createElement("a");
         link.href = destino;
         return link.href === window.location.href;
     },
 
     obterModoAtual() {
-        const script = document.currentScript;
-        return script?.dataset?.rkAuth || "protected";
+        if (typeof document === "undefined") return "protected";
+        return document.currentScript?.dataset?.rkAuth || "protected";
     },
 
     obterPaginaAtual() {
-        return window.location.pathname
-            .replace(/\\/g, "/")
-            .split("/")
-            .pop() || "index.html";
+        if (typeof window === "undefined") return "index.html";
+        return window.location.pathname.replace(/\\/g, "/").split("/").pop() || "index.html";
     },
 
     paginaAtualProtegida() {
@@ -183,12 +336,16 @@ const RKAuth = {
     }
 };
 
-window.RKAuth = RKAuth;
-window.verificarAutenticacao = () => RKAuth.verificarAutenticacao();
-window.mostrarTelaLogin = () => RKAuth.redirecionarLogin();
-window.esconderTelaLogin = () => {};
-window.mostrarAreaInterna = () => {};
-window.esconderAreaInterna = () => {};
+if (typeof window !== "undefined") {
+    window.RKAuth = RKAuth;
+    window.verificarAutenticacao = () => RKAuth.verificarAutenticacao();
+    window.mostrarTelaLogin = () => RKAuth.redirecionarLogin();
+    window.esconderTelaLogin = () => {};
+    window.mostrarAreaInterna = () => RKAuth.liberarInterface();
+    window.esconderAreaInterna = () => document.documentElement.classList.add("rk-auth-pending");
+    RKAuth.inicializar();
+}
 
-RKAuth.prepararEstiloInterno();
-RKAuth.verificarAutenticacao();
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { RKAuth };
+}

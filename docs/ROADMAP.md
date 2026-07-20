@@ -2,14 +2,14 @@
 
 ## Sprint 0 — base segura
 
-### Patch 1 — organização e validação
+### Patch 1 — organização e validação — concluído
 
 - proteger a publicação contra arquivos internos;
 - padronizar versão;
 - automatizar verificações;
 - documentar o estado atual.
 
-### Patch 2 — autenticação
+### Patch 2 — autenticação — concluído
 
 - implementar Firebase Authentication;
 - remover usuário e senha salvos no navegador;

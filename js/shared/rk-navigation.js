@@ -174,7 +174,7 @@ const RKNavigation = {
         }
 
         const script = document.createElement("script");
-        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=5.2.3`;
+        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=0.4.2`;
         script.dataset.rkVersion = "true";
         script.onload = callback;
         script.onerror = callback;
@@ -400,7 +400,7 @@ const RKNavigation = {
     },
 
     obterVersao() {
-        return String(window.RK_VERSION || "v0.4.0-producao");
+        return String(window.RK_VERSION || "v0.4.2");
     },
 
     renderizarLink(link) {
@@ -444,6 +444,8 @@ const RKNavigation = {
     },
 
     protegerLinksInternos(lista) {
+        if (lista.dataset.rkLinksProtegidos === "true") return;
+        lista.dataset.rkLinksProtegidos = "true";
         lista.addEventListener("click", (event) => {
             const link = event.target.closest("a");
             if (!link || link.classList.contains("login")) {
@@ -548,6 +550,14 @@ const RKNavigation = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    if (window.RKAuth?.paginaAtualProtegida()) {
+        const sessao = await RKAuth.aguardarAutenticacao();
+        if (!sessao) return;
+    }
     RKNavigation.iniciar();
+});
+
+window.addEventListener("rk:auth-state-changed", () => {
+    if (document.readyState !== "loading") RKNavigation.iniciar();
 });
