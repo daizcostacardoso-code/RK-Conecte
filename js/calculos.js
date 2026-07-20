@@ -47,13 +47,14 @@ const Calculos = {
         // Agora o campo é o preço do alumínio por metro reto.
         const aluminio = Math.max(0, Util.numero(valores.aluminio ?? valores.despesa));
         const acessorios = Math.max(0, Util.numero(item.acessorios));
+        const valorAdicional = Math.max(0, Util.numero(item.valorAdicional));
 
         const adicionalPercentual = valorVidro * (percCor / 100);
         const valorMetro = valorVidro + valorCor + adicionalPercentual;
 
         const totalVidro = valorMetro * area * quantidade;
         const totalAluminio = aluminio * metrosAluminio;
-        const total = totalVidro + totalAluminio + acessorios;
+        const total = totalVidro + totalAluminio + acessorios + valorAdicional;
 
         return {
             ...item,
@@ -72,6 +73,9 @@ const Calculos = {
             totalVidro: Util.arredondar(totalVidro, 2),
             totalAluminio: Util.arredondar(totalAluminio, 2),
             totalAcessorios: Util.arredondar(acessorios, 2),
+            valorAdicional: Util.arredondar(valorAdicional, 2),
+            descricaoAdicional: item.descricaoAdicional || "",
+            totalAdicional: Util.arredondar(valorAdicional, 2),
             total: Util.arredondar(total, 2)
         };
     },
@@ -82,23 +86,33 @@ const Calculos = {
         }
 
         const lista = Array.isArray(itens) ? itens : [];
-        const subtotal = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.total)), 0);
+        const totalItens = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.total)), 0);
+        const totalAdicionais = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.valorAdicional)), 0);
+        const subtotal = Math.max(0, totalItens - totalAdicionais);
 
         const tipo = desconto?.tipo || "valor";
         const descontoInformado = Math.max(0, Util.numero(desconto?.valor));
         let valorDesconto = 0;
 
         if (tipo === "percentual") {
-            valorDesconto = subtotal * (Math.min(descontoInformado, 100) / 100);
+            valorDesconto = totalItens * (Math.min(descontoInformado, 100) / 100);
         } else {
-            valorDesconto = Math.min(descontoInformado, subtotal);
+            valorDesconto = Math.min(descontoInformado, totalItens);
         }
 
-        const total = subtotal - valorDesconto;
+        const total = totalItens - valorDesconto;
+        const adicionais = lista
+            .filter(item => Util.numero(item.valorAdicional) > 0)
+            .map(item => ({
+                descricao: String(item.descricaoAdicional || "Adicional").trim(),
+                valor: Util.arredondar(Util.numero(item.valorAdicional), 2)
+            }));
 
         return {
             subtotal: Util.arredondar(subtotal, 2),
+            totalAdicionais: Util.arredondar(totalAdicionais, 2),
             desconto: Util.arredondar(valorDesconto, 2),
+            adicionais,
             total: Util.arredondar(total < 0 ? 0 : total, 2)
         };
     }

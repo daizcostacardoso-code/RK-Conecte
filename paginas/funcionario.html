@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
     <title>Painel RK Vidraçaria</title>
-    <link rel="stylesheet" href="../css/style.css?v=3.4.0">
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -46,6 +51,7 @@
 
             <div class="dashboard-acoes">
                 <a href="novo-orcamento.html" id="btnNovoOrcamentoPainel" class="botao">+ Novo Orçamento</a>
+                <a href="nota-servico.html" class="botao botao-claro">Emitir Nota de Serviço</a>
                 <a href="valores.html" class="botao botao-claro">⚙ Valores</a>
             </div>
         </div>
@@ -379,7 +385,7 @@
             <div class="box-cabecalho">
                 <div>
                     <h3>Configurações do sistema</h3>
-                    <p>Personalize usuário, login, senha, foto, dados da empresa e valores usados no orçamento.</p>
+                    <p>Personalize o perfil visual, os dados da empresa e os valores usados no orçamento.</p>
                 </div>
                 <a href="valores.html" class="botao botao-claro">Abrir valores detalhados</a>
             </div>
@@ -396,8 +402,7 @@
                     </div>
                     <div class="grid-2">
                         <div class="campo"><label for="cfgNomeUsuario">Nome do usuário</label><input type="text" id="cfgNomeUsuario" placeholder="Ex: Caio"></div>
-                        <div class="campo"><label for="cfgUsuario">Login</label><input type="text" id="cfgUsuario" placeholder="admin"></div>
-                        <div class="campo"><label for="cfgSenha">Senha</label><input type="password" id="cfgSenha" placeholder="1234"></div>
+                        <div class="campo"><label for="cfgEmailUsuario">E-mail de acesso</label><input type="email" id="cfgEmailUsuario" readonly></div>
                         <div class="campo"><label for="cfgFotoUsuario">Foto do usuário</label><input type="file" id="cfgFotoUsuario" accept="image/*"></div>
                     </div>
                 </div>
@@ -470,18 +475,23 @@
     <div class="rodape-status">
         <span id="temperaturaAtual">Temperatura: carregando...</span>
         <span class="rodape-separador">•</span>
-        <span class="connect-assinatura">Connect Suite</span>
     </div>
 </footer>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="../js/firebase-config.js?v=2.6.0"></script>
 <script src="../js/config.js?v=2.6.0"></script>
 <script src="../js/storage.js?v=2.6.0"></script>
 <script src="../js/util.js?v=2.6.0"></script>
-<script src="../js/funcionario.js?v=2.7.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.1"></script>
+<script src="../js/caixa/caixa-model.js?v=2.1.0"></script>
+<script src="../js/caixa/caixa-validator.js?v=2.1.0"></script>
+<script src="../js/caixa/caixa-repository.js?v=2.1.1"></script>
+<script src="../js/caixa/caixa-export.js?v=2.1.0"></script>
+<script src="../js/caixa/caixa-service.js?v=2.1.0"></script>
+<script src="../js/funcionario.js?v=5.7.0"></script>
 
     <script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
 </body>
 </html>

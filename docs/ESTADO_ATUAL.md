@@ -1,0 +1,41 @@
+# Estado atual do RK-Conecte
+
+## Base técnica
+
+- Versão: `v0.4.3`.
+- Frontend: HTML, CSS e JavaScript sem framework.
+- Hospedagem: Firebase Hosting.
+- Banco oficial: Cloud Firestore.
+- Aplicativo instalável: PWA com service worker.
+
+## Funcionalidades existentes
+
+- site institucional e solicitação pública;
+- clientes;
+- produtos, itens e dependências;
+- orçamento inteligente e PDF;
+- histórico de arquivos e aprovação interna;
+- medição de obra;
+- nota de serviço;
+- controle básico de caixa;
+- dashboard comercial.
+
+## Validação automatizada
+
+O projeto possui testes para clientes, numeração de orçamento, orçamento
+inteligente, PDFs, notas de serviço, operações do adaptador Firestore e regras
+de segurança executadas no Firebase Emulator.
+
+Use `npm run check` para validar a sintaxe e executar todos os testes.
+
+## Segurança concluída na Sprint 0
+
+- Firebase Authentication substitui o login local.
+- Coleções internas exigem usuário autenticado e perfil ativo autorizado por UID.
+- O público lê somente `configuracoes/valores`.
+- Solicitações públicas aceitam apenas criação com estrutura e limites válidos.
+- Caminhos desconhecidos são negados por padrão.
+- Contas autenticadas sem autorização explícita continuam sem acesso interno.
+- Os testes usam um projeto de demonstração e não acessam dados de produção.
+
+A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGURA.md).

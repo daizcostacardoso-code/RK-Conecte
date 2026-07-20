@@ -3,88 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>RK Vidraçaria</title>
+    <script src="js/shared/rk-auth.js?v=0.4.2" data-rk-auth="public"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=3.2.0">
+    <title>RK Vidra&ccedil;aria | Agilidade e excelência</title>
+    <meta name="description" content="Vidra&ccedil;aria em Porto Seguro com box, espelhos, fachadas, guarda-corpo, coberturas, fechamentos e manuten&ccedil;&atilde;o em vidro sob medida.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://rk-vidracaria.web.app/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="RK Vidra&ccedil;aria | Vidros sob medida">
+    <meta property="og:description" content="Solu&ccedil;&otilde;es profissionais em vidro para resid&ecirc;ncias, com&eacute;rcios e obras em Porto Seguro.">
+    <meta property="og:url" content="https://rk-vidracaria.web.app/">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80">
+
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="stylesheet" href="css/style.css?v=5.8.1">
+    <link rel="icon" type="image/png" href="imagens/icons/icon-192.png">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="imagens/icons/icon-192.png">
 </head>
-<body>
+<body class="public-page public-home">
 
-    <header>
-        <div class="container">
-            <div class="marca-header">
-                <img src="imagens/logo.jpeg" alt="Logo RK Vidraçaria">
-                <h1>RK Vidraçaria</h1>
-            </div>
+    <header class="public-header">
+        <div class="container public-header__inner">
+            <a class="public-brand" href="index.html" aria-label="RK Vidra&ccedil;aria - in&iacute;cio">
+                <img src="imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria" width="52" height="52">
+                <span>
+                    <strong>RK Vidra&ccedil;aria</strong>
+                    <small>Vidros sob medida</small>
+                </span>
+            </a>
 
-<nav>
+            <button class="public-menu-toggle" type="button" aria-expanded="false" aria-controls="publicMenu">Menu</button>
 
-    <ul>
-
-        <li><a href="index.html">Início</a></li>
-
-        <li><a href="paginas/servicos.html">Serviços</a></li>
-
-        <li><a href="paginas/produtos.html">Produtos</a></li>
-
-        <li><a href="paginas/contato.html">Contato</a></li>
-
-        <li><a href="paginas/orcamento.html">Orçamento</a></li>
-
-        <li><a class="login" href="paginas/login.html">Login</a></li>
-
-    </ul>
-
-</nav>
+            <nav class="public-nav" aria-label="Navega&ccedil;&atilde;o principal">
+                <ul id="publicMenu">
+                    <li><a class="rk-nav-ativo" href="index.html" aria-current="page">In&iacute;cio</a></li>
+                    <li><a href="paginas/servicos-publico.html">Servi&ccedil;os</a></li>
+                    <li><a href="paginas/produtos-publico.html">Produtos</a></li>
+                    <li><a href="paginas/galeria.html">Galeria</a></li>
+                    <li><a href="paginas/contato.html">Contato</a></li>
+                    <li><a class="public-nav__cta" href="paginas/orcamento.html">Or&ccedil;amento</a></li>
+                    <li><a class="login nav-login-button" href="paginas/login.html">Login</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <section class="banner">
-        <h2>Soluções em Vidros para sua Casa e Empresa</h2>
-        <p>Boxes, espelhos, janelas, portas, fachadas e muito mais.</p>
+    <main>
+        <section class="public-hero public-hero--home">
+            <div class="container public-hero__content">
+                <span class="public-eyebrow">Vidra&ccedil;aria em Porto Seguro</span>
+                <h1>Vidros sob medida com acabamento profissional</h1>
+                <p>Box, espelhos, fachadas, guarda-corpo, coberturas e fechamentos para casas, lojas e obras comerciais.</p>
+                <div class="public-hero__actions">
+                    <a class="botao public-button public-button--primary" href="paginas/orcamento.html">Solicitar or&ccedil;amento</a>
+                    <a class="botao public-button public-button--ghost" href="paginas/servicos-publico.html">Ver servi&ccedil;os</a>
+                </div>
+            </div>
+        </section>
 
-        <a href="paginas/orcamento.html" class="botao">
-    Solicite um Orçamento
-</a>
-    </section>
+        <section class="public-section public-section--compact" aria-label="Diferenciais da RK Vidra&ccedil;aria">
+            <div class="container public-metrics">
+                <div>
+                    <strong>Medida certa</strong>
+                    <span>Levantamento orientado para cada ambiente</span>
+                </div>
+                <div>
+                    <strong>Acabamento limpo</strong>
+                    <span>Instala&ccedil;&atilde;o cuidadosa e visual profissional</span>
+                </div>
+                <div>
+                    <strong>Atendimento direto</strong>
+                    <span>Retorno pelo WhatsApp e acompanhamento do pedido</span>
+                </div>
+            </div>
+        </section>
 
-    <section class="servicos">
-        <div class="container">
-            <h2>Nossos Serviços</h2>
-
-            <div class="cards">
-
-                <div class="card">
-                    <h3>Box para Banheiro</h3>
-                    <p>Boxes de vidro temperado com qualidade e segurança.</p>
+        <section class="public-section">
+            <div class="container">
+                <div class="public-section__header">
+                    <span class="public-eyebrow">Solu&ccedil;&otilde;es RK</span>
+                    <h2>Servi&ccedil;os para resid&ecirc;ncias, empresas e obras</h2>
+                    <p>Organizamos cada projeto para combinar seguran&ccedil;a, uso di&aacute;rio e valor visual do ambiente.</p>
                 </div>
 
-                <div class="card">
-                    <h3>Espelhos Sob Medida</h3>
-                    <p>Espelhos personalizados para residências e empresas.</p>
+                <div class="public-card-grid public-card-grid--three">
+                    <article class="public-card">
+                        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=720&q=80" alt="Box de vidro em banheiro moderno" loading="lazy" decoding="async" width="720" height="520">
+                        <div class="public-card__body">
+                            <span>Box</span>
+                            <h3>Box para banheiro</h3>
+                            <p>Modelos de correr ou abrir, com vidro temperado e ferragens adequadas ao espa&ccedil;o.</p>
+                            <a href="paginas/orcamento.html">Solicitar or&ccedil;amento</a>
+                        </div>
+                    </article>
+
+                    <article class="public-card">
+                        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=720&q=80" alt="Ambiente interno com espelho decorativo" loading="lazy" decoding="async" width="720" height="520">
+                        <div class="public-card__body">
+                            <span>Espelhos</span>
+                            <h3>Espelhos sob medida</h3>
+                            <p>Pe&ccedil;as para banheiros, quartos, salas, lojas e academias com instala&ccedil;&atilde;o cuidadosa.</p>
+                            <a href="paginas/orcamento.html">Solicitar or&ccedil;amento</a>
+                        </div>
+                    </article>
+
+                    <article class="public-card">
+                        <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=720&q=80" alt="Fachada comercial com vidro" loading="lazy" decoding="async" width="720" height="520">
+                        <div class="public-card__body">
+                            <span>Fachadas</span>
+                            <h3>Fachadas e fechamentos</h3>
+                            <p>Vidros para pontos comerciais, varandas e ambientes que precisam de luz e prote&ccedil;&atilde;o.</p>
+                            <a href="paginas/orcamento.html">Solicitar or&ccedil;amento</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="public-section public-section--tone">
+            <div class="container public-split">
+                <div>
+                    <span class="public-eyebrow">Produtos</span>
+                    <h2>Materiais e acabamentos para cada tipo de projeto</h2>
+                    <p>Trabalhamos com vidro temperado, espelhos, portas, janelas, guarda-corpo e solu&ccedil;&otilde;es sob medida para obra nova ou manuten&ccedil;&atilde;o.</p>
+                    <a class="botao public-button public-button--primary" href="paginas/produtos-publico.html">Ver produtos</a>
+                </div>
+                <div class="public-feature-list" aria-label="Produtos em destaque">
+                    <span>Vidro temperado</span>
+                    <span>Box de banheiro</span>
+                    <span>Espelhos</span>
+                    <span>Portas de vidro</span>
+                    <span>Fachadas</span>
+                    <span>Guarda-corpo</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="public-section">
+            <div class="container">
+                <div class="public-section__header">
+                    <span class="public-eyebrow">Obras realizadas</span>
+                    <h2>Trabalhos com visual limpo e aplica&ccedil;&atilde;o pr&aacute;tica</h2>
+                    <p>Uma sele&ccedil;&atilde;o institucional de aplica&ccedil;&otilde;es para mostrar possibilidades de uso do vidro.</p>
                 </div>
 
-                <div class="card">
-                    <h3>Portas e Janelas</h3>
-                    <p>Instalação de portas, janelas e fachadas de vidro.</p>
+                <div class="public-gallery-preview">
+                    <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80" alt="Ambiente residencial com vidro e ilumina&ccedil;&atilde;o natural" loading="lazy" decoding="async" width="900" height="580">
+                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80" alt="Casa moderna com esquadrias de vidro" loading="lazy" decoding="async" width="900" height="580">
+                    <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=900&q=80" alt="Varanda com fechamento em vidro" loading="lazy" decoding="async" width="900" height="580">
                 </div>
 
+                <div class="public-center-action">
+                    <a class="botao public-button public-button--secondary" href="paginas/galeria.html">Abrir galeria</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="public-cta">
+            <div class="container public-cta__inner">
+                <div>
+                    <span class="public-eyebrow">Atendimento RK</span>
+                    <h2>Quer transformar uma medida em or&ccedil;amento?</h2>
+                    <p>Envie seu pedido pelo formul&aacute;rio p&uacute;blico ou fale direto pelo WhatsApp.</p>
+                </div>
+                <div class="public-cta__actions">
+                    <a class="botao public-button public-button--primary" href="paginas/orcamento.html">Pedir or&ccedil;amento</a>
+                    <a class="botao public-button public-button--whatsapp" href="https://wa.me/5573999819768?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20com%20a%20RK%20Vidra%C3%A7aria." target="_blank" rel="noopener">WhatsApp</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="public-footer">
+        <div class="container public-footer__grid">
+            <div class="public-footer__brand">
+                <img src="imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria" width="48" height="48" loading="lazy">
+                <div>
+                    <strong>RK Vidra&ccedil;aria</strong>
+                    <p>Vidros sob medida para resid&ecirc;ncias, com&eacute;rcios e obras em Porto Seguro.</p>
+                </div>
+            </div>
+            <div>
+                <h2>Links r&aacute;pidos</h2>
+                <a href="paginas/servicos-publico.html">Servi&ccedil;os</a>
+                <a href="paginas/produtos-publico.html">Produtos</a>
+                <a href="paginas/galeria.html">Galeria</a>
+                <a href="paginas/orcamento.html">Or&ccedil;amento</a>
+            </div>
+            <div>
+                <h2>Contato</h2>
+                <a href="tel:+5573999819768">(73) 9981-9768</a>
+                <a href="https://wa.me/5573999819768" target="_blank" rel="noopener">WhatsApp</a>
+                <span>Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</span>
+            </div>
+            <div>
+                <h2>Redes sociais</h2>
+                <a href="https://wa.me/5573999819768" target="_blank" rel="noopener">WhatsApp</a>
+                <a href="paginas/contato.html">Contato pelo site</a>
             </div>
         </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p>
-        <p>📞 (73) 9981-9768 | 📍 Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
+        <div class="public-footer__bottom">
+            <span>&copy; 2026 RK Vidra&ccedil;aria. Todos os direitos reservados.</span>
+        </div>
     </footer>
 
+    <script src="js/shared/rk-navigation.js?v=5.3.5"></script>
     <script src="js/app-install.js?v=3.2.0"></script>
+    <script src="js/public-site.js?v=5.0.1"></script>
+  <script src="js/conecte-signature.js?v=20260718"></script>
 </body>
-
 </html>

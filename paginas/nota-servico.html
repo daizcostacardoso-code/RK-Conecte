@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
+    <title>Nota de Serviço - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <link rel="stylesheet" href="../css/nota-servico.css?v=1.0.0">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+    <meta name="theme-color" content="#083d67">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="nota-servico-page comercial-page">
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+            <div><strong>RK Vidraçaria</strong><small>Centro Comercial</small></div>
+        </div>
+        <nav><ul><li><a href="dashboard-comercial.html">Dashboard</a></li><li><a href="clientes.html">Clientes</a></li><li><a href="orcamento-inteligente.html">Orçamento</a></li><li><a class="login" href="login.html">Login</a></li></ul></nav>
+    </div>
+</header>
+
+<main class="nota-main">
+    <div class="container nota-shell">
+        <section class="nota-cabecalho">
+            <div><span class="nota-etiqueta">Documento comercial</span><h1>Nota de Serviço</h1><p>Registre os serviços executados e gere uma nota profissional em PDF.</p></div>
+            <button class="botao-claro" id="btnNovaNota" type="button">Nova nota</button>
+        </section>
+
+        <div id="notaAviso" class="nota-aviso" role="status" aria-live="polite"></div>
+
+        <section class="nota-painel" aria-labelledby="dadosNotaTitulo">
+            <div class="nota-painel-topo"><div><h2 id="dadosNotaTitulo">Dados da nota</h2><p>O número é gerado automaticamente e pode ser ajustado.</p></div><span class="nota-status-rascunho" id="estadoDocumento">Rascunho salvo</span></div>
+            <div class="nota-grid nota-grid--quatro">
+                <label><span>Número da nota *</span><input id="numeroNota" maxlength="30" required></label>
+                <label><span>Data de emissão *</span><input id="dataEmissao" type="date" required></label>
+                <label><span>Data de conclusão</span><input id="dataConclusao" type="date"></label>
+                <label><span>Status</span><select id="status"><option value="Concluído">Concluído</option><option value="Em andamento">Em andamento</option><option value="Pendente">Pendente</option><option value="Cancelado">Cancelado</option></select></label>
+                <label class="nota-campo-duplo"><span>Responsável pelo serviço</span><input id="responsavel" maxlength="100" placeholder="Nome do técnico ou responsável"></label>
+                <label class="nota-campo-duplo"><span>Local do serviço</span><input id="localServico" maxlength="180" placeholder="Endereço onde o serviço foi realizado"></label>
+            </div>
+        </section>
+
+        <section class="nota-painel" aria-labelledby="clienteTitulo">
+            <h2 id="clienteTitulo">Dados do cliente</h2>
+            <div class="nota-grid nota-grid--quatro">
+                <label class="nota-campo-duplo"><span>Nome / Razão social *</span><input id="clienteNome" autocomplete="name" maxlength="120" required></label>
+                <label><span>CPF / CNPJ</span><input id="clienteDocumento" maxlength="24" inputmode="numeric"></label>
+                <label><span>Telefone / WhatsApp</span><input id="clienteTelefone" type="tel" autocomplete="tel" maxlength="30"></label>
+                <label class="nota-campo-duplo"><span>Endereço</span><input id="clienteEndereco" autocomplete="street-address" maxlength="180"></label>
+                <label class="nota-campo-duplo"><span>E-mail</span><input id="clienteEmail" type="email" autocomplete="email" maxlength="120"></label>
+            </div>
+        </section>
+
+        <section class="nota-painel" aria-labelledby="novoServicoTitulo">
+            <div class="nota-painel-topo"><div><h2 id="novoServicoTitulo">Adicionar serviço</h2><p>Informe a descrição, quantidade e valor unitário.</p></div><span id="modoEdicaoServico" class="nota-status-edicao" hidden>Editando item</span></div>
+            <form id="formServico" novalidate>
+                <div class="nota-grid nota-grid--servico">
+                    <label class="nota-campo-descricao"><span>Descrição do serviço *</span><input id="servicoDescricao" maxlength="200" placeholder="Ex.: Instalação de box em vidro temperado" required></label>
+                    <label><span>Quantidade *</span><input id="servicoQuantidade" type="text" inputmode="decimal" value="1" required></label>
+                    <label><span>Unidade</span><select id="servicoUnidade"><option>un.</option><option>m²</option><option>m</option><option>hora</option><option>diária</option><option>serviço</option></select></label>
+                    <label><span>Valor unitário *</span><input id="servicoValor" type="text" inputmode="decimal" placeholder="0,00" required></label>
+                </div>
+                <div class="nota-acoes-form"><button class="botao" id="btnSalvarServico" type="submit">Adicionar serviço</button><button class="botao-claro" id="btnCancelarServico" type="button">Limpar</button></div>
+            </form>
+        </section>
+
+        <section class="nota-painel" aria-labelledby="servicosTitulo">
+            <div class="nota-painel-topo"><div><h2 id="servicosTitulo">Serviços da nota</h2><p id="servicosResumo">Nenhum serviço adicionado.</p></div></div>
+            <div class="nota-tabela-wrap"><table class="nota-tabela"><thead><tr><th>Descrição</th><th>Quant.</th><th>Unidade</th><th>Valor unit.</th><th>Total</th><th>Ações</th></tr></thead><tbody id="servicosCorpo"></tbody></table></div>
+            <div class="nota-totais">
+                <label><span>Desconto</span><div class="nota-campo-moeda"><span>R$</span><input id="desconto" type="text" inputmode="decimal" value="0,00"></div></label>
+                <dl><div><dt>Subtotal</dt><dd id="subtotalExibicao">R$ 0,00</dd></div><div class="nota-total-final"><dt>Total da nota</dt><dd id="totalExibicao">R$ 0,00</dd></div></dl>
+            </div>
+        </section>
+
+        <section class="nota-painel" aria-labelledby="detalhesTitulo">
+            <h2 id="detalhesTitulo">Pagamento e observações</h2>
+            <div class="nota-grid nota-grid--dois">
+                <label><span>Forma de pagamento</span><select id="formaPagamento"><option>Pix</option><option>Dinheiro</option><option>Cartão de débito</option><option>Cartão de crédito</option><option>Transferência bancária</option><option>Boleto</option><option>A combinar</option></select></label>
+                <label><span>Condição de pagamento</span><input id="condicaoPagamento" maxlength="120" placeholder="Ex.: Pago na conclusão do serviço"></label>
+                <label><span>Garantia</span><input id="garantia" maxlength="180" placeholder="Ex.: 90 dias para o serviço executado"></label>
+                <label><span>Referência / pedido</span><input id="referencia" maxlength="80" placeholder="Número do orçamento ou pedido"></label>
+                <label class="nota-campo-total"><span>Observações</span><textarea id="observacoes" rows="4" maxlength="1200" placeholder="Materiais utilizados, orientações ao cliente e outras informações"></textarea></label>
+            </div>
+        </section>
+
+        <div class="nota-acoes-finais">
+            <button class="botao" id="btnGerarPdf" type="button">Emitir e gerar PDF</button>
+            <button class="botao-claro" id="btnSalvarRascunho" type="button">Salvar rascunho</button>
+        </div>
+
+        <section class="nota-painel nota-historico" aria-labelledby="historicoTitulo">
+            <div class="nota-painel-topo"><div><h2 id="historicoTitulo">Notas salvas no Firestore</h2><p>Reabra uma nota para consultar, editar ou gerar o PDF novamente.</p></div><span id="historicoContagem">0 notas</span></div>
+            <div id="historicoLista" class="nota-historico-lista"></div>
+        </section>
+    </div>
+</main>
+<footer><p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p><p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p></footer>
+<script src="../js/vendor/pdf-lib.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=3.0.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.2"></script>
+<script src="../js/notas-servico/nota-servico-model.js?v=1.0.1"></script>
+<script src="../js/notas-servico/nota-servico-repository.js?v=1.0.0"></script>
+<script src="../js/notas-servico/nota-servico-pdf.js?v=1.0.0"></script>
+<script src="../js/notas-servico/nota-servico-ui.js?v=1.0.0"></script>
+<script src="../js/notas-servico/nota-servico-controller.js?v=1.1.1"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.6"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

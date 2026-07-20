@@ -32,7 +32,7 @@ const OrcamentoModel = {
         const vendedor = Util.$("vendedor")?.value?.trim() || dadosAnteriores.vendedor || "";
         const usuario = vendedor || dadosAnteriores.usuarios?.atualizacao || "Sistema";
         const statusAtual = Util.$("statusOrcamento")?.value || dadosAnteriores.status || "rascunho";
-        const numero = Util.$("numeroOrcamento")?.value?.trim() || dadosAnteriores.numero || this.numeroProvisorio();
+        const numero = Util.$("numeroOrcamento")?.value?.trim() || dadosAnteriores.numero || "";
         const dataCriacao = Util.$("dataCriacao")?.value || datasAnteriores.criacao || this.dataHoje();
         const dataValidade = Util.$("dataValidade")?.value || datasAnteriores.validade || this.dataValidadePadrao();
 
@@ -131,6 +131,8 @@ const OrcamentoModel = {
             valorM2: item.valorM2 ?? item.valorMetro ?? 0,
             valorFerragens: item.valorFerragens ?? item.acessorios ?? 0,
             valorServico: item.valorServico ?? 0,
+            valorAdicional: item.valorAdicional ?? 0,
+            descricaoAdicional: item.descricaoAdicional || "",
             observacoes: item.observacoes || ""
         };
     },

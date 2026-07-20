@@ -1,8 +1,6 @@
 const Funcionario = {
     chaveSolicitacoes: Config.storage.solicitacoesSite,
-    chaveCaixa: Config.storage.caixaEmpresa || "vidracaria_caixa_empresa",
     chaveConfig: Config.storage.configuracoesSistema || "vidracaria_configuracoes_sistema",
-    chaveSessao: "vidracaria_sessao_funcionario",
     chaveAnotacoes: "vidracaria_anotacoes_funcionario",
     chaveLembretes: Config.storage.lembretes || "vidracaria_lembretes",
     solicitacoes: [],
@@ -29,7 +27,10 @@ const Funcionario = {
     },
 
     async iniciar() {
-        this.verificarSessao();
+        const sessao = window.RKAuth
+            ? await RKAuth.aguardarAutenticacao()
+            : this.verificarSessao();
+        if (!sessao) return;
         this.carregarPerfilUsuario();
         this.prepararAbas();
         this.carregarConfiguracoesNaTela();
@@ -85,55 +86,32 @@ const Funcionario = {
 
 
     async carregarCaixa() {
-        let locais = Storage.carregar(this.chaveCaixa, []);
-        if (!Array.isArray(locais)) locais = [];
-        locais = this.normalizarListaCaixa(locais);
-
-        try {
-            if (typeof db !== "undefined" && db) {
-                const snap = await db.collection("caixa_empresa")
-                    .limit(200)
-                    .get();
-
-                const nuvem = [];
-                snap.forEach(doc => nuvem.push({ idFirestore: doc.id, ...doc.data() }));
-
-                const mapa = new Map();
-                [...locais, ...nuvem].forEach((mov, indice) => {
-                    const chave = mov.idFirestore || mov.idLocal || mov.criadoEmISO || `caixa_${indice}`;
-                    mapa.set(chave, mov);
-                });
-
-                this.caixa = this.ordenarMovimentosCaixa(this.normalizarListaCaixa(Array.from(mapa.values())));
-
-                Storage.salvar(this.chaveCaixa, this.caixa);
-                return;
-            }
-        } catch (erro) {
-            console.error("Erro ao carregar caixa da nuvem:", erro);
-        }
-
-        this.caixa = this.ordenarMovimentosCaixa(locais);
-        Storage.salvar(this.chaveCaixa, this.caixa);
+        CaixaService.configurar();
+        this.caixa = await CaixaService.listar();
     },
 
     normalizarListaCaixa(lista) {
+        if (window.CaixaService) {
+            return CaixaService.normalizarLista(lista);
+        }
+
         return (Array.isArray(lista) ? lista : [])
             .map((mov, indice) => this.normalizarMovimentoCaixa(mov, indice))
             .filter(Boolean);
     },
 
     normalizarMovimentoCaixa(mov = {}, indice = 0) {
-        const agoraISO = new Date().toISOString();
-        const criadoEmISO = mov.criadoEmISO || agoraISO;
-        const data = this.normalizarDataCaixa(mov.data, criadoEmISO);
+        if (window.CaixaService) {
+            return CaixaService.normalizarMovimento(mov, indice);
+        }
+
+        const data = this.normalizarDataCaixa(mov.data || mov.data_movimento);
         const referencia = this.obterReferenciasDataCaixa(data);
         const categoria = mov.categoria || (mov.tipo === "entrada" ? "entrada" : "despesa");
         const tipo = mov.tipo || (categoria === "entrada" ? "entrada" : "saida");
 
         return {
-            idLocal: mov.idLocal || `caixa_${criadoEmISO.replace(/[^0-9]/g, "") || Date.now()}_${indice}`,
-            idFirestore: mov.idFirestore || "",
+            caixaId: String(mov.caixaId ?? mov.caixa_id ?? ""),
             descricao: mov.descricao || "",
             categoria,
             tipo,
@@ -147,13 +125,16 @@ const Funcionario = {
             mesReferencia: mov.mesReferencia || referencia.mesReferencia,
             anoReferencia: Number(mov.anoReferencia || referencia.anoReferencia) || referencia.anoReferencia,
             diaReferencia: Number(mov.diaReferencia || referencia.diaReferencia) || referencia.diaReferencia,
-            criadoEm: mov.criadoEm || Util.agora(),
-            criadoEmISO,
-            atualizadoEmISO: mov.atualizadoEmISO || criadoEmISO
+            criadoEm: mov.criadoEm ?? mov.criado_em ?? "",
+            atualizadoEm: mov.atualizadoEm ?? mov.atualizado_em ?? ""
         };
     },
 
     normalizarDataCaixa(data, fallbackISO = "") {
+        if (window.CaixaModel) {
+            return CaixaModel.normalizarData(data, fallbackISO);
+        }
+
         const texto = String(data || "").slice(0, 10);
         if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) return texto;
 
@@ -164,6 +145,10 @@ const Funcionario = {
     },
 
     obterReferenciasDataCaixa(data) {
+        if (window.CaixaModel) {
+            return CaixaModel.obterReferencia(data);
+        }
+
         const normalizada = this.normalizarDataCaixa(data);
         const [ano, mes, dia] = normalizada.split("-");
         return {
@@ -174,6 +159,10 @@ const Funcionario = {
     },
 
     normalizarStatusCaixa(status) {
+        if (window.CaixaModel) {
+            return CaixaModel.normalizarStatus(status);
+        }
+
         const valor = String(status || "confirmado").toLowerCase();
         if (valor.includes("pend")) return "pendente";
         if (valor.includes("cancel")) return "cancelado";
@@ -181,9 +170,13 @@ const Funcionario = {
     },
 
     ordenarMovimentosCaixa(lista) {
+        if (window.CaixaService) {
+            return CaixaService.ordenar(lista);
+        }
+
         return (Array.isArray(lista) ? lista : []).sort((a, b) => {
-            const dataA = `${a.data || ""} ${a.criadoEmISO || ""}`;
-            const dataB = `${b.data || ""} ${b.criadoEmISO || ""}`;
+            const dataA = `${a.data || ""} ${a.criadoEm || ""}`;
+            const dataB = `${b.data || ""} ${b.criadoEm || ""}`;
             return String(dataB).localeCompare(String(dataA));
         });
     },
@@ -273,7 +266,7 @@ const Funcionario = {
             <ul>
                 ${itens.map((item, i) => `
                     <li>
-                        ${i + 1}. ${item.tipoVidro || "Item"} - ${item.largura || "?"}x${item.altura || "?"}cm - Qtd ${item.quantidade || 1} - ${Util.moeda(item.total || 0)}
+                        ${i + 1}. ${item.tipoVidro || "Item"} - ${item.altura || "?"}x${item.largura || "?"}cm - Qtd ${item.quantidade || 1} - ${Util.moeda(item.total || 0)}
                     </li>
                 `).join("")}
             </ul>
@@ -383,7 +376,7 @@ const Funcionario = {
         const altura = pedido.altura ? `${pedido.altura}cm` : "?";
         const quantidade = pedido.quantidade || 1;
         if (!pedido.largura && !pedido.altura) return `Qtd. ${quantidade}`;
-        return `${largura} x ${altura} | Qtd. ${quantidade}`;
+        return `${altura} x ${largura} | Qtd. ${quantidade}`;
     },
 
     montarObservacaoParaOrcamento(pedido) {
@@ -476,15 +469,11 @@ const Funcionario = {
         if (!valor || valor <= 0) return this.mensagemCaixa("Informe um valor maior que zero.", true);
 
         const tipo = categoria === "entrada" ? "entrada" : "saida";
-        const agoraISO = new Date().toISOString();
-        const referencia = this.obterReferenciasDataCaixa(data);
 
         // Base pronta para integrações futuras: entradas de orçamentos aprovados,
         // serviços/produtos, despesas de compras, pagamentos de funcionários e
         // relatórios mensais usando mesReferencia.
-        const movimento = this.normalizarMovimentoCaixa({
-            idLocal: `caixa_${Date.now()}`,
-            idFirestore: "",
+        const movimento = {
             descricao,
             categoria,
             tipo,
@@ -494,30 +483,14 @@ const Funcionario = {
             origem,
             observacao,
             responsavel,
-            status,
-            mesReferencia: referencia.mesReferencia,
-            anoReferencia: referencia.anoReferencia,
-            diaReferencia: referencia.diaReferencia,
-            criadoEm: Util.agora(),
-            criadoEmISO: agoraISO,
-            atualizadoEmISO: agoraISO
-        });
+            status
+        };
 
-        this.caixa.unshift(movimento);
-        Storage.salvar(this.chaveCaixa, this.caixa);
-
-        try {
-            if (typeof db !== "undefined" && db) {
-                // A coleção caixa_empresa permanece a mesma. As regras atuais estão abertas
-                // e futuramente devem exigir autenticação para leitura e gravação.
-                const ref = await db.collection("caixa_empresa").add(movimento);
-                movimento.idFirestore = ref.id;
-                await ref.set({ idFirestore: ref.id }, { merge: true });
-                Storage.salvar(this.chaveCaixa, this.caixa);
-            }
-        } catch (erro) {
-            console.error("Erro ao salvar movimento do caixa na nuvem:", erro);
+        const resultado = await CaixaService.salvar(movimento);
+        if (!resultado.sucesso) {
+            return this.mensagemCaixa(resultado.erros.join(" "), true);
         }
+        this.caixa = resultado.lista || await CaixaService.listar();
 
         const form = Util.$("formCaixa");
         if (form) form.reset();
@@ -721,7 +694,7 @@ const Funcionario = {
                         <strong>${entrada ? "+" : "-"} ${Util.moeda(mov.valor)}</strong>
                         <div class="caixa-movimento-acoes">
                             <button type="button" class="btn-caixa-acao cancelar" onclick="Funcionario.cancelarMovimentoCaixa('${chave}')" ${cancelado ? "disabled" : ""}>Cancelar</button>
-                            <button type="button" class="btn-caixa-acao excluir" onclick="Funcionario.excluirMovimentoCaixaDefinitivo('${chave}')">Excluir definitivo</button>
+                            <button type="button" class="btn-caixa-acao excluir" onclick="Funcionario.excluirMovimentoCaixaDefinitivo('${chave}')">Cancelar</button>
                         </div>
                     </div>
                 </div>
@@ -769,10 +742,8 @@ const Funcionario = {
         if (!mov || mov.status === "cancelado") return;
         if (!confirm("Cancelar este lançamento? Ele continuará no histórico, mas não entrará no saldo confirmado.")) return;
 
-        mov.status = "cancelado";
-        mov.atualizadoEmISO = new Date().toISOString();
-        Storage.salvar(this.chaveCaixa, this.caixa);
-        await this.sincronizarMovimentoCaixaNaNuvem(mov, { status: mov.status, atualizadoEmISO: mov.atualizadoEmISO });
+        const resultado = await CaixaService.cancelar(chave);
+        this.caixa = resultado.lista || await CaixaService.listar();
 
         this.atualizarCaixa();
         this.atualizarIndicadores();
@@ -784,24 +755,10 @@ const Funcionario = {
         if (!ativos.length) return this.mensagemCaixa("Não há lançamentos ativos para cancelar.", true);
         if (!confirm("Cancelar todos os lançamentos do caixa? Eles continuarão no histórico como cancelados.")) return;
 
-        const atualizadoEmISO = new Date().toISOString();
-        this.caixa = this.caixa.map(mov => ({ ...mov, status: "cancelado", atualizadoEmISO }));
-        Storage.salvar(this.chaveCaixa, this.caixa);
-
-        try {
-            if (typeof db !== "undefined" && db) {
-                const batch = db.batch();
-                let temOperacao = false;
-                ativos.forEach(mov => {
-                    if (!mov.idFirestore) return;
-                    batch.set(db.collection("caixa_empresa").doc(mov.idFirestore), { status: "cancelado", atualizadoEmISO }, { merge: true });
-                    temOperacao = true;
-                });
-                if (temOperacao) await batch.commit();
-            }
-        } catch (erro) {
-            console.error("Erro ao cancelar lançamentos na nuvem:", erro);
+        for (const mov of ativos) {
+            await CaixaService.cancelar(this.chaveMovimentoCaixa(mov, this.caixa.indexOf(mov)));
         }
+        this.caixa = await CaixaService.listar();
 
         this.atualizarCaixa();
         this.atualizarIndicadores();
@@ -814,23 +771,14 @@ const Funcionario = {
         const mov = this.caixa[indice];
         if (!mov) return;
 
-        const confirmacao = prompt("Exclusão definitiva remove o lançamento do histórico e da nuvem. Digite EXCLUIR para confirmar.");
-        if (confirmacao !== "EXCLUIR") return;
+        if (!confirm("Cancelar este lançamento? Ele continuará no histórico.")) return;
 
-        this.caixa.splice(indice, 1);
-        Storage.salvar(this.chaveCaixa, this.caixa);
-
-        try {
-            if (typeof db !== "undefined" && db && mov.idFirestore) {
-                await db.collection("caixa_empresa").doc(mov.idFirestore).delete();
-            }
-        } catch (erro) {
-            console.error("Erro ao excluir movimento da nuvem:", erro);
-        }
+        const resultado = await CaixaService.excluir(chave);
+        this.caixa = resultado.lista || await CaixaService.listar();
 
         this.atualizarCaixa();
         this.atualizarIndicadores();
-        this.mensagemCaixa("Lançamento excluído definitivamente.", false);
+        this.mensagemCaixa("Lançamento cancelado.", false);
     },
 
     async removerMovimentoCaixa(indice) {
@@ -840,13 +788,7 @@ const Funcionario = {
     },
 
     async sincronizarMovimentoCaixaNaNuvem(mov, dados) {
-        try {
-            if (typeof db !== "undefined" && db && mov.idFirestore) {
-                await db.collection("caixa_empresa").doc(mov.idFirestore).set(dados, { merge: true });
-            }
-        } catch (erro) {
-            console.error("Erro ao atualizar movimento na nuvem:", erro);
-        }
+        await CaixaService.atualizar(this.chaveMovimentoCaixa(mov), dados);
     },
 
     atualizarResumoRelatoriosCaixa(resumo) {
@@ -901,12 +843,17 @@ const Funcionario = {
         this.mensagemCaixa("CSV exportado com os lançamentos filtrados.", false);
     },
 
-    exportarCaixaJSON() {
+    async exportarCaixaJSON() {
         const lista = this.obterLancamentosCaixaFiltrados();
         if (!lista.length) return this.mensagemCaixa("Não há lançamentos para exportar.", true);
 
-        const conteudo = JSON.stringify(this.normalizarListaCaixa(lista), null, 2);
-        this.baixarArquivoCaixa(`caixa_empresa_${new Date().toISOString().slice(0, 10)}.json`, conteudo, "application/json;charset=utf-8");
+        if (window.CaixaService) {
+            CaixaExport.baixar(lista);
+        } else {
+            const conteudo = JSON.stringify(this.normalizarListaCaixa(lista), null, 2);
+            this.baixarArquivoCaixa(`caixa_empresa_${new Date().toISOString().slice(0, 10)}.json`, conteudo, "application/json;charset=utf-8");
+        }
+
         this.mensagemCaixa("JSON exportado com os lançamentos filtrados.", false);
     },
 
@@ -928,7 +875,11 @@ const Funcionario = {
     },
 
     chaveMovimentoCaixa(mov, indice = 0) {
-        return String(mov?.idFirestore || mov?.idLocal || mov?.criadoEmISO || `caixa_${indice}`);
+        if (window.CaixaService) {
+            return CaixaService.chave(mov, indice);
+        }
+
+        return String(mov?.caixaId || mov?.caixa_id || `caixa_${indice}`);
     },
 
     indiceMovimentoCaixaPorChave(chave) {
@@ -991,25 +942,32 @@ const Funcionario = {
 
 
     verificarSessao() {
-        const sessao = Storage.carregar(this.chaveSessao, null);
+        const sessao = window.RKAuth ? RKAuth.obterSessao() : null;
         if (!sessao || !sessao.logado) {
-            // Mantém compatibilidade para testes locais: se a página for aberta direto pelo arquivo,
-            // não bloqueia completamente, mas recomenda login quando publicada.
-            if (location.protocol !== "file:") {
-                window.location.href = "login.html";
+            if (window.RKAuth) {
+                RKAuth.redirecionarLogin();
+            } else {
+                window.location.replace("login.html");
             }
+            return null;
         }
+
+        return sessao;
     },
 
     sair() {
-        Storage.remover(this.chaveSessao);
+        if (window.RKAuth) {
+            RKAuth.sair();
+            return;
+        }
+
+        localStorage.removeItem("usuarioLogado");
+        sessionStorage.removeItem("usuarioLogado");
         window.location.href = "login.html";
     },
 
     obterConfiguracoesSistema() {
         const padrao = {
-            usuario: "admin",
-            senha: "1234",
             nomeUsuario: "Funcionário RK",
             fotoUsuario: "",
             nomeEmpresa: Config.empresa?.nome || "RK Vidraçaria",
@@ -1021,8 +979,10 @@ const Funcionario = {
             lembreteIntervaloMinutos: "5",
             lembreteQuantidadeAviso: "3"
         };
-        const salvas = Storage.carregar(this.chaveConfig, {});
-        return { ...padrao, ...(salvas || {}) };
+        const salvas = { ...(Storage.carregar(this.chaveConfig, {}) || {}) };
+        delete salvas.usuario;
+        delete salvas.senha;
+        return { ...padrao, ...salvas };
     },
 
     salvarConfiguracoesSistema(config) {
@@ -1034,11 +994,17 @@ const Funcionario = {
 
     carregarPerfilUsuario() {
         const config = this.obterConfiguracoesSistema();
-        this.texto("nomeUsuarioTopo", config.nomeUsuario || "Funcionário RK");
-        this.texto("loginUsuarioTopo", config.usuario || "admin");
-        this.aplicarFotoUsuario("fotoUsuarioTopo", config);
-        this.aplicarFotoUsuario("fotoUsuarioPreview", config);
-        this.texto("nomeUsuarioPreview", config.nomeUsuario || "Funcionário RK");
+        const sessao = window.RKAuth?.obterSessao() || {};
+        const perfil = {
+            ...config,
+            nomeUsuario: config.nomeUsuario || sessao.nomeUsuario || "Funcionário RK",
+            fotoUsuario: config.fotoUsuario || sessao.fotoUsuario || ""
+        };
+        this.texto("nomeUsuarioTopo", perfil.nomeUsuario);
+        this.texto("loginUsuarioTopo", sessao.email || "Firebase Authentication");
+        this.aplicarFotoUsuario("fotoUsuarioTopo", perfil);
+        this.aplicarFotoUsuario("fotoUsuarioPreview", perfil);
+        this.texto("nomeUsuarioPreview", perfil.nomeUsuario);
     },
 
     aplicarFotoUsuario(id, config) {
@@ -1049,7 +1015,7 @@ const Funcionario = {
             el.classList.add("com-imagem");
             return;
         }
-        const nome = (config.nomeUsuario || config.usuario || "RK").trim();
+        const nome = (config.nomeUsuario || "RK").trim();
         const partes = nome.split(/\s+/).filter(Boolean);
         el.textContent = (partes[0]?.[0] || "R") + (partes[1]?.[0] || "K");
         el.classList.remove("com-imagem");
@@ -1072,10 +1038,10 @@ const Funcionario = {
 
     carregarConfiguracoesNaTela() {
         const c = this.obterConfiguracoesSistema();
+        const sessao = window.RKAuth?.obterSessao() || {};
         const campos = {
             cfgNomeUsuario: c.nomeUsuario,
-            cfgUsuario: c.usuario,
-            cfgSenha: c.senha,
+            cfgEmailUsuario: sessao.email || "",
             cfgNomeEmpresa: c.nomeEmpresa,
             cfgTelefoneEmpresa: c.telefoneEmpresa,
             cfgEnderecoEmpresa: c.enderecoEmpresa,
@@ -1106,7 +1072,7 @@ const Funcionario = {
         if (reset && !reset.dataset.registrado) {
             reset.dataset.registrado = "1";
             reset.addEventListener("click", () => {
-                if (!confirm("Restaurar login, perfil e configurações para o padrão?")) return;
+                if (!confirm("Restaurar perfil e configurações para o padrão?")) return;
                 Storage.remover(this.chaveConfig);
                 this.carregarConfiguracoesNaTela();
                 this.mensagemConfig("Configurações restauradas.");
@@ -1136,17 +1102,10 @@ const Funcionario = {
     },
 
     async salvarConfiguracoesDaTela() {
-        const usuario = (Util.$("cfgUsuario")?.value || "admin").trim();
-        const senha = Util.$("cfgSenha")?.value || "1234";
         const nomeUsuario = (Util.$("cfgNomeUsuario")?.value || "Funcionário RK").trim();
-
-        if (!usuario) return this.mensagemConfig("Informe o login do usuário.", true);
-        if (!senha || senha.length < 4) return this.mensagemConfig("A senha deve ter pelo menos 4 caracteres.", true);
 
         const atual = this.obterConfiguracoesSistema();
         const config = this.salvarConfiguracoesSistema({
-            usuario,
-            senha,
             nomeUsuario,
             fotoUsuario: this._fotoUsuarioTemporaria || atual.fotoUsuario || "",
             nomeEmpresa: (Util.$("cfgNomeEmpresa")?.value || "").trim(),
@@ -1159,25 +1118,16 @@ const Funcionario = {
             lembreteQuantidadeAviso: Util.$("cfgLembreteQuantidade")?.value || "3"
         });
 
-        Storage.salvar(this.chaveSessao, {
-            logado: true,
-            usuario: config.usuario,
-            nomeUsuario: config.nomeUsuario,
-            fotoUsuario: config.fotoUsuario,
-            entradaEm: new Date().toISOString()
-        });
-
         this._fotoUsuarioTemporaria = null;
         this.carregarConfiguracoesNaTela();
         this.carregarPerfilUsuario();
-        this.mensagemConfig("Configurações salvas. O novo login já está valendo.");
+        this.mensagemConfig("Configurações salvas. O acesso continua protegido pelo Firebase Authentication.");
         this.iniciarAvisosDeLembretes();
 
         try {
             if (typeof db !== "undefined" && db) {
                 await db.collection("configuracoes").doc("sistema").set({
                     nomeUsuario: config.nomeUsuario,
-                    usuario: config.usuario,
                     nomeEmpresa: config.nomeEmpresa,
                     telefoneEmpresa: config.telefoneEmpresa,
                     enderecoEmpresa: config.enderecoEmpresa,

@@ -24,8 +24,9 @@ const OrcamentoCalculos = {
         const valorM2 = Math.max(0, Util.numero(item.valorM2 ?? item.valorMetro));
         const valorFerragens = Math.max(0, Util.numero(item.valorFerragens ?? item.ferragens ?? item.acessorios));
         const valorServico = Math.max(0, Util.numero(item.valorServico ?? item.servicos ?? item.maoObra));
+        const valorAdicional = Math.max(0, Util.numero(item.valorAdicional));
         const totalVidro = areaM2 * valorM2 * quantidade;
-        const total = totalVidro + valorFerragens + valorServico;
+        const total = totalVidro + valorFerragens + valorServico + valorAdicional;
 
         return {
             ...item,
@@ -45,11 +46,14 @@ const OrcamentoCalculos = {
             valorMetro: valorM2,
             valorFerragens,
             valorServico,
+            valorAdicional,
+            descricaoAdicional: item.descricaoAdicional || "",
             acessorios: valorFerragens,
             totalVidro: Util.arredondar(totalVidro, 2),
             totalFerragens: Util.arredondar(valorFerragens, 2),
             totalAcessorios: Util.arredondar(valorFerragens, 2),
             totalServico: Util.arredondar(valorServico, 2),
+            totalAdicional: Util.arredondar(valorAdicional, 2),
             totalAluminio: 0,
             aluminio: 0,
             despesa: 0,
@@ -61,7 +65,9 @@ const OrcamentoCalculos = {
     calcularTotais(itens = [], ajustes = {}) {
         const lista = Array.isArray(itens) ? itens : [];
         const ajustesNormalizados = this.normalizarAjustes(ajustes);
-        const subtotal = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.total)), 0);
+        const totalItens = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.total)), 0);
+        const totalAdicionais = lista.reduce((soma, item) => soma + Math.max(0, Util.numero(item.valorAdicional)), 0);
+        const subtotal = Math.max(0, totalItens - totalAdicionais);
         const areaTotalM2 = lista.reduce((soma, item) => {
             const area = Util.numero(item.areaM2 ?? item.area);
             const quantidade = Math.max(1, Util.numero(item.quantidade) || 1);
@@ -70,17 +76,24 @@ const OrcamentoCalculos = {
 
         const descontoValor = Math.max(0, Util.numero(ajustesNormalizados.descontoValor));
         const descontoPercentual = Math.min(100, Math.max(0, Util.numero(ajustesNormalizados.descontoPercentual)));
-        const descontoPercentualValor = subtotal * (descontoPercentual / 100);
-        const descontoTotal = Math.min(subtotal, descontoValor + descontoPercentualValor);
+        const descontoPercentualValor = totalItens * (descontoPercentual / 100);
+        const descontoTotal = Math.min(totalItens, descontoValor + descontoPercentualValor);
         const acrescimo = Math.max(0, Util.numero(ajustesNormalizados.acrescimo));
         const frete = Math.max(0, Util.numero(ajustesNormalizados.frete));
         const instalacao = Math.max(0, Util.numero(ajustesNormalizados.instalacao));
-        const totalFinal = Math.max(0, subtotal - descontoTotal + acrescimo + frete + instalacao);
+        const totalFinal = Math.max(0, totalItens - descontoTotal + acrescimo + frete + instalacao);
+        const adicionais = lista
+            .filter(item => Util.numero(item.valorAdicional) > 0)
+            .map(item => ({
+                descricao: String(item.descricaoAdicional || "Adicional").trim(),
+                valor: Util.arredondar(Util.numero(item.valorAdicional), 2)
+            }));
 
         return {
             quantidadeItens: lista.length,
             areaTotalM2: Util.arredondar(areaTotalM2, 3),
             subtotal: Util.arredondar(subtotal, 2),
+            totalAdicionais: Util.arredondar(totalAdicionais, 2),
             descontoValor: Util.arredondar(descontoValor, 2),
             descontoPercentual: Util.arredondar(descontoPercentual, 2),
             descontoPercentualValor: Util.arredondar(descontoPercentualValor, 2),
@@ -89,6 +102,7 @@ const OrcamentoCalculos = {
             acrescimo: Util.arredondar(acrescimo, 2),
             frete: Util.arredondar(frete, 2),
             instalacao: Util.arredondar(instalacao, 2),
+            adicionais,
             totalFinal: Util.arredondar(totalFinal, 2),
             total: Util.arredondar(totalFinal, 2)
         };

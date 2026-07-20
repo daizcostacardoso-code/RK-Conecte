@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
+    <script>document.documentElement.classList.add("orcamento-inteligente-html");</script>
+    <title>Or&ccedil;amento Inteligente - RK Vidra&ccedil;aria</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=5.9.5">
+    <link rel="stylesheet" href="../css/orcamento-inteligente-mobile.css?v=1.0.9">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidra&ccedil;aria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="orcamento-inteligente-page">
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria">
+            <div>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Centro Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="orcamento.html">Or&ccedil;amento</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="orcamentoInteligenteContextoFixo" class="orcamento-inteligente-contexto-fixo" aria-live="polite" hidden>
+    <span class="orcamento-inteligente-contexto-cliente">
+        <small>Cliente</small>
+        <strong data-orcamento-contexto-cliente></strong>
+    </span>
+    <span class="orcamento-inteligente-contexto-itens" aria-label="Quantidade de itens adicionados">
+        <strong data-orcamento-contexto-itens>0</strong>
+        <small data-orcamento-contexto-itens-rotulo>itens</small>
+    </span>
+    <div class="orcamento-inteligente-configuracoes orcamento-inteligente-configuracoes-contexto">
+        <button type="button" class="orcamento-inteligente-configuracoes-gatilho" data-orcamento-configuracoes-gatilho aria-expanded="false" aria-controls="orcamentoConfiguracoesMobile" aria-label="Abrir configurações do orçamento" title="Configurações do orçamento">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M19.14 12.94a7.8 7.8 0 0 0 .05-.94 7.8 7.8 0 0 0-.05-.94l2.03-1.58-1.92-3.32-2.39.96a7.25 7.25 0 0 0-1.63-.94L14.87 3h-3.84l-.36 3.18c-.58.24-1.12.56-1.62.94l-2.4-.96-1.92 3.32 2.04 1.58a7.8 7.8 0 0 0-.05.94c0 .32.02.63.05.94l-2.04 1.58 1.92 3.32 2.4-.96c.5.38 1.04.7 1.62.94l.36 3.18h3.84l.36-3.18c.59-.24 1.13-.56 1.63-.94l2.39.96 1.92-3.32-2.03-1.58ZM12.95 15.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4Z"/>
+            </svg>
+        </button>
+        <div id="orcamentoConfiguracoesMobile" class="orcamento-inteligente-configuracoes-menu" data-orcamento-configuracoes-menu hidden>
+            <strong>Configurações</strong>
+            <button type="button" class="orcamento-inteligente-configuracoes-acao orcamento-inteligente-configuracoes-acao-perigo" data-orcamento-action="novo-orcamento">
+                <span aria-hidden="true">&#128465;</span>
+                <span><b>Limpar orçamento</b><small>Começar um orçamento vazio</small></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<main class="orcamento-inteligente-modulo">
+    <div class="container">
+        <section class="orcamento-inteligente-cabecalho" aria-labelledby="orcamentoInteligenteTitulo">
+            <div>
+                <span class="orcamento-inteligente-label">Centro Comercial</span>
+                <h1 id="orcamentoInteligenteTitulo">Or&ccedil;amento Inteligente</h1>
+                <p>Crie propostas comerciais com m&uacute;ltiplos servi&ccedil;os e itens sob medida.</p>
+            </div>
+
+            <div class="orcamento-inteligente-configuracoes orcamento-inteligente-configuracoes-cabecalho">
+                <button type="button" class="orcamento-inteligente-configuracoes-gatilho" data-orcamento-configuracoes-gatilho aria-expanded="false" aria-controls="orcamentoConfiguracoesCabecalho" aria-label="Abrir configurações do orçamento" title="Configurações do orçamento">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.14 12.94a7.8 7.8 0 0 0 .05-.94 7.8 7.8 0 0 0-.05-.94l2.03-1.58-1.92-3.32-2.39.96a7.25 7.25 0 0 0-1.63-.94L14.87 3h-3.84l-.36 3.18c-.58.24-1.12.56-1.62.94l-2.4-.96-1.92 3.32 2.04 1.58a7.8 7.8 0 0 0-.05.94c0 .32.02.63.05.94l-2.04 1.58 1.92 3.32 2.4-.96c.5.38 1.04.7 1.62.94l.36 3.18h3.84l.36-3.18c.59-.24 1.13-.56 1.63-.94l2.39.96 1.92-3.32-2.03-1.58ZM12.95 15.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4Z"/></svg>
+                </button>
+                <div id="orcamentoConfiguracoesCabecalho" class="orcamento-inteligente-configuracoes-menu" data-orcamento-configuracoes-menu hidden>
+                    <strong>Configurações</strong>
+                    <button type="button" class="orcamento-inteligente-configuracoes-acao orcamento-inteligente-configuracoes-acao-perigo" data-orcamento-action="novo-orcamento"><span aria-hidden="true">&#128465;</span><span><b>Limpar orçamento</b><small>Começar um orçamento vazio</small></span></button>
+                </div>
+            </div>
+        </section>
+
+        <section class="orcamento-inteligente-painel orcamento-inteligente-etapas-painel" aria-labelledby="orcamentoInteligenteEtapasTitulo">
+            <div class="orcamento-inteligente-painel-topo">
+                <div>
+                    <h2 id="orcamentoInteligenteEtapasTitulo">Etapas</h2>
+                    <p id="orcamentoInteligenteStatus">Contexto em prepara&ccedil;&atilde;o.</p>
+                </div>
+            </div>
+            <div id="orcamentoInteligenteEtapas" class="orcamento-inteligente-etapas"></div>
+        </section>
+
+        <section class="orcamento-inteligente-layout">
+            <div class="orcamento-inteligente-principal">
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoClienteTitulo" data-orcamento-secao="cliente">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Cliente</span>
+                            <h2 id="orcamentoClienteTitulo">Sele&ccedil;&atilde;o de cliente</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteCliente" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProjetoTitulo" data-orcamento-secao="projeto">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Projeto</span>
+                            <h2 id="orcamentoProjetoTitulo">Sele&ccedil;&atilde;o de projeto</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteProjeto" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoProdutosTitulo" data-orcamento-secao="produtos">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Itens</span>
+                            <h2 id="orcamentoProdutosTitulo">Adicionar itens</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteProdutos" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoRevisaoTitulo" data-orcamento-secao="revisao">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">Revis&atilde;o</span>
+                            <h2 id="orcamentoRevisaoTitulo">Revis&atilde;o dos itens</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteRevisao" class="orcamento-inteligente-placeholder"></div>
+                </section>
+
+                <section class="orcamento-inteligente-painel" aria-labelledby="orcamentoCalculoTitulo" data-orcamento-secao="calculo">
+                    <div class="orcamento-inteligente-painel-topo">
+                        <div>
+                            <span class="orcamento-inteligente-label">C&aacute;lculo</span>
+                            <h2 id="orcamentoCalculoTitulo">Resultado do c&aacute;lculo</h2>
+                        </div>
+                    </div>
+                    <div id="orcamentoInteligenteCalculo" class="orcamento-inteligente-placeholder"></div>
+                </section>
+            </div>
+
+            <aside class="orcamento-inteligente-painel orcamento-inteligente-resumo-painel" aria-labelledby="orcamentoResumoTitulo" data-orcamento-secao="resumo">
+                <div class="orcamento-inteligente-painel-topo">
+                    <div>
+                        <span class="orcamento-inteligente-label">Resumo</span>
+                        <h2 id="orcamentoResumoTitulo">Resumo final</h2>
+                    </div>
+                    <div class="orcamento-inteligente-configuracoes orcamento-inteligente-configuracoes-resumo">
+                        <button type="button" class="orcamento-inteligente-configuracoes-gatilho" data-orcamento-configuracoes-gatilho aria-expanded="false" aria-controls="orcamentoConfiguracoesDesktop" aria-label="Abrir configurações do orçamento" title="Configurações do orçamento">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.14 12.94a7.8 7.8 0 0 0 .05-.94 7.8 7.8 0 0 0-.05-.94l2.03-1.58-1.92-3.32-2.39.96a7.25 7.25 0 0 0-1.63-.94L14.87 3h-3.84l-.36 3.18c-.58.24-1.12.56-1.62.94l-2.4-.96-1.92 3.32 2.04 1.58a7.8 7.8 0 0 0-.05.94c0 .32.02.63.05.94l-2.04 1.58 1.92 3.32 2.4-.96c.5.38 1.04.7 1.62.94l.36 3.18h3.84l.36-3.18c.59-.24 1.13-.56 1.63-.94l2.39.96 1.92-3.32-2.03-1.58ZM12.95 15.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4Z"/></svg>
+                        </button>
+                        <div id="orcamentoConfiguracoesDesktop" class="orcamento-inteligente-configuracoes-menu" data-orcamento-configuracoes-menu hidden>
+                            <strong>Configurações</strong>
+                            <button type="button" class="orcamento-inteligente-configuracoes-acao orcamento-inteligente-configuracoes-acao-perigo" data-orcamento-action="novo-orcamento"><span aria-hidden="true">&#128465;</span><span><b>Limpar orçamento</b><small>Começar um orçamento vazio</small></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="orcamentoInteligenteResumo" class="orcamento-inteligente-resumo"></div>
+            </aside>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 RK Vidra&ccedil;aria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="../js/config.js?v=3.9.1"></script>
+<script src="../js/storage.js?v=3.9.1"></script>
+<script src="../js/util.js?v=3.9.1"></script>
+<script src="../js/storage/storage-adapter.js?v=3.9.1"></script>
+<script src="../js/storage/local-storage-adapter.js?v=5.4.0"></script>
+<script src="../js/storage/memory-adapter.js?v=3.9.1"></script>
+<script src="../js/core/event-types.js?v=5.1A"></script>
+<script src="../js/core/event-bus.js?v=5.1A"></script>
+<script src="../js/core/app-state-events.js?v=5.1A"></script>
+<script src="../js/core/app-state.js?v=5.1A"></script>
+<script src="../js/core/app-state-service.js?v=5.1A"></script>
+<script src="../js/workflow/workflow-state.js?v=3.9.1"></script>
+<script src="../js/workflow/workflow-validator.js?v=3.9.1"></script>
+<script src="../js/workflow/workflow-events.js?v=3.9.1"></script>
+<script src="../js/workflow/workflow-engine.js?v=3.9.1"></script>
+<script src="../js/clientes/cliente-model.js?v=3.9.1"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=3.0.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.1.0"></script>
+<script src="../js/clientes/cliente-factory.js?v=3.9.1"></script>
+<script src="../js/clientes/cliente-validator.js?v=3.9.1"></script>
+<script src="../js/clientes/cliente-repository.js?v=6.1.1"></script>
+<script src="../js/clientes/cliente-service.js?v=3.9.1"></script>
+<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=5.2.1"></script>
+<script src="../js/projetos/projeto-status.js?v=3.9.1"></script>
+<script src="../js/projetos/projeto-historico.js?v=3.9.1"></script>
+<script src="../js/projetos/projeto-model.js?v=3.9.1"></script>
+<script src="../js/projetos/projeto-storage.js?v=3.9.1"></script>
+<script src="../js/projetos/projeto-service.js?v=3.9.1"></script>
+<script src="../js/servicos/servico-model.js?v=5.6.7"></script>
+<script src="../js/servicos/servico-factory.js?v=3.9.1"></script>
+<script src="../js/servicos/servico-validator.js?v=3.9.1"></script>
+<script src="../js/servicos/servico-repository.js?v=3.9.1"></script>
+<script src="../js/servicos/servico-service.js?v=3.9.1"></script>
+<script src="../js/produtos/produto-model.js?v=3.9.1"></script>
+<script src="../js/produtos/produto-factory.js?v=3.9.1"></script>
+<script src="../js/produtos/produto-validator.js?v=3.9.1"></script>
+<script src="../js/produtos/produto-repository.js?v=6.1.0"></script>
+<script src="../js/produtos/produto-service.js?v=3.9.1"></script>
+<script src="../js/calculos/calculo-model.js?v=3.9.1"></script>
+<script src="../js/calculos/calculo-validator.js?v=3.9.1"></script>
+<script src="../js/calculos/calculo-engine.js?v=7.2.1"></script>
+<script src="../js/calculos/calculo-service.js?v=7.2.1"></script>
+<script src="../js/orcamentos/orcamento-state.js?v=3.9.1"></script>
+<script src="../js/orcamentos/orcamento-context.js?v=5.3.0"></script>
+<script src="../js/orcamentos/orcamento-factory.js?v=3.9.1"></script>
+<script src="../js/orcamentos/orcamento-item-config.js?v=5.6.7"></script>
+<script src="../js/orcamentos/orcamento-orchestrator.js?v=7.2.1"></script>
+<script src="../js/usecases/orcamentos/criar-orcamento-usecase.js?v=3.9.1"></script>
+<script src="../js/usecases/orcamentos/calcular-orcamento-usecase.js?v=3.9.1"></script>
+<script src="../js/usecases/orcamentos/validar-orcamento-usecase.js?v=3.9.1"></script>
+<script src="../js/documentos/document-model.js?v=7.2.1"></script>
+<script src="../js/documentos/document-builder.js?v=7.2.1"></script>
+<script src="../js/documentos/document-validator.js?v=5.1A"></script>
+<script src="../js/documentos/document-service.js?v=5.8.5"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-model.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-validator.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-repository.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-service.js?v=1.0.0"></script>
+<script src="../js/documentos/document-pdf-repository.js?v=6.0.4"></script>
+<script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
+<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=7.2.1"></script>
+<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=7.2.2"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

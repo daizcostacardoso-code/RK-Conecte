@@ -52,6 +52,8 @@ const Eventos = {
             "valorM2",
             "valorFerragens",
             "valorServico",
+            "valorAdicional",
+            "descricaoAdicional",
             "observacoesItem",
             "acessorios"
         ];
@@ -62,13 +64,25 @@ const Eventos = {
             if (!campo) return;
 
             campo.addEventListener("input", () => {
+                this.atualizarObrigatoriedadeAdicional();
                 this.atualizarPrevia();
             });
 
             campo.addEventListener("change", () => {
+                this.atualizarObrigatoriedadeAdicional();
                 this.atualizarPrevia();
             });
         });
+    },
+
+    atualizarObrigatoriedadeAdicional() {
+        const valor = Util.$("valorAdicional");
+        const descricao = Util.$("descricaoAdicional");
+        if (!valor || !descricao) return;
+
+        const obrigatoria = Math.max(0, Util.numero(valor.value)) > 0;
+        descricao.required = obrigatoria;
+        descricao.setAttribute("aria-required", obrigatoria ? "true" : "false");
     },
 
     camposDesconto() {

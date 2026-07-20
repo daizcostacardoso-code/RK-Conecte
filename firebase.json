@@ -1,14 +1,36 @@
 {
   "hosting": {
     "public": ".",
+    "predeploy": [
+      "npm run check"
+    ],
     "ignore": [
       "firebase.json",
+      "firestore.rules",
+      "package.json",
+      "package-lock.json",
+      "README.md",
+      "CHANGELOG.md",
+      "LIMPEZA_REALIZADA.txt",
       "**/.*",
       "**/node_modules/**",
-      "docs/**"
+      "docs/**",
+      "patchs/**",
+      "scripts/**",
+      "tests/**",
+      "tmp/**"
     ]
   },
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
   }
 }

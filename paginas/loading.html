@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
     <title>Carregando - RK Vidraçaria</title>
-    <link rel="stylesheet" href="../css/style.css?v=3.2.0">
+    <link rel="stylesheet" href="../css/style.css?v=5.8.0">
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,14 +32,14 @@
                 <div class="splash-avatar" id="splashAvatar">RK</div>
                 <div>
                     <strong id="splashUsuario">Funcionário RK</strong>
-                    <small id="splashLogin">admin</small>
+                    <small id="splashLogin">Validando acesso...</small>
                 </div>
             </div>
 
             <div class="splash-info-grid">
                 <div>
                     <span>Versão</span>
-                    <strong>RK Vidraçaria v2.7</strong>
+                    <strong>RK Vidraçaria v0.4.2</strong>
                 </div>
                 <div>
                     <span>CNPJ</span>
@@ -43,7 +47,7 @@
                 </div>
                 <div>
                     <span>Sistema</span>
-                    <strong>Connect Suite</strong>
+                    <strong>RK Vidra&ccedil;aria</strong>
                 </div>
             </div>
 
@@ -56,26 +60,22 @@
     </main>
 
     <script>
-        (function(){
-            const chaveSessao = "vidracaria_sessao_funcionario";
+        (async function(){
             const chaveConfig = "vidracaria_configuracoes_sistema";
-            const sessao = JSON.parse(localStorage.getItem(chaveSessao) || "null");
+            const sessao = await RKAuth.aguardarAutenticacao();
             const config = JSON.parse(localStorage.getItem(chaveConfig) || "{}");
 
-            if (!sessao || !sessao.logado) {
-                window.location.href = "login.html";
-                return;
-            }
+            if (!sessao || !sessao.logado) return;
 
             const nomeEmpresa = config.nomeEmpresa || "RK Vidraçaria";
             const nomeUsuario = sessao.nomeUsuario || config.nomeUsuario || "Funcionário RK";
-            const loginUsuario = sessao.usuario || config.usuario || "admin";
+            const emailUsuario = sessao.email || sessao.usuario || "";
             const foto = sessao.fotoUsuario || config.fotoUsuario || "";
             const cnpj = config.cnpjEmpresa || config.cnpj || "Não informado";
 
             document.getElementById("splashEmpresa").textContent = nomeEmpresa;
             document.getElementById("splashUsuario").textContent = nomeUsuario;
-            document.getElementById("splashLogin").textContent = "Usuário: " + loginUsuario;
+            document.getElementById("splashLogin").textContent = emailUsuario;
             document.getElementById("splashCnpj").textContent = cnpj;
 
             const avatar = document.getElementById("splashAvatar");
@@ -88,10 +88,11 @@
             }
 
             setTimeout(() => {
-                window.location.href = "funcionario.html";
+                window.location.href = "dashboard-comercial.html";
             }, 2600);
         })();
     </script>
     <script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
 </body>
 </html>

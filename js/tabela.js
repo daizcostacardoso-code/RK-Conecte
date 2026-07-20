@@ -17,6 +17,7 @@ const Tabela = {
             const valorM2 = item.valorM2 ?? item.valorMetro ?? item.valorVidro ?? 0;
             const valorFerragens = item.valorFerragens ?? item.totalFerragens ?? item.totalAcessorios ?? item.acessorios ?? 0;
             const valorServico = item.valorServico ?? item.totalServico ?? 0;
+            const valorAdicional = item.valorAdicional ?? item.totalAdicional ?? 0;
 
             tr.innerHTML = `
                 <td>${indice + 1}</td>
@@ -31,6 +32,7 @@ const Tabela = {
                 <td>${Util.moeda(valorM2)}</td>
                 <td>${Util.moeda(valorFerragens)}</td>
                 <td>${Util.moeda(valorServico)}</td>
+                <td>${valorAdicional > 0 ? `${this.texto(item.descricaoAdicional || "Adicional")} - ${Util.moeda(valorAdicional)}` : ""}</td>
                 <td>${Util.moeda(item.total)}</td>
                 <td>
                     <button type="button" onclick="Tabela.excluir(${indice})">

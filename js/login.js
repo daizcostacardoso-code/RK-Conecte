@@ -1,40 +1,82 @@
 const Login = {
-    chaveConfig: "vidracaria_configuracoes_sistema",
+    processando: false,
 
-    obterConfiguracoes() {
-        try {
-            const salvas = JSON.parse(localStorage.getItem(this.chaveConfig) || "{}");
-            return {
-                usuario: salvas.usuario || "admin",
-                senha: salvas.senha || "1234",
-                nomeUsuario: salvas.nomeUsuario || "Funcionário RK",
-                fotoUsuario: salvas.fotoUsuario || ""
-            };
-        } catch (erro) {
-            return { usuario: "admin", senha: "1234", nomeUsuario: "Funcionário RK", fotoUsuario: "" };
-        }
-    },
-
-    entrar(event) {
+    async entrar(event) {
         event.preventDefault();
+        if (this.processando) return;
 
-        const usuario = document.getElementById("usuario")?.value.trim() || "";
+        const email = document.getElementById("email")?.value.trim() || "";
         const senha = document.getElementById("senha")?.value || "";
-        const config = this.obterConfiguracoes();
+        const autenticacao = window.RKAuth?.obterInstanciaFirebase();
 
-        if (usuario === config.usuario && senha === config.senha) {
-            localStorage.setItem("vidracaria_sessao_funcionario", JSON.stringify({
-                logado: true,
-                usuario: config.usuario,
-                nomeUsuario: config.nomeUsuario,
-                fotoUsuario: config.fotoUsuario,
-                entradaEm: new Date().toISOString()
-            }));
-            window.location.href = "loading.html";
+        if (!autenticacao) {
+            this.mostrarMensagem("Não foi possível conectar ao serviço de autenticação.");
             return;
         }
 
+        this.alterarProcessamento(true);
+        this.mostrarMensagem("");
+
+        try {
+            await autenticacao.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            const credencial = await autenticacao.signInWithEmailAndPassword(email, senha);
+            if (window.RKAuth) RKAuth.processarEstado(credencial.user);
+            else window.location.replace("dashboard-comercial.html");
+        } catch (erro) {
+            this.mostrarMensagem(this.mensagemErro(erro));
+            this.alterarProcessamento(false);
+        }
+    },
+
+    preparar() {
+        const erro = new URLSearchParams(window.location.search).get("erro");
+        if (erro === "sessao_expirada") {
+            this.mostrarMensagem("Sua sessão terminou. Entre novamente.");
+        }
+        if (erro === "auth_indisponivel") {
+            this.mostrarMensagem("A autenticação está temporariamente indisponível. Verifique a conexão.");
+        }
+
+        window.addEventListener("rk:auth-error", event => {
+            this.mostrarMensagem(event.detail?.mensagem || "Falha ao iniciar a autenticação.");
+        });
+    },
+
+    alterarProcessamento(ativo) {
+        this.processando = ativo;
+        const botao = document.getElementById("loginEntrar");
+        if (!botao) return;
+        botao.disabled = ativo;
+        botao.setAttribute("aria-busy", String(ativo));
+        botao.textContent = ativo ? "Entrando..." : "Acessar painel";
+    },
+
+    mostrarMensagem(texto) {
         const mensagem = document.getElementById("mensagem");
-        if (mensagem) mensagem.textContent = "Usuário ou senha incorretos";
+        if (mensagem) mensagem.textContent = texto || "";
+    },
+
+    mensagemErro(erro = {}) {
+        const codigo = String(erro.code || "");
+        const mensagens = {
+            "auth/invalid-email": "Informe um e-mail válido.",
+            "auth/user-disabled": "Este usuário está desativado.",
+            "auth/invalid-credential": "E-mail ou senha incorretos.",
+            "auth/user-not-found": "E-mail ou senha incorretos.",
+            "auth/wrong-password": "E-mail ou senha incorretos.",
+            "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+            "auth/network-request-failed": "Falha de conexão. Verifique a internet e tente novamente.",
+            "auth/unauthorized-domain": "Este endereço ainda não foi autorizado no Firebase Authentication."
+        };
+        return mensagens[codigo] || "Não foi possível entrar. Tente novamente.";
     }
 };
+
+if (typeof window !== "undefined") {
+    window.Login = Login;
+    document.addEventListener("DOMContentLoaded", () => Login.preparar());
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { Login };
+}

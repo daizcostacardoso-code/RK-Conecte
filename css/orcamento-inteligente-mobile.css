@@ -1,0 +1,242 @@
+/* Ajustes exclusivos da jornada mobile do Orcamento Inteligente. */
+.orcamento-inteligente-contexto-fixo {
+    display: none;
+}
+
+@media (max-width: 820px) {
+    html.orcamento-inteligente-html {
+        scroll-snap-type: none !important;
+    }
+
+    body.orcamento-inteligente-page {
+        --orcamento-mobile-timeline-largura: 48px;
+        scroll-snap-type: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo > .container {
+        padding-right: 0;
+        background: #ffffff;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel {
+        padding-right: calc(var(--orcamento-mobile-timeline-largura) + 10px) !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel.orcamento-inteligente-secao-oculta,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel:not(.orcamento-inteligente-resumo-mobile-visivel) {
+        display: none !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel.orcamento-inteligente-secao-ativa,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel.orcamento-inteligente-resumo-mobile-visivel {
+        scroll-snap-align: none;
+        scroll-snap-stop: normal;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel {
+        right: 2px;
+        bottom: var(--orcamento-mobile-timeline-bottom, calc(12px + var(--safe-bottom, 0px)));
+        width: var(--orcamento-mobile-timeline-largura);
+        padding: 4px 2px !important;
+        border: 0 !important;
+        border-radius: 0;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas {
+        grid-template-rows: repeat(6, minmax(46px, 1fr));
+        align-content: stretch;
+        gap: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa {
+        min-width: 0;
+        width: 100%;
+        min-height: 46px;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        gap: 2px;
+        border-radius: 9px;
+        padding: 2px 0 !important;
+        transform: none !important;
+        transform-origin: 50% 50%;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 36px;
+        height: 36px;
+        font-size: 15px;
+        justify-self: center;
+        margin-right: auto;
+        margin-left: auto;
+        background: #ffffff;
+        box-shadow: 0 1px 5px rgba(5, 42, 82, .16), 0 0 0 2px #ffffff;
+        box-sizing: border-box;
+        transform: none !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        width: auto;
+        max-width: none;
+        justify-self: center;
+        font-size: 8px;
+        line-height: 1.05;
+        text-align: center;
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        overflow-wrap: normal;
+        word-break: normal;
+        hyphens: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.ativa {
+        background: rgba(234, 243, 255, .72);
+        box-shadow: inset 0 0 0 1px rgba(18, 107, 255, .12);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.ativa .orcamento-inteligente-etapa-bola {
+        transform: none !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.concluida .orcamento-inteligente-etapa-bola {
+        box-shadow: 0 1px 5px rgba(47, 158, 68, .16), 0 0 0 2px #ffffff;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa::before {
+        top: calc(-50% - 5px);
+        bottom: calc(50% + 5px);
+        left: 50%;
+        right: auto;
+        width: 2px;
+        margin: 0;
+        z-index: 0;
+        transform: translateX(-50%);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola,
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        position: relative;
+        z-index: 1;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-aviso-flutuante {
+        right: calc(var(--orcamento-mobile-timeline-largura) + 11px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-fixo:not([hidden]) {
+        position: fixed;
+        top: calc(var(--orcamento-mobile-header-altura, 58px) + 7px);
+        left: 10px;
+        right: calc(var(--orcamento-mobile-timeline-largura) + 7px);
+        z-index: 90;
+        min-width: 0;
+        height: 46px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(18, 107, 255, .2);
+        border-radius: 11px;
+        background: rgba(255, 255, 255, .96);
+        box-shadow: 0 8px 22px rgba(5, 42, 82, .14);
+        padding: 6px 7px 6px 10px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-cliente {
+        min-width: 0;
+        display: grid;
+        gap: 1px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-cliente small,
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-itens small {
+        color: #6b7f93;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-cliente strong {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        color: #102f4d;
+        font-size: 13px;
+        line-height: 1.25;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-itens {
+        min-width: 47px;
+        height: 32px;
+        display: grid;
+        grid-template-columns: auto auto;
+        align-items: baseline;
+        justify-content: center;
+        gap: 3px;
+        border-radius: 8px;
+        background: #eaf3ff;
+        color: #0b48b6;
+        padding: 6px 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-itens strong {
+        font-size: 15px;
+        line-height: 1;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-itens small {
+        color: #0b48b6;
+        font-size: 8px;
+        text-transform: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-configuracoes-contexto {
+        display: block;
+    }
+
+    body.orcamento-inteligente-page.orcamento-inteligente-contexto-ativo
+        .orcamento-inteligente-principal > .orcamento-inteligente-painel,
+    body.orcamento-inteligente-page.orcamento-inteligente-contexto-ativo
+        .orcamento-inteligente-resumo-painel {
+        padding-top: 62px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    body.orcamento-inteligente-page {
+        --orcamento-mobile-timeline-largura: 44px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        max-width: none;
+        font-size: 7px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-fixo:not([hidden]) {
+        left: 7px;
+        gap: 5px;
+        padding-left: 8px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-itens {
+        min-width: 42px;
+        padding-inline: 5px;
+    }
+}

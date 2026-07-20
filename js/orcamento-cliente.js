@@ -247,7 +247,7 @@ const OrcamentoCliente = {
         ];
 
         this.itens.forEach((item, indice) => {
-            linhas.push(`${indice + 1}. ${item.tipoVidro} ${item.largura}x${item.altura}cm | Qtd ${item.quantidade} | ${Util.moeda(item.total)}`);
+            linhas.push(`${indice + 1}. ${item.tipoVidro} ${item.altura}x${item.largura}cm | Qtd ${item.quantidade} | ${Util.moeda(item.total)}`);
         });
 
         if (observacoes) linhas.push(`Observações: ${observacoes}`);

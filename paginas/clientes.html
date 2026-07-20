@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
+    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
+    <title>Clientes - RK Vidraçaria</title>
+
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="clientes-page">
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+            <div>
+                <strong>RK Vidraçaria</strong>
+                <small>Centro Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">Início</a></li>
+                <li><a href="orcamento.html">Orçamento</a></li>
+                <li><a href="funcionario.html">Painel</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="clientes-modulo">
+    <div class="container">
+        <section class="clientes-cabecalho" aria-labelledby="clientesTitulo">
+            <div>
+                <span class="clientes-modulo-label">Centro Comercial</span>
+                <h1 id="clientesTitulo">Clientes</h1>
+            </div>
+
+            <div class="clientes-cabecalho-acoes">
+                <label class="clientes-busca" for="buscaCliente">
+                    <span>Buscar</span>
+                    <input type="search" id="buscaCliente" placeholder="Nome, telefone, CPF/CNPJ ou e-mail">
+                </label>
+                <button type="button" id="btnNovoCliente" class="botao clientes-btn-principal">Novo Cliente</button>
+            </div>
+        </section>
+
+        <section class="clientes-grid clientes-grid-operacional">
+            <div class="clientes-painel clientes-lista-painel">
+                <div class="clientes-painel-topo">
+                    <div>
+                        <h2>Lista de clientes</h2>
+                        <p id="clientesResumo">0 clientes cadastrados</p>
+                    </div>
+                </div>
+
+                <div id="clientesAviso" class="clientes-aviso" aria-live="polite"></div>
+
+                <div class="clientes-tabela-wrap">
+                    <table class="clientes-tabela">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Telefone</th>
+                                <th>Cidade</th>
+                                <th>Status</th>
+                                <th>Última atualização</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientesTabelaCorpo">
+                            <tr>
+                                <td colspan="7" class="clientes-estado-vazio">Nenhum cliente cadastrado ainda.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <aside class="clientes-lateral clientes-lateral-cadastro">
+                <section class="clientes-painel" aria-labelledby="cadastroRapidoTitulo">
+                    <div class="clientes-painel-topo">
+                        <div>
+                            <h2 id="cadastroRapidoTitulo">Cadastro rápido</h2>
+                            <p>Registre o primeiro contato comercial.</p>
+                        </div>
+                    </div>
+
+                    <form id="formClienteRapido" class="cliente-form" novalidate>
+                        <div class="cliente-campo">
+                            <label for="clienteTipoPessoa">Tipo pessoa</label>
+                            <select id="clienteTipoPessoa" name="tipoPessoa">
+                                <option value="fisica">Pessoa física</option>
+                                <option value="juridica">Pessoa jurídica</option>
+                            </select>
+                        </div>
+
+                        <div class="cliente-campo">
+                            <label for="clienteNome">Nome</label>
+                            <input type="text" id="clienteNome" name="nome" autocomplete="name" required>
+                        </div>
+
+                        <div class="cliente-campo">
+                            <label for="clienteNomeFantasia">Nome fantasia</label>
+                            <input type="text" id="clienteNomeFantasia" name="nomeFantasia">
+                        </div>
+
+                        <div class="cliente-campo">
+                            <label for="clienteCpfCnpj">CPF/CNPJ</label>
+                            <input type="text" id="clienteCpfCnpj" name="cpfCnpj" inputmode="numeric">
+                        </div>
+
+                        <div class="cliente-campo">
+                            <label for="clienteTelefonePrincipal">Telefone principal</label>
+                            <input type="tel" id="clienteTelefonePrincipal" name="telefonePrincipal" autocomplete="tel">
+                        </div>
+
+                        <div class="cliente-campo">
+                            <label for="clienteTelefoneSecundario">Telefone secundário</label>
+                            <input type="tel" id="clienteTelefoneSecundario" name="telefoneSecundario">
+                        </div>
+
+                        <div class="cliente-campo">
+                            <label for="clienteEmail">E-mail</label>
+                            <input type="email" id="clienteEmail" name="email" autocomplete="email">
+                        </div>
+
+                        <div class="cliente-campo cliente-campo-cheio">
+                            <label for="clienteObservacoes">Observações</label>
+                            <textarea id="clienteObservacoes" name="observacoes" rows="4"></textarea>
+                        </div>
+
+                        <div class="cliente-form-acoes">
+                            <button type="submit" class="botao clientes-btn-principal">Salvar cliente</button>
+                            <button type="reset" class="botao botao-claro">Limpar</button>
+                        </div>
+                    </form>
+                </section>
+            </aside>
+        </section>
+
+        <section class="clientes-painel clientes-centro-painel" aria-labelledby="clienteDetalheTitulo">
+            <div class="clientes-painel-topo clientes-centro-topo">
+                <div>
+                    <span class="clientes-modulo-label">Centro Comercial</span>
+                    <h2 id="clienteDetalheTitulo">Resumo do cliente</h2>
+                    <p id="clienteDetalheResumo">Selecione um cliente para visualizar.</p>
+                </div>
+            </div>
+
+            <div id="clienteResumoConteudo" class="cliente-resumo-grid" aria-live="polite"></div>
+
+            <div class="cliente-centro-layout">
+                <div class="cliente-centro-principal">
+                    <div class="cliente-abas" role="tablist" aria-label="Seções do cliente">
+                        <button type="button" class="cliente-aba-ativa" data-cliente-aba="dados">Dados</button>
+                        <button type="button" data-cliente-aba="projetos">Projetos</button>
+                        <button type="button" data-cliente-aba="orcamentos">Orçamentos</button>
+                        <button type="button" data-cliente-aba="historico">Histórico</button>
+                        <button type="button" data-cliente-aba="timeline">Timeline</button>
+                        <button type="button" data-cliente-aba="observacoes">Observações</button>
+                    </div>
+
+                    <div id="clienteDetalheConteudo" class="cliente-detalhe-conteudo"></div>
+                </div>
+
+                <aside id="clienteIndicadoresConteudo" class="cliente-indicadores" aria-label="Indicadores do cliente"></aside>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p>
+    <p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+
+<script src="../js/storage/storage-adapter.js?v=3.3.0"></script>
+<script src="../js/storage/memory-adapter.js?v=3.3.0"></script>
+<script src="../js/core/event-types.js?v=5.1A"></script>
+<script src="../js/core/event-bus.js?v=5.1A"></script>
+<script src="../js/core/app-state-events.js?v=5.1A"></script>
+<script src="../js/core/app-state.js?v=5.1A"></script>
+<script src="../js/core/app-state-service.js?v=5.1A"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=3.0.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.1"></script>
+<script src="../js/clientes/cliente-model.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-validator.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-factory.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-repository.js?v=6.1.1"></script>
+<script src="../js/clientes/cliente-service.js?v=3.4.1"></script>
+<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=3.3.0"></script>
+<script src="../js/usecases/clientes/buscar-cliente-usecase.js?v=3.3.0"></script>
+<script src="../js/usecases/clientes/listar-clientes-usecase.js?v=3.3.0"></script>
+<script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
+<script src="../js/clientes/cliente-ui.js?v=3.3.0"></script>
+<script src="../js/clientes/cliente-controller.js?v=3.4.0"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

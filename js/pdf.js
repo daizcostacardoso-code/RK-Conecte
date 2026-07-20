@@ -28,7 +28,7 @@ const PDF = {
         });
     },
 
-    criarPDF(logo) {
+    async criarPDF(logo) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
@@ -54,7 +54,14 @@ const PDF = {
         const observacoes = dadosPublicos.observacoes || "";
         const empresa = this.obterEmpresa();
 
-        const numero = this.obterNumeroOrcamento(dadosPublicos.numero);
+        let numero = "";
+        try {
+            numero = await this.obterNumeroOrcamento(dadosPublicos.numero);
+        } catch (erro) {
+            console.error("Erro ao reservar numero do orcamento:", erro);
+            alert(erro?.message || "Nao foi possivel reservar o numero do orcamento.");
+            return;
+        }
         dadosPublicos.numero = numero;
 
         let y = 15;
@@ -72,12 +79,12 @@ const PDF = {
         }
         this.desenharRodape(doc, dadosPublicos);
 
-        this.salvarOrcamentoEmitido(numero, dadosPublicos, empresa);
+        await this.salvarOrcamentoEmitido(numero, dadosPublicos, empresa);
 
-        doc.save(`orcamento_${numero}.pdf`);
+        doc.save(this.montarNomeArquivo(numero));
     },
 
-    salvarOrcamentoEmitido(numero, dadosOrcamento, empresa) {
+    async salvarOrcamentoEmitido(numero, dadosOrcamento, empresa) {
         const dados = {
             ...dadosOrcamento,
             numero,
@@ -86,49 +93,73 @@ const PDF = {
             criadoEmISO: new Date().toISOString()
         };
 
+        if (typeof DocumentPdfRepository !== "undefined" && DocumentPdfRepository) {
+            return DocumentPdfRepository.salvar(dados, {
+                numero,
+                origem: "NOVO_ORCAMENTO",
+                nomeArquivo: this.montarNomeArquivo(numero)
+            });
+            return;
+        }
+
+        const historico = Storage.carregar(Config.storage.historicoOrcamentos, []) || [];
+        const semDuplicidade = historico.filter(item => String(item.numero || "") !== String(numero));
         Storage.salvar(Config.storage.historicoOrcamentos, [
-            ...(Storage.carregar(Config.storage.historicoOrcamentos, []) || []),
+            ...semDuplicidade,
             dados
         ]);
 
         if (typeof db !== "undefined" && db) {
-            db.collection("orcamentos_emitidos")
+            return db.collection("orcamentos_emitidos")
                 .doc(numero)
                 .set(dados)
                 .catch(erro => console.error("Erro ao salvar orçamento emitido no Firestore:", erro));
         }
     },
 
-    obterNumeroOrcamento(numeroInformado = "") {
+    async obterNumeroOrcamento(numeroInformado = "") {
         const numeroExistente = String(numeroInformado || "").trim();
-        const proximoNumero = Storage.carregar(Config.storage.numeroOrcamento, 1) || 1;
 
         if (numeroExistente) {
-            const numeroLimpo = Number(numeroExistente.replace(/\D/g, ""));
-            if (numeroLimpo && numeroLimpo >= proximoNumero) {
-                Storage.salvar(Config.storage.numeroOrcamento, numeroLimpo + 1);
-            }
             return numeroExistente;
         }
 
-        let numero = Storage.carregar(Config.storage.numeroOrcamento, 1);
-
-        if (!numero || isNaN(numero)) {
-            numero = 1;
+        if (typeof RKFirestoreStore === "undefined" || typeof RKFirestoreStore.reservarNumeroOrcamento !== "function") {
+            throw new Error("Contador central de orcamentos indisponivel. Verifique a conexao e tente novamente.");
         }
 
-        Storage.salvar(Config.storage.numeroOrcamento, numero + 1);
+        try {
+            const numero = await RKFirestoreStore.reservarNumeroOrcamento();
+            const sequencia = Number(String(numero).replace(/\D/g, ""));
+            if (Number.isSafeInteger(sequencia)) {
+                Storage.salvar(Config.storage.numeroOrcamento, sequencia + 1);
+            }
+            return numero;
+        } catch (erro) {
+            console.error("Erro ao reservar numero central do orcamento:", erro);
+            throw new Error("Nao foi possivel reservar o numero do orcamento no banco. Verifique a conexao e tente novamente.");
+        }
+    },
 
-        return String(numero).padStart(6, "0");
+    montarNomeArquivo(numero) {
+        return `RK-Vidracaria-${this.nomeArquivoSeguro(numero)}.pdf`;
+    },
+
+    nomeArquivoSeguro(valor) {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9_-]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "documento";
     },
 
     obterEmpresa() {
         return {
             nome: Util.$("empresa")?.value || "RK VIDRAÇARIA",
-            cnpj: Util.$("cnpj")?.value || "00.000.000/0000-00",
+            cnpj: Util.$("cnpj")?.value || Config.empresa.cnpj || "60.332.101/0001-91",
             endereco: Util.$("endEmpresa")?.value || "Endereço da empresa",
             telefone: Util.$("foneEmpresa")?.value || "(00) 00000-0000",
-            email: Util.$("emailEmpresa")?.value || "contato@email.com"
+            email: Util.$("emailEmpresa")?.value || "rkvidracaria@outlook.com"
         };
     },
 
@@ -226,13 +257,13 @@ const PDF = {
 
             doc.rect(15, y - 5, 180, 8);
 
-            const medidas = `${item.largura || ""}x${item.altura || ""}`;
+            const medidas = this.formatarMedidasItem(item);
             const categoria = typeof OrcamentoModel !== "undefined"
                 ? OrcamentoModel.rotuloCategoria(item.categoria)
                 : item.categoria;
-            const produto = `${item.descricao || categoria || item.tipoVidro || ""}`.trim();
+            const produto = this.limparItemManual(item.descricao || categoria || item.tipoVidro || "");
             const vidro = `${item.tipoVidro || ""} ${item.espessura || ""}mm ${item.cor || ""}`.trim();
-            const area = item.areaM2 ?? item.area ?? 0;
+            const area = this.obterAreaItem(item);
 
             doc.text(String(index + 1), 18, y);
             doc.text(doc.splitTextToSize(produto, 45)[0] || "", 26, y);
@@ -240,7 +271,7 @@ const PDF = {
             doc.text(medidas, 112, y);
             doc.text(String(item.quantidade || ""), 136, y);
             doc.text(`${Util.decimal(area || 0)} m²`, 148, y);
-            doc.text(Util.moeda(item.total || 0), 194, y, { align: "right" });
+            doc.text(Util.moeda(this.obterTotalItem(item)), 194, y, { align: "right" });
 
             y += 8;
         });
@@ -279,6 +310,21 @@ const PDF = {
         doc.setFontSize(10);
         doc.text("Subtotal:", 135, y);
         doc.text(Util.moeda(totais.subtotal), 195, y, { align: "right" });
+
+        const adicionais = Array.isArray(totais.adicionais) ? totais.adicionais : [];
+        const totalFerragensAcessorios = Util.numero(totais.totalAdicionais) > 0
+            ? Util.numero(totais.totalAdicionais)
+            : adicionais.reduce((total, adicional) => total + Math.max(0, Util.numero(adicional.valor)), 0);
+
+        if (totalFerragensAcessorios > 0) {
+            if (y > 258) {
+                doc.addPage();
+                y = 25;
+            }
+            y += 7;
+            doc.text("Ferragens/Acess\u00f3rios:", 135, y);
+            doc.text(Util.moeda(totalFerragensAcessorios), 195, y, { align: "right" });
+        }
 
         y += 7;
         doc.text("Desconto:", 135, y);
@@ -353,6 +399,68 @@ const PDF = {
             doc.text("Obrigado pela preferência!", 105, 286, { align: "center" });
             doc.text(`Página ${i} de ${totalPaginas}`, 195, 286, { align: "right" });
         }
+    },
+
+    formatarMedidasItem(item = {}) {
+        const largura = this.primeiroNumero(item, ["larguraCm", "largura"], 0);
+        const altura = this.primeiroNumero(item, ["alturaCm", "altura"], 0);
+        return `${this.formatarMedidaNumero(altura)} x ${this.formatarMedidaNumero(largura)} cm`;
+    },
+
+    limparItemManual(valor) {
+        return String(valor || "")
+            .replace(/item[\s_-]*manual/gi, " ")
+            .replace(/preencher[\s_-]*manualmente/gi, " ")
+            .replace(/^[\s\-–—:|]+|[\s\-–—:|]+$/g, "")
+            .replace(/\s{2,}/g, " ")
+            .trim();
+    },
+
+    formatarMedidaNumero(valor) {
+        const numero = Number(valor || 0);
+
+        if (!Number.isFinite(numero)) {
+            return "0";
+        }
+
+        if (Number.isInteger(numero)) {
+            return String(numero);
+        }
+
+        return numero.toLocaleString("pt-BR", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    },
+
+    obterAreaItem(item = {}) {
+        const largura = this.primeiroNumero(item, ["larguraCm", "largura"], 0);
+        const altura = this.primeiroNumero(item, ["alturaCm", "altura"], 0);
+
+        if (largura > 0 && altura > 0) {
+            return (largura * altura) / 10000;
+        }
+
+        return this.primeiroNumero(item, ["areaM2", "area"], 0);
+    },
+
+    obterTotalItem(item = {}) {
+        const total = this.primeiroNumero(item, ["subtotalFinal", "valorTotal", "total", "totalGeral", "subtotal"], 0);
+        return Math.max(0, total - Math.max(0, Util.numero(item.valorAdicional)));
+    },
+
+    primeiroNumero(objeto = {}, chaves = [], padrao = 0) {
+        const chave = chaves.find(nome => {
+            const valor = objeto[nome];
+            return valor !== undefined && valor !== null && valor !== "";
+        });
+
+        if (!chave) {
+            return padrao;
+        }
+
+        const numero = Util.numero(objeto[chave]);
+        return Number.isFinite(numero) ? numero : padrao;
     },
 
     formatarData(valor) {

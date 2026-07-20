@@ -52,6 +52,12 @@ const Orcamento = {
             return;
         }
 
+        if (itemFormulario.valorAdicional > 0 && !itemFormulario.descricaoAdicional) {
+            alert("Informe a descricao do adicional.");
+            Util.$("descricaoAdicional")?.focus();
+            return;
+        }
+
         const itemCalculado = Calculos.calcularItem(itemFormulario, valores);
 
         Itens.adicionar(itemCalculado);
@@ -253,6 +259,14 @@ const Orcamento = {
 
         if (Util.$("valorServico") && rascunho.valorServico) {
             Util.$("valorServico").value = rascunho.valorServico;
+        }
+
+        if (Util.$("valorAdicional") && rascunho.valorAdicional) {
+            Util.$("valorAdicional").value = rascunho.valorAdicional;
+        }
+
+        if (Util.$("descricaoAdicional") && rascunho.descricaoAdicional) {
+            Util.$("descricaoAdicional").value = rascunho.descricaoAdicional;
         }
 
         if (Util.$("observacoesItem") && rascunho.observacoes) {

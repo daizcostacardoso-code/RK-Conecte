@@ -1,0 +1,24 @@
+{
+  "name": "rk-conecte",
+  "version": "0.4.3",
+  "private": true,
+  "description": "Sistema web da RK Vidraçaria para atendimento, orçamentos e operação interna.",
+  "scripts": {
+    "test": "node --test",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-rk-conecte \"node --test tests/firestore-rules.emulator.mjs\"",
+    "check:syntax": "node scripts/check-syntax.js",
+    "check": "npm run check:syntax && npm test && npm run test:rules"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "5.0.1",
+    "firebase": "12.16.0",
+    "firebase-tools": "15.24.0"
+  },
+  "overrides": {
+    "@opentelemetry/core": "2.9.0",
+    "uuid": "11.1.1"
+  }
+}

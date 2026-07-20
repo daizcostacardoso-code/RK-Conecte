@@ -2,26 +2,166 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function autorizado() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/usuarios_autorizados/$(request.auth.uid))
+        && get(/databases/$(database)/documents/usuarios_autorizados/$(request.auth.uid)).data.ativo == true
+        && get(/databases/$(database)/documents/usuarios_autorizados/$(request.auth.uid)).data.perfil in ['admin', 'funcionario'];
+    }
+
+    function administrador() {
+      return autorizado()
+        && get(/databases/$(database)/documents/usuarios_autorizados/$(request.auth.uid)).data.perfil == 'admin';
+    }
+
+    function perfilValido(uid) {
+      let perfil = request.resource.data;
+      return perfil.keys().hasAll(['ativo', 'perfil', 'email', 'nome'])
+        && perfil.keys().hasOnly(['ativo', 'perfil', 'email', 'nome'])
+        && perfil.ativo is bool
+        && perfil.perfil in ['admin', 'funcionario']
+        && textoEntre(perfil.email, 3, 254)
+        && textoEntre(perfil.nome, 2, 120)
+        && uid.size() >= 1;
+    }
+
+    function textoEntre(valor, minimo, maximo) {
+      return valor is string
+        && valor.size() >= minimo
+        && valor.size() <= maximo;
+    }
+
+    function clientePublicoValido(cliente) {
+      return cliente is map
+        && cliente.keys().hasAll(['nome', 'telefone', 'email', 'endereco'])
+        && cliente.keys().hasOnly(['nome', 'telefone', 'email', 'endereco'])
+        && textoEntre(cliente.nome, 2, 120)
+        && textoEntre(cliente.telefone, 8, 30)
+        && textoEntre(cliente.email, 0, 254)
+        && textoEntre(cliente.endereco, 0, 300);
+    }
+
+    function solicitacaoPublicaValida() {
+      let dados = request.resource.data;
+      return dados.keys().hasAll([
+          'origem', 'cliente', 'nome', 'telefone', 'email', 'endereco',
+          'itens', 'servico', 'quantidadeItens', 'subtotal', 'desconto',
+          'observacoes', 'descricao', 'mensagem', 'data', 'criadoEmISO', 'status'
+        ])
+        && dados.keys().hasOnly([
+          'origem', 'cliente', 'nome', 'telefone', 'email', 'endereco',
+          'itens', 'servico', 'quantidadeItens', 'subtotal', 'desconto',
+          'observacoes', 'descricao', 'mensagem', 'data', 'criadoEmISO', 'status'
+        ])
+        && dados.origem == 'orcamento_cliente'
+        && dados.status == 'Solicitado'
+        && clientePublicoValido(dados.cliente)
+        && dados.nome == dados.cliente.nome
+        && dados.telefone == dados.cliente.telefone
+        && dados.email == dados.cliente.email
+        && dados.endereco == dados.cliente.endereco
+        && dados.itens is list
+        && dados.itens.size() > 0
+        && dados.itens.size() <= 30
+        && dados.quantidadeItens is int
+        && dados.quantidadeItens == dados.itens.size()
+        && dados.subtotal is number
+        && dados.subtotal >= 0
+        && dados.subtotal <= 100000000
+        && dados.desconto is map
+        && dados.desconto.keys().hasAll(['tipo', 'valor'])
+        && dados.desconto.keys().hasOnly(['tipo', 'valor'])
+        && dados.desconto.tipo == 'valor'
+        && dados.desconto.valor == 0
+        && textoEntre(dados.servico, 1, 2000)
+        && textoEntre(dados.observacoes, 0, 2000)
+        && textoEntre(dados.descricao, 0, 2000)
+        && textoEntre(dados.mensagem, 1, 12000)
+        && textoEntre(dados.data, 1, 40)
+        && textoEntre(dados.criadoEmISO, 20, 40);
+    }
+
+    // O formulário público usa apenas os valores de cálculo publicados.
+    match /configuracoes/valores {
+      allow read: if true;
+      allow write: if autorizado();
+    }
+
     match /configuracoes/{documento} {
-      allow read, write: if true;
+      allow read, write: if autorizado();
+    }
+
+    // A autenticação prova a identidade; este cadastro concede autorização.
+    // O primeiro administrador deve ser criado pelo Console antes do deploy.
+    match /usuarios_autorizados/{uid} {
+      allow get: if autorizado() && (request.auth.uid == uid || administrador());
+      allow list: if administrador();
+      allow create, update: if administrador() && perfilValido(uid);
+      allow delete: if administrador() && request.auth.uid != uid;
+    }
+
+    // Visitantes podem criar uma solicitação validada, mas nunca consultar,
+    // alterar ou excluir solicitações. A equipe autenticada mantém o CRUD.
+    match /solicitacoes_site/{documento} {
+      allow create: if autorizado() || solicitacaoPublicaValida();
+      allow read, update, delete: if autorizado();
     }
 
     match /orcamentos/{documento} {
-      allow read, write: if true;
+      allow read, write: if autorizado();
     }
 
     match /orcamentos_emitidos/{documento} {
-      allow read, write: if true;
+      allow read, write: if autorizado();
     }
 
-    match /solicitacoes_site/{documento} {
-      allow read, write: if true;
+    match /projetos/{documento} {
+      allow read, write: if autorizado();
     }
 
-    // TODO: as regras atuais estão abertas para facilitar a operação.
-    // Futuramente, exigir autenticação antes de liberar o caixa da empresa.
     match /caixa_empresa/{documento} {
-      allow read, write: if true;
+      allow read, write: if autorizado();
+    }
+
+    match /clientes/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /produtos/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /itens/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /item_dependencias/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /tamanhos_padrao/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /unidades_medida/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /categorias_produto/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /categorias_item/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    match /notas_servico/{documento} {
+      allow read, write: if autorizado();
+    }
+
+    // Coleções novas ou caminhos não mapeados começam bloqueados.
+    match /{documento=**} {
+      allow read, write: if false;
     }
   }
 }

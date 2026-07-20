@@ -1,7 +1,7 @@
 const OrcamentoUI = {
     prepararCamposIniciais(dados = {}) {
         const normalizado = OrcamentoModel.normalizar(dados);
-        this.valor("numeroOrcamento", normalizado.numero || OrcamentoModel.numeroProvisorio());
+        this.valor("numeroOrcamento", normalizado.numero || "");
         this.valor("dataCriacao", normalizado.datas.criacao);
         this.valor("dataValidade", normalizado.datas.validade);
         this.valor("statusOrcamento", normalizado.status);

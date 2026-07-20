@@ -28,6 +28,8 @@ const Formulario = {
             valorM2: Math.max(0, Util.numero(Util.$("valorM2")?.value)),
             valorFerragens: Math.max(0, Util.numero(Util.$("valorFerragens")?.value ?? Util.$("acessorios")?.value)),
             valorServico: Math.max(0, Util.numero(Util.$("valorServico")?.value)),
+            valorAdicional: Math.max(0, Util.numero(Util.$("valorAdicional")?.value)),
+            descricaoAdicional: Util.$("descricaoAdicional")?.value?.trim() || "",
             acessorios: Math.max(0, Util.numero(Util.$("valorFerragens")?.value ?? Util.$("acessorios")?.value)),
             observacoes: Util.$("observacoesItem")?.value?.trim() || ""
         };
@@ -53,6 +55,11 @@ const Formulario = {
         if (Util.$("valorM2")) Util.$("valorM2").value = "";
         if (Util.$("valorFerragens")) Util.$("valorFerragens").value = "";
         if (Util.$("valorServico")) Util.$("valorServico").value = "";
+        if (Util.$("valorAdicional")) Util.$("valorAdicional").value = "";
+        if (Util.$("descricaoAdicional")) {
+            Util.$("descricaoAdicional").value = "";
+            Util.$("descricaoAdicional").required = false;
+        }
         if (Util.$("totalItem")) Util.$("totalItem").value = "";
         if (Util.$("observacoesItem")) Util.$("observacoesItem").value = "";
         if (Util.$("aluminio")) Util.$("aluminio").value = "";
