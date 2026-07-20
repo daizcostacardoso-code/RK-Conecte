@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.5.0';
+const RK_CACHE = 'rk-conecte-v0.6.0';
 const APP_SHELL = [
   '/',
   '/index.html',

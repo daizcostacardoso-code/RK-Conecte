@@ -1,11 +1,11 @@
 const OrcamentoAprovacaoValidator = {
     transicoes: {
-        rascunho: ["emitido"],
+        rascunho: ["emitido", "cancelado"],
         emitido: ["enviado", "aprovado", "recusado", "cancelado"],
         enviado: ["aprovado", "recusado", "cancelado"],
-        recusado: ["enviado"],
-        expirado: ["enviado"],
-        aprovado: [],
+        recusado: ["enviado", "cancelado"],
+        expirado: ["enviado", "cancelado"],
+        aprovado: ["cancelado"],
         cancelado: []
     },
 

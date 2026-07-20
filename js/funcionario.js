@@ -4,6 +4,7 @@ const Funcionario = {
     chaveAnotacoes: "vidracaria_anotacoes_funcionario",
     chaveLembretes: Config.storage.lembretes || "vidracaria_lembretes",
     solicitacoes: [],
+    orcamentosEmitidos: [],
     caixa: [],
     lembretes: [],
     calcExpressao: "",
@@ -36,6 +37,7 @@ const Funcionario = {
         this.carregarConfiguracoesNaTela();
         this.carregarFerramentas();
         await this.carregarSolicitacoes();
+        await this.carregarOrcamentosEmitidos();
         await this.carregarCaixa();
         this.atualizarIndicadores();
         this.listarSolicitacoes();
@@ -88,6 +90,20 @@ const Funcionario = {
     async carregarCaixa() {
         CaixaService.configurar();
         this.caixa = await CaixaService.listar();
+    },
+
+    async carregarOrcamentosEmitidos() {
+        this.orcamentosEmitidos = [];
+        if (typeof RKFirestoreStore === "undefined" || typeof RKFirestoreStore.fetch !== "function") return;
+
+        try {
+            const resposta = await RKFirestoreStore.fetch("/orcamentos");
+            const corpo = await resposta.json();
+            if (!resposta.ok || corpo?.ok === false) throw new Error(corpo?.mensagem || "Falha ao consultar orçamentos.");
+            this.orcamentosEmitidos = Array.isArray(corpo?.dados) ? corpo.dados : [];
+        } catch (erro) {
+            console.warn("Não foi possível carregar os orçamentos canônicos.", erro);
+        }
     },
 
     normalizarListaCaixa(lista) {
@@ -182,8 +198,7 @@ const Funcionario = {
     },
 
     atualizarIndicadores() {
-        const proximoNumero = Storage.carregar(Config.storage.numeroOrcamento, 1);
-        const feitos = Math.max(0, Util.numero(proximoNumero) - 1);
+        const feitos = this.orcamentosEmitidos.length;
         const solicitacoes = this.obterSolicitacoes();
         const orcamentoAtual = Storage.carregar(Config.storage.orcamentoAtual, null);
         const temOrcamentoAtual = orcamentoAtual && Array.isArray(orcamentoAtual.itens) && orcamentoAtual.itens.length > 0;
@@ -326,6 +341,13 @@ const Funcionario = {
                 quantidade: pedido.quantidade || 1
             },
             origemSolicitacaoId: pedido.idFirestore || null,
+            solicitacaoId: pedido.idFirestore || "",
+            clienteId: cliente.id || cliente.cliente_id || "",
+            vinculos: {
+                solicitacaoId: pedido.idFirestore || "",
+                clienteId: cliente.id || cliente.cliente_id || "",
+                projetoId: ""
+            },
             atualizadoEm: Util.agora(),
             atualizadoEmISO: new Date().toISOString()
         };
@@ -335,13 +357,12 @@ const Funcionario = {
 
         try {
             if (typeof db !== "undefined" && db) {
-                await db.collection("orcamentos").doc("atual").set(orcamento, { merge: true });
                 if (pedido.idFirestore) {
                     await db.collection("solicitacoes_site").doc(pedido.idFirestore).set({ status: "Em orçamento" }, { merge: true });
                 }
             }
         } catch (erro) {
-            console.error("Erro ao preparar orçamento na nuvem:", erro);
+            console.error("Erro ao atualizar a solicitação no Firestore:", erro);
         }
 
         solicitacoes[indice].status = "Em orçamento";

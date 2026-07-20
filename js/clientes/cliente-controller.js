@@ -71,8 +71,71 @@ const ClienteController = {
             return;
         }
 
-        this.salvarClienteAtual(resultado.cliente);
-        ClienteUI.renderizarDetalhe(resultado.cliente);
+        const cliente = await this.enriquecerClienteComercial(resultado.cliente);
+        this.salvarClienteAtual(cliente);
+        ClienteUI.renderizarDetalhe(cliente);
+    },
+
+    async enriquecerClienteComercial(cliente = {}) {
+        const orcamentos = (await this.listarOrcamentosDoCliente(cliente))
+            .sort((a, b) => String(a.atualizadoEmISO || a.dataEmissao || "").localeCompare(String(b.atualizadoEmISO || b.dataEmissao || "")));
+        const historicoComercial = orcamentos.flatMap(orcamento => {
+            return (Array.isArray(orcamento.historicoStatus) ? orcamento.historicoStatus : []).map(evento => ({
+                id: evento.id,
+                tipo: evento.acao,
+                data: evento.realizadoEm,
+                descricao: `${orcamento.numero || orcamento.id}: ${String(evento.acao || "atualizacao").replace(/_/g, " ")}`
+            }));
+        });
+
+        return {
+            ...cliente,
+            orcamentos: orcamentos.map(orcamento => ({
+                id: orcamento.id,
+                numero: orcamento.numero,
+                status: orcamento.status,
+                data: orcamento.atualizadoEmISO || orcamento.dataEmissao || "",
+                total: typeof OrcamentoAprovacaoModel !== "undefined" ? OrcamentoAprovacaoModel.obterTotal(orcamento) : 0
+            })),
+            historico: [...(Array.isArray(cliente.historico) ? cliente.historico : []), ...historicoComercial]
+                .sort((a, b) => String(a.data || "").localeCompare(String(b.data || "")))
+        };
+    },
+
+    async listarOrcamentosDoCliente(cliente = {}) {
+        if (typeof DocumentPdfRepository === "undefined" || typeof DocumentPdfRepository.buscar !== "function") return [];
+        const clienteId = String(cliente.id || "").trim();
+        const nomeBusca = this.normalizarBusca(cliente.nome || cliente.nomeFantasia);
+        const documentoBusca = String(cliente.cpfCnpj || "").replace(/\D/g, "");
+
+        try {
+            let resultado = clienteId ? await DocumentPdfRepository.buscar({ clienteId }) : null;
+            if (!resultado?.sucesso || !resultado.registros?.length) {
+                resultado = await DocumentPdfRepository.buscar({ cliente: cliente.nome || cliente.nomeFantasia || "" });
+            }
+            if (!resultado?.sucesso) return [];
+
+            return (resultado.registros || []).filter(registro => {
+                const idRegistro = String(registro.clienteId || registro.vinculos?.clienteId || registro.cliente?.id || "").trim();
+                const documentoRegistro = String(registro.cliente?.documento || registro.cliente?.cpfCnpj || "").replace(/\D/g, "");
+                const nomeRegistro = this.normalizarBusca(registro.clienteNome || registro.cliente?.nome);
+                return (clienteId && idRegistro === clienteId)
+                    || (documentoBusca && documentoRegistro === documentoBusca)
+                    || (!!nomeBusca && nomeRegistro === nomeBusca);
+            });
+        } catch (erro) {
+            console.warn("Não foi possível carregar o histórico comercial do cliente.", erro);
+            return [];
+        }
+    },
+
+    normalizarBusca(valor = "") {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/\s+/g, " ")
+            .trim();
     },
 
     async executarCriacao(dados) {

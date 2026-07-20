@@ -1,5 +1,17 @@
 # Histórico de alterações
 
+## v0.6.0 — orçamento canônico e fluxo comercial
+
+- Consolidada `orcamentos_emitidos` como fonte oficial dos orçamentos comerciais.
+- Removidas as gravações de rascunho no documento global `orcamentos/atual`.
+- Mantidos rascunhos em andamento somente no dispositivo do usuário.
+- Padronizados identificador, número, revisão e vínculos de solicitação, cliente e projeto.
+- Reemissões localizam registros legados pelo número e não criam documentos duplicados.
+- Integrados Dashboard, painel do funcionário e histórico do cliente aos orçamentos reais.
+- Substituída a exclusão definitiva por cancelamento com histórico preservado.
+- Tornada somente leitura a coleção legada de orçamentos nas regras do Firestore.
+- Adicionados testes do contrato canônico, compatibilidade, duplicidade e cancelamento.
+
 ## v0.5.0 — persistência canônica no Firestore
 
 - Implementado o adaptador real do Firestore para projetos e itens de serviço.

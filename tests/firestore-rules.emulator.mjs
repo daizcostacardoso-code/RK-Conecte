@@ -136,8 +136,6 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
     }).firestore();
     const caminhos = [
         "configuracoes/sistema",
-        "orcamentos/atual",
-        "orcamentos_emitidos/000001",
         "solicitacoes_site/solicitacao-1",
         "projetos/projeto-1",
         "servicos/servico-1",
@@ -160,6 +158,29 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
         await assertSucceeds(updateDoc(referencia, { atualizado: true }));
         await assertSucceeds(deleteDoc(referencia));
     }
+});
+
+test("orçamento canônico pode ser atualizado sem exclusão definitiva", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    const orcamento = doc(equipe, "orcamentos_emitidos", "000001");
+
+    await assertSucceeds(setDoc(orcamento, { numero: "000001", status: "emitido" }));
+    await assertSucceeds(getDoc(orcamento));
+    await assertSucceeds(updateDoc(orcamento, { status: "cancelado" }));
+    await assertFails(deleteDoc(orcamento));
+});
+
+test("coleção legada de orçamento é somente leitura para usuário autorizado", async () => {
+    await autorizar("funcionario-1");
+    await gravarSemRegras("orcamentos/atual", { status: "rascunho", cliente: { nome: "Legado" } });
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    const legado = doc(equipe, "orcamentos", "atual");
+
+    await assertSucceeds(getDoc(legado));
+    await assertFails(setDoc(legado, { status: "emitido" }, { merge: true }));
+    await assertFails(updateDoc(legado, { status: "emitido" }));
+    await assertFails(deleteDoc(legado));
 });
 
 test("funcionário lê o próprio perfil sem administrar outros usuários", async () => {

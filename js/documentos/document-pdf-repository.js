@@ -82,30 +82,44 @@ const DocumentPdfRepository = {
         };
     },
 
-    async excluir(registro = {}) {
+    async cancelar(registro = {}, opcoes = {}) {
         const id = registro.orcamentoId || registro.orcamento_id || registro.id || registro.numero;
-        if (!id) throw new Error("Orcamento sem identificador para exclusao.");
+        if (!id) throw new Error("Orcamento sem identificador para cancelamento.");
         if (!this.firestoreDisponivel()) throw new Error("Firestore indisponivel.");
+        if (typeof OrcamentoAprovacaoService === "undefined" || typeof OrcamentoAprovacaoService.cancelar !== "function") {
+            throw new Error("Servico comercial indisponivel para cancelar o orcamento.");
+        }
 
-        const snapshot = await db.collection(this.colecao).get();
-        const procurados = new Set([
-            String(id), String(registro.id || ""), String(registro.numero || ""),
-            String(registro.orcamentoId || registro.orcamento_id || "")
-        ].filter(Boolean));
-        const documentos = snapshot.docs.filter(doc => {
-            const dados = doc.data() || {};
-            return [doc.id, dados.id, dados.numero, dados.orcamento_id, dados.numero_orcamento, dados.registro?.numero]
-                .some(valor => valor !== undefined && procurados.has(String(valor)));
+        const resultado = await OrcamentoAprovacaoService.cancelar(id, {
+            confirmado: true,
+            observacao: opcoes.observacao || "Orcamento cancelado pelo arquivo comercial."
         });
-        if (!documentos.length) throw new Error("Orcamento nao encontrado no Firestore.");
-        const lote = db.batch();
-        documentos.forEach(doc => lote.delete(doc.ref));
-        await lote.commit();
-        return true;
+        if (!resultado?.sucesso) {
+            throw new Error(resultado?.erros?.join(" ") || "Nao foi possivel cancelar o orcamento.");
+        }
+        return resultado.registro;
+    },
+
+    async excluir(registro = {}, opcoes = {}) {
+        return this.cancelar(registro, opcoes);
     },
 
     async buscarFirestore(filtros = {}) {
         try {
+            if (filtros.clienteId) {
+                const consultaClienteId = await db.collection(this.colecao)
+                    .where("clienteId", "==", filtros.clienteId)
+                    .limit(40)
+                    .get();
+                if (consultaClienteId.docs?.length) {
+                    return {
+                        sucesso: true,
+                        registros: this.normalizarSnapshot(consultaClienteId),
+                        erros: []
+                    };
+                }
+            }
+
             if (filtros.numero) {
                 const direto = await db.collection(this.colecao).doc(this.idDocumento(filtros.numero)).get();
                 const registrosDiretos = direto.exists ? [this.normalizarRegistro({ ...direto.data(), id: direto.id })] : [];
@@ -158,14 +172,21 @@ const DocumentPdfRepository = {
                 };
             }
 
-            const recentes = await db.collection(this.colecao)
-                .orderBy("dataEmissao", "desc")
-                .limit(40)
-                .get();
+            let recentesOrdenados = [];
+            try {
+                const recentes = await db.collection(this.colecao)
+                    .orderBy("dataEmissao", "desc")
+                    .limit(40)
+                    .get();
+                recentesOrdenados = this.normalizarSnapshot(recentes);
+            } catch (erroOrdenacao) {
+                console.warn("Orcamentos antigos sem data ordenavel; usando leitura compativel.", erroOrdenacao);
+            }
+            const compativeis = await db.collection(this.colecao).limit(40).get();
 
             return {
                 sucesso: true,
-                registros: this.normalizarSnapshot(recentes),
+                registros: this.mesclarListas(recentesOrdenados, this.normalizarSnapshot(compativeis)),
                 erros: []
             };
         } catch (erro) {
@@ -202,6 +223,10 @@ const DocumentPdfRepository = {
                 }
 
                 if (filtros.clienteBusca && !String(registro.clienteNomeBusca || "").includes(filtros.clienteBusca)) {
+                    return false;
+                }
+
+                if (filtros.clienteId && String(registro.clienteId || registro.vinculos?.clienteId || "") !== filtros.clienteId) {
                     return false;
                 }
 
@@ -293,12 +318,16 @@ const DocumentPdfRepository = {
 
         const documento = this.normalizarDocumento(entrada.documento || entrada.documentoComercial || (entrada.tipo === "DOCUMENTO_COMERCIAL" ? entrada : null));
         const dadosDocumento = documento?.dados || {};
-        const cliente = entrada.cliente || dadosDocumento.cliente || {};
-        const projeto = entrada.projeto || dadosDocumento.projeto || {};
+        const cliente = this.primeiroObjeto(entrada.cliente, entrada.registro?.cliente, dadosDocumento.cliente);
+        const projeto = this.primeiroObjeto(entrada.projeto, entrada.registro?.projeto, dadosDocumento.projeto);
         const metadados = dadosDocumento.metadados || documento?.metadados || entrada.metadados || {};
         const numero = this.texto(
             opcoes.numero
             || entrada.numero
+            || entrada.numero_orcamento
+            || entrada.numeroOrcamento
+            || entrada.registro?.numero
+            || entrada.registro?.numero_orcamento
             || metadados.numeroOrcamento
             || metadados.orcamentoNumero
             || projeto.numero
@@ -308,13 +337,16 @@ const DocumentPdfRepository = {
         const dataEmissao = this.normalizarData(
             opcoes.dataEmissao
             || entrada.dataEmissao
+            || entrada.data_orcamento
+            || entrada.registro?.dataEmissao
+            || entrada.registro?.data_orcamento
             || entrada.criadoEmISO
             || entrada.criadoEm
             || metadados.geradoEm
             || metadados.criadoEm
             || entrada.datas?.criacao
         );
-        const clienteNome = this.texto(opcoes.clienteNome || entrada.clienteNome || cliente.nome || entrada.nomeCliente);
+        const clienteNome = this.texto(opcoes.clienteNome || entrada.clienteNome || entrada.cliente_nome || cliente.nome || entrada.nomeCliente || entrada.registro?.clienteNome);
         const id = this.idDocumento(opcoes.id || numero || entrada.id || `${clienteNome}-${dataEmissao}-${projeto.nome || projeto.numero || ""}`);
         const nomeArquivo = this.texto(
             opcoes.nomeArquivo
@@ -323,7 +355,16 @@ const DocumentPdfRepository = {
             || this.montarNomeArquivo(numero || id)
         );
 
-        return {
+        const criadoEmISO = entrada.criadoEmISO
+            || entrada.criado_em
+            || metadados.geradoEm
+            || metadados.criadoEm
+            || (dataEmissao ? `${dataEmissao}T00:00:00.000Z` : "");
+        const atualizadoEmISO = entrada.atualizadoEmISO
+            || entrada.atualizado_em
+            || metadados.atualizadoEm
+            || criadoEmISO;
+        const registro = {
             ...entrada,
             id,
             numero,
@@ -335,11 +376,15 @@ const DocumentPdfRepository = {
             documento,
             pdfArmazenado: false,
             armazenamento: "documento_regeneravel",
-            schemaVersion: 2,
+            schemaVersion: Math.max(3, Number.parseInt(entrada.schemaVersion, 10) || 0),
             origem: opcoes.origem || entrada.origem || metadados.origem || "DOCUMENTO_COMERCIAL",
-            criadoEmISO: entrada.criadoEmISO || metadados.geradoEm || metadados.criadoEm || new Date().toISOString(),
-            atualizadoEmISO: new Date().toISOString()
+            criadoEmISO,
+            atualizadoEmISO
         };
+
+        return typeof OrcamentoAprovacaoModel !== "undefined"
+            ? OrcamentoAprovacaoModel.normalizarRegistro(registro)
+            : registro;
     },
 
     normalizarDocumento(documento = null) {
@@ -366,6 +411,10 @@ const DocumentPdfRepository = {
         return null;
     },
 
+    primeiroObjeto(...valores) {
+        return valores.find(valor => valor && typeof valor === "object" && Object.keys(valor).length) || {};
+    },
+
     normalizarFiltros(filtros = {}) {
         const numero = this.texto(filtros.numero || filtros.numeroOrcamento).replace(/\s+/g, "");
         const data = this.normalizarData(filtros.data || filtros.dataEmissao || filtros.criadoEm);
@@ -375,7 +424,8 @@ const DocumentPdfRepository = {
             numero,
             data,
             cliente,
-            clienteBusca: this.normalizarBusca(cliente)
+            clienteBusca: this.normalizarBusca(cliente),
+            clienteId: this.texto(filtros.clienteId || filtros.cliente_id)
         };
     },
 

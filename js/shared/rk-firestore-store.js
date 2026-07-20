@@ -13,7 +13,7 @@
         "categorias-produtos": { colecao: "categorias_produto", id: "categoria_id", somenteLeitura: true },
         "categorias-itens": { colecao: "categorias_item", id: "categoria_item_id", somenteLeitura: true },
         caixa: { colecao: "caixa_empresa", id: "caixa_id", excluir: "cancelar" },
-        orcamentos: { colecao: "orcamentos_emitidos", id: "orcamento_id", excluir: "remover" },
+        orcamentos: { colecao: "orcamentos_emitidos", id: "orcamento_id", excluir: "cancelar" },
         notas: { colecao: "notas_servico", id: "nota_id", excluir: "remover" }
     };
 
@@ -185,13 +185,30 @@
         if (rota.recurso === "orcamentos") {
             const registro = entrada.registro || entrada;
             const numero = registro.numero || registro.numero_orcamento || id;
+            const cliente = registro.cliente || entrada.cliente || registro.documento?.dados?.cliente || {};
+            const projeto = registro.projeto || entrada.projeto || registro.documento?.dados?.projeto || {};
+            const vinculosOrigem = entrada.vinculos || registro.vinculos || {};
+            const vinculos = {
+                solicitacaoId: String(vinculosOrigem.solicitacaoId || entrada.solicitacaoId || registro.solicitacaoId || registro.origemSolicitacaoId || ""),
+                clienteId: String(vinculosOrigem.clienteId || entrada.clienteId || registro.clienteId || cliente.id || ""),
+                projetoId: String(vinculosOrigem.projetoId || entrada.projetoId || registro.projetoId || projeto.id || "")
+            };
             return {
                 ...entrada,
                 registro,
+                id,
                 orcamento_id: id,
+                numero,
                 numero_orcamento: numero,
                 data_orcamento: registro.dataEmissao || registro.data_orcamento || agora.slice(0, 10),
                 cliente_nome: registro.clienteNome || registro.cliente?.nome || "",
+                vinculos,
+                solicitacaoId: vinculos.solicitacaoId,
+                clienteId: vinculos.clienteId,
+                projetoId: vinculos.projetoId,
+                status: registro.status || entrada.status || "emitido",
+                schemaVersion: Math.max(3, Number.parseInt(entrada.schemaVersion, 10) || 0),
+                fonteCanonica: "orcamentos_emitidos",
                 atualizado_em: agora,
                 criado_em: entrada.criado_em || agora
             };
@@ -245,7 +262,34 @@
         if (rota.config.excluir === "inativar") {
             encontrados.forEach(doc => lote.set(doc.ref, { ativo: 0, atualizado_em: new Date().toISOString() }, { merge: true }));
         } else if (rota.config.excluir === "cancelar") {
-            encontrados.forEach(doc => lote.set(doc.ref, { status: "cancelado", atualizado_em: new Date().toISOString() }, { merge: true }));
+            const agora = new Date().toISOString();
+            encontrados.forEach(doc => {
+                const atual = doc.data() || {};
+                const historicoStatus = Array.isArray(atual.historicoStatus) ? [...atual.historicoStatus] : [];
+                if (rota.recurso === "orcamentos" && atual.status !== "cancelado") {
+                    historicoStatus.push({
+                        id: `hist_cancelamento_${idDocumento(doc.id)}`,
+                        statusAnterior: atual.status || "emitido",
+                        statusAtual: "cancelado",
+                        acao: "orcamento_cancelado",
+                        observacao: "Orcamento cancelado pelo fluxo canonico.",
+                        realizadoEm: agora,
+                        realizadoPor: null,
+                        origem: "RKFirestoreStore"
+                    });
+                }
+                lote.set(doc.ref, {
+                    status: "cancelado",
+                    historicoStatus,
+                    aprovacao: {
+                        ...(atual.aprovacao || {}),
+                        status: "cancelado",
+                        canceladoEm: agora
+                    },
+                    atualizado_em: agora,
+                    atualizadoEmISO: agora
+                }, { merge: true });
+            });
         } else {
             encontrados.forEach(doc => lote.delete(doc.ref));
         }
