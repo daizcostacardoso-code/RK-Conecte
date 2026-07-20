@@ -1022,7 +1022,9 @@ const Funcionario = {
             fotoUsuario: config.fotoUsuario || sessao.fotoUsuario || ""
         };
         this.texto("nomeUsuarioTopo", perfil.nomeUsuario);
-        this.texto("loginUsuarioTopo", sessao.email || "Firebase Authentication");
+        this.texto("loginUsuarioTopo", sessao.email || "Acesso interno");
+        const controleAcessos = Util.$("btnControleAcessos");
+        if (controleAcessos) controleAcessos.hidden = sessao.perfil !== "admin";
         this.aplicarFotoUsuario("fotoUsuarioTopo", perfil);
         this.aplicarFotoUsuario("fotoUsuarioPreview", perfil);
         this.texto("nomeUsuarioPreview", perfil.nomeUsuario);
@@ -1142,7 +1144,7 @@ const Funcionario = {
         this._fotoUsuarioTemporaria = null;
         this.carregarConfiguracoesNaTela();
         this.carregarPerfilUsuario();
-        this.mensagemConfig("Configurações salvas. O acesso continua protegido pelo Firebase Authentication.");
+        this.mensagemConfig("Preferências salvas. O acesso continua protegido.");
         this.iniciarAvisosDeLembretes();
 
         try {

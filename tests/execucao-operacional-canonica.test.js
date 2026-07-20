@@ -34,8 +34,8 @@ test("ordem de serviço carrega o contrato operacional na ordem segura", () => {
     assert.deepEqual(ordem, [...ordem].sort((a, b) => a - b));
     assert.match(html, /id="btnIniciarInstalacao"/);
     assert.match(html, /id="btnConcluirOrdem"/);
-    assert.match(html, /nota-servico-model\.js\?v=0\.8\.0/);
-    assert.match(html, /nota-servico-controller\.js\?v=0\.8\.0/);
+    assert.match(html, /nota-servico-model\.js\?v=0\.9\.0/);
+    assert.match(html, /nota-servico-controller\.js\?v=0\.9\.0/);
 });
 
 test("medições e ordens operacionais preservam vínculos e histórico", () => {
@@ -57,7 +57,7 @@ test("dashboard inclui pendências de medição, produção e instalação", () 
     assert.match(controller, /emProducao/);
     assert.match(controller, /emInstalacao/);
     assert.match(controller, /this\.montarAcoes\(orcamentos, projetos\)/);
-    assert.match(html, /dashboard-comercial-controller\.js\?v=0\.8\.0/);
+    assert.match(html, /dashboard-comercial-controller\.js\?v=0\.9\.0/);
 });
 
 test("cancelamento comercial também encerra ordem operacional ativa", () => {

@@ -17,12 +17,32 @@ service cloud.firestore {
     function perfilValido(uid) {
       let perfil = request.resource.data;
       return perfil.keys().hasAll(['ativo', 'perfil', 'email', 'nome'])
-        && perfil.keys().hasOnly(['ativo', 'perfil', 'email', 'nome'])
+        && perfil.keys().hasOnly([
+          'ativo', 'perfil', 'email', 'nome', 'criadoEmISO', 'criadoPor',
+          'atualizadoEmISO', 'atualizadoPor', 'ultimoAcessoEm', 'historicoAcesso'
+        ])
         && perfil.ativo is bool
         && perfil.perfil in ['admin', 'funcionario']
         && textoEntre(perfil.email, 3, 254)
         && textoEntre(perfil.nome, 2, 120)
+        && (!perfil.keys().hasAny(['criadoEmISO']) || textoEntre(perfil.criadoEmISO, 0, 40))
+        && (!perfil.keys().hasAny(['criadoPor']) || textoEntre(perfil.criadoPor, 0, 120))
+        && (!perfil.keys().hasAny(['atualizadoEmISO']) || textoEntre(perfil.atualizadoEmISO, 0, 40))
+        && (!perfil.keys().hasAny(['atualizadoPor']) || textoEntre(perfil.atualizadoPor, 0, 120))
+        && (!perfil.keys().hasAny(['ultimoAcessoEm']) || textoEntre(perfil.ultimoAcessoEm, 0, 40))
+        && (!perfil.keys().hasAny(['historicoAcesso']) || (perfil.historicoAcesso is list && perfil.historicoAcesso.size() <= 100))
         && uid.size() >= 1;
+    }
+
+    function administradorPreservaProprioAcesso(uid) {
+      return request.auth.uid != uid
+        || (request.resource.data.ativo == true && request.resource.data.perfil == 'admin');
+    }
+
+    function atualizacaoDoProprioAcesso(uid) {
+      return request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ultimoAcessoEm', 'atualizadoEmISO'])
+        && perfilValido(uid);
     }
 
     function textoEntre(valor, minimo, maximo) {
@@ -157,6 +177,34 @@ service cloud.firestore {
         || (anterior == 'em_instalacao' && destino in ['concluido', 'cancelado']);
     }
 
+    function financeiroOperacionalValido() {
+      let financeiro = request.resource.data;
+      return financeiro.keys().hasAll([
+          'projetoId', 'orcamentoId', 'valorContratadoCentavos',
+          'valorRecebidoCentavos', 'saldoCentavos', 'status', 'recebimentos'
+        ])
+        && textoEntre(financeiro.projetoId, 1, 120)
+        && textoEntre(financeiro.orcamentoId, 1, 120)
+        && financeiro.valorContratadoCentavos is int
+        && financeiro.valorRecebidoCentavos is int
+        && financeiro.saldoCentavos is int
+        && financeiro.valorContratadoCentavos >= 0
+        && financeiro.valorRecebidoCentavos >= 0
+        && financeiro.valorRecebidoCentavos <= financeiro.valorContratadoCentavos
+        && financeiro.saldoCentavos == financeiro.valorContratadoCentavos - financeiro.valorRecebidoCentavos
+        && financeiro.status in ['pendente', 'parcial', 'quitado', 'cancelado']
+        && financeiro.recebimentos is list
+        && financeiro.recebimentos.size() <= 500
+        && existsAfter(/databases/$(database)/documents/projetos/$(financeiro.projetoId));
+    }
+
+    function vinculoFinanceiroPreservado() {
+      return request.resource.data.projetoId == resource.data.projetoId
+        && request.resource.data.orcamentoId == resource.data.orcamentoId
+        && request.resource.data.valorRecebidoCentavos >= resource.data.valorRecebidoCentavos
+        && request.resource.data.recebimentos.size() >= resource.data.recebimentos.size();
+    }
+
     // O formulário público usa apenas os valores de cálculo publicados.
     match /configuracoes/valores {
       allow read: if true;
@@ -172,8 +220,10 @@ service cloud.firestore {
     match /usuarios_autorizados/{uid} {
       allow get: if autorizado() && (request.auth.uid == uid || administrador());
       allow list: if administrador();
-      allow create, update: if administrador() && perfilValido(uid);
-      allow delete: if administrador() && request.auth.uid != uid;
+      allow create: if administrador() && perfilValido(uid);
+      allow update: if (administrador() && perfilValido(uid) && administradorPreservaProprioAcesso(uid))
+        || atualizacaoDoProprioAcesso(uid);
+      allow delete: if false;
     }
 
     // Visitantes podem criar uma solicitação validada, mas nunca consultar,
@@ -202,6 +252,13 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /financeiro_operacional/{documento} {
+      allow read: if autorizado();
+      allow create: if autorizado() && financeiroOperacionalValido();
+      allow update: if autorizado() && financeiroOperacionalValido() && vinculoFinanceiroPreservado();
+      allow delete: if false;
+    }
+
     match /medicoes/{documento} {
       allow read: if autorizado();
       allow create: if autorizado() && medicaoOperacionalValida();
@@ -214,7 +271,8 @@ service cloud.firestore {
     }
 
     match /caixa_empresa/{documento} {
-      allow read, write: if autorizado();
+      allow read, create, update: if autorizado();
+      allow delete: if false;
     }
 
     match /clientes/{documento} {

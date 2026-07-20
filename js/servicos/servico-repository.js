@@ -13,7 +13,7 @@ const ServicoRepository = {
             || (typeof FirestoreAdapter !== "undefined" ? FirestoreAdapter : null);
 
         if (typeof StorageAdapterContract === "undefined" || !StorageAdapterContract.validar(adapter)) {
-            throw new Error("ServicoRepository precisa do FirestoreAdapter.");
+            throw new Error("Camada de dados dos serviços indisponível.");
         }
 
         this.adapter = adapter;

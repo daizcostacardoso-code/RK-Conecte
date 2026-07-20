@@ -25,3 +25,11 @@ test("Acesso interno exige perfil ativo vinculado ao UID autenticado", () => {
     assert.match(regras, /\.data\.perfil\s+in\s+\['admin',\s*'funcionario'\]/);
     assert.doesNotMatch(regras, /allow\s+read\s*,\s*write\s*:\s*if\s+request\.auth\s*!=\s*null/);
 });
+
+test("financeiro e acessos preservam vínculos e bloqueiam exclusão definitiva", () => {
+    assert.match(regras, /match\s+\/financeiro_operacional\/\{documento\}/);
+    assert.match(regras, /existsAfter\(\/databases\/\$\(database\)\/documents\/projetos/);
+    assert.match(regras, /match\s+\/caixa_empresa\/\{documento\}[\s\S]*?allow\s+delete\s*:\s*if\s+false/);
+    assert.match(regras, /match\s+\/usuarios_autorizados\/\{uid\}[\s\S]*?allow\s+delete\s*:\s*if\s+false/);
+    assert.match(regras, /administradorPreservaProprioAcesso/);
+});

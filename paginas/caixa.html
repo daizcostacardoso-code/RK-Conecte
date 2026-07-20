@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
-    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.9.0"></script>
+    <script src="../js/shared/rk-auth.js?v=0.9.0" data-rk-auth="protected"></script>
     <title>Caixa - RK Vidraçaria</title>
     <link rel="stylesheet" href="../css/style.css?v=5.9.2">
     <link rel="stylesheet" href="../css/caixa-basico.css?v=1.0.2">
@@ -33,12 +33,35 @@
         </section>
 
         <section class="caixa-basico-resumo" aria-label="Resumo do caixa">
-            <article class="caixa-basico-resumo-card entrada"><span>Entradas</span><strong id="caixaBasicoEntradas">R$ 0,00</strong></article>
+            <article class="caixa-basico-resumo-card entrada"><span>Entradas no caixa</span><strong id="caixaBasicoEntradas">R$ 0,00</strong></article>
             <article class="caixa-basico-resumo-card saida"><span>Saídas</span><strong id="caixaBasicoSaidas">R$ 0,00</strong></article>
             <article class="caixa-basico-resumo-card saldo"><span>Saldo atual</span><strong id="caixaBasicoSaldo">R$ 0,00</strong></article>
         </section>
 
         <div id="caixaBasicoAviso" class="caixa-basico-aviso" role="status" aria-live="polite"></div>
+
+        <section class="caixa-basico-painel financeiro-operacional" aria-labelledby="financeiroProjetosTitulo">
+            <div class="caixa-basico-painel-topo caixa-basico-painel-topo-lista">
+                <div><h2 id="financeiroProjetosTitulo">Recebimentos dos projetos</h2><p>Consulte valores contratados, saldos e registre cada pagamento sem duplicidade.</p></div>
+                <label class="financeiro-busca"><span>Buscar projeto</span><input id="financeiroBusca" type="search" placeholder="Projeto, orçamento ou cliente"></label>
+            </div>
+            <div class="financeiro-resumo">
+                <article><span>Contratado</span><strong id="financeiroContratado">R$ 0,00</strong></article>
+                <article><span>Recebido</span><strong id="financeiroRecebido">R$ 0,00</strong></article>
+                <article><span>A receber</span><strong id="financeiroPendente">R$ 0,00</strong></article>
+            </div>
+            <div class="caixa-basico-tabela-wrap"><table class="caixa-basico-tabela financeiro-tabela"><thead><tr><th>Projeto</th><th>Cliente</th><th>Contratado</th><th>Recebido</th><th>Saldo</th><th>Situação</th><th>Ação</th></tr></thead><tbody id="financeiroCorpo"><tr><td colspan="7" class="caixa-basico-vazio">Carregando projetos...</td></tr></tbody></table></div>
+            <form id="financeiroRecebimentoForm" class="financeiro-form" hidden novalidate>
+                <div class="financeiro-form-titulo"><div><strong id="financeiroProjetoSelecionado">Registrar recebimento</strong><small id="financeiroSaldoSelecionado"></small></div><button id="financeiroFechar" type="button" aria-label="Fechar">×</button></div>
+                <div class="caixa-basico-form-grid">
+                    <label class="caixa-basico-campo"><span>Valor *</span><input id="financeiroValor" type="number" min="0.01" step="0.01" inputmode="decimal" required></label>
+                    <label class="caixa-basico-campo"><span>Data *</span><input id="financeiroData" type="date" required></label>
+                    <label class="caixa-basico-campo"><span>Forma de pagamento</span><select id="financeiroPagamento"><option>PIX</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option><option>Boleto</option><option>Não informado</option></select></label>
+                    <label class="caixa-basico-campo"><span>Observação</span><input id="financeiroObservacao" maxlength="500" placeholder="Opcional"></label>
+                </div>
+                <div class="caixa-basico-acoes"><button class="botao" type="submit">Confirmar recebimento</button></div>
+            </form>
+        </section>
 
         <section class="caixa-basico-painel" aria-labelledby="novoLancamentoTitulo">
             <div class="caixa-basico-painel-topo"><div><h2 id="novoLancamentoTitulo">Novo lançamento</h2><p>Preencha os dados básicos da movimentação.</p></div></div>
@@ -74,14 +97,17 @@
 <script src="../js/util.js?v=2.6.0"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="../js/firebase-config.js?v=3.0.0"></script>
-<script src="../js/shared/rk-firestore-store.js?v=0.8.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=0.9.0"></script>
+<script src="../js/projetos/projeto-model.js?v=0.9.0"></script>
+<script src="../js/caixa/financeiro-operacional-model.js?v=0.9.0"></script>
+<script src="../js/caixa/financeiro-operacional-repository.js?v=0.9.0"></script>
 <script src="../js/caixa/caixa-model.js?v=2.1.0"></script>
 <script src="../js/caixa/caixa-validator.js?v=2.1.0"></script>
 <script src="../js/caixa/caixa-repository.js?v=2.1.1"></script>
 <script src="../js/caixa/caixa-export.js?v=2.1.0"></script>
 <script src="../js/caixa/caixa-service.js?v=2.1.0"></script>
-<script src="../js/caixa/caixa-basico-controller.js?v=2.1.1"></script>
-<script src="../js/shared/rk-navigation.js?v=0.8.0"></script>
+<script src="../js/caixa/caixa-basico-controller.js?v=0.9.0"></script>
+<script src="../js/shared/rk-navigation.js?v=0.9.0"></script>
   <script src="../js/conecte-signature.js?v=20260718"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.8.0`.
+- Versão: `v0.9.0`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -19,6 +19,8 @@
 - nota de serviço;
 - controle básico de caixa;
 - dashboard comercial.
+- financeiro por projeto integrado ao caixa;
+- controle administrativo de acessos.
 
 ## Validação automatizada
 
@@ -82,3 +84,14 @@ A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGU
 - Cancelamentos preservam medições, ordens, projetos e seus históricos.
 - O dashboard inclui pendências de medição, produção e instalação.
 - Regras impedem exclusão definitiva e troca dos vínculos operacionais.
+
+## Financeiro e acessos consolidados na Sprint 2
+
+- Cada projeto aprovado possui um documento único em `financeiro_operacional`.
+- Recebimentos atualizam financeiro, resumo do projeto e `caixa_empresa` na mesma transação.
+- Repetições com o mesmo identificador não duplicam recebimentos nem lançamentos.
+- Cancelamentos preservam valores já recebidos e todo o histórico.
+- A tela de acessos é exclusiva para administradores e não armazena senhas.
+- Perfis podem ser ativados, desativados ou alterados sem exclusão definitiva.
+- Toda tela interna exige identidade válida e perfil ativo antes de ser exibida.
+- A interface apresenta termos de negócio e não expõe nomes da infraestrutura interna.

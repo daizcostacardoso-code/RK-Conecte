@@ -225,7 +225,7 @@ const OrcamentoCliente = {
         Storage.salvar(this.chaveSolicitacoes, locais);
 
         try {
-            if (typeof db === "undefined" || !db) throw new Error("Firebase indisponível");
+            if (typeof db === "undefined" || !db) throw new Error("Serviço temporariamente indisponível");
             const ref = await db.collection("solicitacoes_site").add(pedido);
             pedido.idFirestore = ref.id;
             locais[locais.length - 1] = pedido;

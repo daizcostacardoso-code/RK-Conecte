@@ -5,6 +5,8 @@ const { OrcamentoAprovacaoModel } = require("../js/orcamentos/orcamento-aprovaca
 const { ProjetoModel } = require("../js/projetos/projeto-model.js");
 global.OrcamentoAprovacaoModel = OrcamentoAprovacaoModel;
 global.ProjetoModel = ProjetoModel;
+const { FinanceiroOperacionalModel } = require("../js/caixa/financeiro-operacional-model.js");
+global.FinanceiroOperacionalModel = FinanceiroOperacionalModel;
 const { ProjetoOperacionalModel } = require("../js/projetos/projeto-operacional-model.js");
 global.ProjetoOperacionalModel = ProjetoOperacionalModel;
 const { ProjetoOperacionalRepository } = require("../js/projetos/projeto-operacional-repository.js");
@@ -65,6 +67,8 @@ test("repositório abre projeto e vincula orçamento na mesma transação", asyn
     assert.equal(primeiro.sucesso, true);
     assert.equal(primeiro.criado, true);
     assert.equal(firestore.mapa("projetos").size, 1);
+    assert.equal(firestore.mapa("financeiro_operacional").size, 1);
+    assert.equal(primeiro.financeiro.valorContratadoCentavos, 315000);
     assert.equal(primeiro.orcamento.vinculos.projetoId, "prj_orc_orcamento-91");
 
     const repetido = await ProjetoOperacionalRepository.abrirDeOrcamento("orcamento-91", {
@@ -103,6 +107,7 @@ test("repositório abre projeto e vincula orçamento na mesma transação", asyn
     assert.equal(cancelado.sucesso, true);
     assert.equal(cancelado.projeto.status, "cancelado");
     assert.equal(cancelado.projeto.ativo, false);
+    assert.equal(cancelado.financeiro.status, "cancelado");
     assert.equal(cancelado.projeto.historico.filter(item => item.tipo === "operacao_cancelada").length, 1);
     assert.equal(firestore.mapa("notas_servico").get("os_prj_orc_orcamento-91").status, "cancelado");
     assert.equal(firestore.mapa("notas_servico").get("os_prj_orc_orcamento-91").historicoOperacional.filter(item => item.tipo === "ordem_servico_cancelada").length, 1);

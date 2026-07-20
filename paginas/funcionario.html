@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="../js/firebase-auth-bootstrap.js?v=0.4.2"></script>
-    <script src="../js/shared/rk-auth.js?v=0.4.2" data-rk-auth="protected"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.9.0"></script>
+    <script src="../js/shared/rk-auth.js?v=0.9.0" data-rk-auth="protected"></script>
     <title>Painel RK Vidraçaria</title>
     <link rel="stylesheet" href="../css/style.css?v=5.9.2">
     <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
@@ -53,6 +53,7 @@
                 <a href="novo-orcamento.html" id="btnNovoOrcamentoPainel" class="botao">+ Novo Orçamento</a>
                 <a href="nota-servico.html" class="botao botao-claro">Emitir Nota de Serviço</a>
                 <a href="valores.html" class="botao botao-claro">⚙ Valores</a>
+                <a href="acessos.html" id="btnControleAcessos" class="botao botao-claro" hidden>Controle de acessos</a>
             </div>
         </div>
 
@@ -61,7 +62,7 @@
             <button type="button" data-aba="caixa">Caixa</button>
             <button type="button" data-aba="solicitacoes" id="abaSolicitacoesBotao" class="aba-com-alerta">Solicitações <span id="alertaSolicitacoes" class="badge-solicitacoes oculto">!</span></button>
             <button type="button" data-aba="ferramentas">Ferramentas</button>
-            <button type="button" data-aba="configuracoes">Configurações</button>
+            <button type="button" data-aba="configuracoes">Preferências</button>
         </nav>
 
         <div class="dashboard-cards secao-aba" data-secao="dashboard">
@@ -384,7 +385,7 @@
         <div class="dashboard-box configuracoes-box secao-aba" data-secao="configuracoes">
             <div class="box-cabecalho">
                 <div>
-                    <h3>Configurações do sistema</h3>
+                    <h3>Preferências do painel</h3>
                     <p>Personalize o perfil visual, os dados da empresa e os valores usados no orçamento.</p>
                 </div>
                 <a href="valores.html" class="botao botao-claro">Abrir valores detalhados</a>
@@ -458,7 +459,7 @@
                 </div>
 
                 <div class="acoes-config">
-                    <button type="submit" class="botao">Salvar configurações</button>
+                    <button type="submit" class="botao">Salvar preferências</button>
                     <button type="button" id="btnResetarConfig" class="botao botao-claro">Restaurar padrão</button>
                     <small id="mensagemConfig" class="mensagem-caixa"></small>
                 </div>
@@ -483,7 +484,7 @@
 <script src="../js/config.js?v=2.6.0"></script>
 <script src="../js/storage.js?v=2.6.0"></script>
 <script src="../js/util.js?v=2.6.0"></script>
-<script src="../js/shared/rk-firestore-store.js?v=0.8.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=0.9.0"></script>
 <script src="../js/caixa/caixa-model.js?v=2.1.0"></script>
 <script src="../js/caixa/caixa-validator.js?v=2.1.0"></script>
 <script src="../js/caixa/caixa-repository.js?v=2.1.1"></script>

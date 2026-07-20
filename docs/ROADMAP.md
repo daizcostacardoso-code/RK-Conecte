@@ -58,15 +58,20 @@
 - preservar vínculos, cancelamentos e histórico sem exclusão definitiva;
 - apresentar pendências operacionais no dashboard.
 
+### Patch 8 — financeiro operacional e acessos — concluído
+
+- integrar recebimentos de projetos ao caixa sem duplicidade;
+- manter saldos, situações e histórico financeiro por projeto;
+- impedir exclusões definitivas de registros financeiros;
+- criar a administração de acessos e perfis da equipe;
+- exigir perfil ativo antes de liberar as telas internas;
+- ocultar da interface as referências à infraestrutura técnica.
+
 ### Próximos passos
 
-- vincular os recebimentos do caixa ao orçamento aprovado;
-- remover módulos antigos que permanecerem sem uso após a migração.
-
-### Continuação da Sprint 2
-
-- integrar o caixa ao projeto operacional;
-- validar o fluxo completo no mobile e no desktop.
+- validar o fluxo completo no mobile e no desktop;
+- remover módulos antigos que permanecerem sem uso após a migração;
+- preparar cenários de ponta a ponta para o lançamento.
 
 ## Sprint 3 — lançamento
 

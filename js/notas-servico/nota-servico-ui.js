@@ -17,7 +17,7 @@ const NotaServicoUI = {
     },
     renderizarHistorico(itens) {
         this.el("historicoContagem").textContent = `${itens.length} ${itens.length === 1 ? "nota" : "notas"}`; const lista = this.el("historicoLista");
-        if (!itens.length) { lista.innerHTML = '<div class="nota-historico-vazio">Nenhuma nota foi salva no Firestore.</div>'; return; }
+        if (!itens.length) { lista.innerHTML = '<div class="nota-historico-vazio">Nenhuma nota foi salva.</div>'; return; }
         lista.innerHTML = itens.map(item => `<article><div><span>${this.escapar(item.numeroNota)} · ${this.escapar(NotaServicoModel.rotuloStatus(item.status))}</span><strong>${this.escapar(item.clienteNome)}</strong><small>${this.dataBr(item.dataEmissao)} • ${item.servicos.length} ${item.servicos.length === 1 ? "serviço" : "serviços"}${item.projetoId ? " • projeto vinculado" : ""}</small></div><b>${NotaServicoModel.moeda(NotaServicoModel.total(item))}</b><div class="nota-historico-acoes"><button type="button" data-historico="abrir" data-id="${this.escapar(item.id)}">Abrir</button><button type="button" data-historico="pdf" data-id="${this.escapar(item.id)}">PDF</button>${item.status === "cancelado" ? "" : `<button class="perigo" type="button" data-historico="excluir" data-id="${this.escapar(item.id)}">Cancelar</button>`}</div></article>`).join("");
     },
     dataBr(data) { if (!/^\d{4}-\d{2}-\d{2}$/.test(data || "")) return "-"; const [a,m,d] = data.split("-"); return `${d}/${m}/${a}`; },

@@ -1,5 +1,19 @@
 # Histórico de alterações
 
+## v0.9.0 — financeiro operacional e controle de acessos
+
+- Aberto um financeiro determinístico para cada projeto originado de orçamento aprovado.
+- Vinculados valores contratado, recebido e saldo ao projeto operacional.
+- Registrados recebimentos no financeiro e no caixa na mesma transação, sem duplicidade.
+- Adicionados estados pendente, parcial, quitado e cancelado com histórico preservado.
+- Protegidos lançamentos vinculados contra edição ou cancelamento manual pelo caixa.
+- Criada tela administrativa para cadastrar, ativar e desativar acessos e alterar perfis.
+- Incluídos geração de senha temporária e envio de recuperação sem armazenar senhas.
+- Bloqueadas a autodesativação e a remoção do próprio perfil administrativo.
+- Exigido perfil ativo antes de liberar qualquer tela interna e registrado o último acesso.
+- Removidas da interface as referências visíveis à infraestrutura técnica interna.
+- Reforçadas as regras e adicionados testes de financeiro, acessos, interface e permissões.
+
 ## v0.8.0 — execução operacional canônica
 
 - Persistida uma medição determinística por projeto na coleção `medicoes`.

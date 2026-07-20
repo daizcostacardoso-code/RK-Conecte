@@ -141,7 +141,7 @@ const Valores = {
 
         try {
             if (typeof db === "undefined" || !db) {
-                throw new Error("Firebase não carregado. Verifique firebase-config.js.");
+                throw new Error("Serviço de dados temporariamente indisponível.");
             }
 
             await db.collection("configuracoes")
@@ -167,7 +167,7 @@ const Valores = {
     async carregar() {
         try {
             if (typeof db === "undefined" || !db) {
-                throw new Error("Firebase não carregado. Verifique firebase-config.js.");
+                throw new Error("Serviço de dados temporariamente indisponível.");
             }
 
             const documento = await db.collection("configuracoes")

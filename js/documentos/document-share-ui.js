@@ -114,7 +114,7 @@ const DocumentShareUI = {
         }
 
         const fonte = estado.fonteBusca === "firestore"
-            ? "Firestore"
+            ? "Documentos salvos"
             : estado.fonteBusca === "atual" ? "orcamento atual" : "armazenamento local";
 
         return [

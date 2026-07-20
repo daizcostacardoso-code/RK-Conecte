@@ -26,7 +26,7 @@ const ProjetoStorage = {
     obterBanco() {
         const firestore = typeof db !== "undefined" && db ? db : globalThis.RKFirebase?.db;
         if (!firestore || typeof firestore.collection !== "function") {
-            throw new Error("Firestore indisponivel para Projetos.");
+            throw new Error("Dados de projetos temporariamente indisponiveis.");
         }
         return firestore;
     },

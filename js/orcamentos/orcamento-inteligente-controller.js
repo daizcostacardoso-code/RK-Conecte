@@ -143,7 +143,7 @@ const OrcamentoInteligenteController = {
         if (!resultado.sucesso) {
             OrcamentoInteligenteUI.mostrarAviso(resultado.erros.join(" "), "erro");
         } else if (this.errosCatalogoItens.length) {
-            this.mostrarAviso("Nao foi possivel carregar todos os itens prontos do Firestore. Voce ainda pode preencher o item manualmente.", "erro");
+            this.mostrarAviso("Nao foi possivel carregar todos os itens prontos. Voce ainda pode preencher o item manualmente.", "erro");
         }
     },
 
@@ -1549,7 +1549,7 @@ const OrcamentoInteligenteController = {
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Clientes para o fluxo guiado.", erro);
-            this.errosCatalogoItens.push("Nao foi possivel carregar os clientes do Firestore.");
+            this.errosCatalogoItens.push("Nao foi possivel carregar os clientes.");
         }
         return [];
     },
@@ -1562,7 +1562,7 @@ const OrcamentoInteligenteController = {
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Projetos para o fluxo guiado.", erro);
-            this.errosCatalogoItens.push("Nao foi possivel carregar os projetos do Firestore.");
+            this.errosCatalogoItens.push("Nao foi possivel carregar os projetos.");
         }
         return [];
     },
@@ -1576,7 +1576,7 @@ const OrcamentoInteligenteController = {
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Servicos para o fluxo guiado.", erro);
-            this.errosCatalogoItens.push("Nao foi possivel carregar os itens do Firestore.");
+            this.errosCatalogoItens.push("Nao foi possivel carregar os itens.");
         }
         return [];
     },
@@ -1590,18 +1590,18 @@ const OrcamentoInteligenteController = {
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Produtos para o fluxo guiado.", erro);
-            this.errosCatalogoItens.push("Nao foi possivel carregar os produtos do Firestore.");
+            this.errosCatalogoItens.push("Nao foi possivel carregar os produtos.");
         }
         return [];
     },
 
     async listarItensFirestore() {
-        const dados = await this.buscarListaFirestore("/itens?status=ativo", "itens", "Nao foi possivel carregar os itens prontos do Firestore.");
+        const dados = await this.buscarListaFirestore("/itens?status=ativo", "itens", "Nao foi possivel carregar os itens prontos.");
         return dados.map(item => this.normalizarItemFirestore(item)).filter(item => item.id);
     },
 
     async listarTamanhosPadraoFirestore() {
-        const dados = await this.buscarListaFirestore("/tamanhos-padrao?status=ativo", "tamanhos", "Nao foi possivel carregar os tamanhos padrao do Firestore.");
+        const dados = await this.buscarListaFirestore("/tamanhos-padrao?status=ativo", "tamanhos", "Nao foi possivel carregar os tamanhos padrao.");
         return dados.map(tamanho => this.normalizarTamanhoFirestore(tamanho)).filter(tamanho => tamanho.id && tamanho.itemId);
     },
 
@@ -1616,13 +1616,13 @@ const OrcamentoInteligenteController = {
             const corpo = await resposta.json().catch(() => null);
 
             if (!resposta.ok || corpo?.ok === false) {
-                throw new Error(corpo?.mensagem || mensagemFalha || "Falha ao consultar o Firestore.");
+                throw new Error(corpo?.mensagem || mensagemFalha || "Falha ao consultar os dados.");
             }
 
             return this.normalizarListaFirestore(corpo, chave);
         } catch (erro) {
             console.warn(mensagemFalha, erro);
-            this.errosCatalogoItens.push(mensagemFalha || "Nao foi possivel consultar o Firestore.");
+            this.errosCatalogoItens.push(mensagemFalha || "Nao foi possivel consultar os dados.");
             return [];
         } finally {}
     },

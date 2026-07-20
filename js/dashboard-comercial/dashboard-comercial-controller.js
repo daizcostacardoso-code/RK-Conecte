@@ -90,7 +90,7 @@ const DashboardComercialController = {
     montarOrcamentos(orcamentosEmitidos = []) {
         const unicos = new Map();
         orcamentosEmitidos.forEach(item => {
-            const orcamento = this.normalizarOrcamento(item.registro || item.dados || item, "Firestore");
+            const orcamento = this.normalizarOrcamento(item.registro || item.dados || item, "Sistema");
             const chave = orcamento.numero || orcamento.id;
             if (chave) {
                 const anterior = unicos.get(chave);

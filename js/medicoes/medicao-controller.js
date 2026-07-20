@@ -22,7 +22,7 @@ const MedicaoController = {
         const projetoId = MedicaoModel.contexto.projetoId;
         if (!projetoId) return this.renderizarContexto();
         if (typeof db === "undefined" || !db || typeof db.collection !== "function") {
-            MedicaoUI.mensagem("Firestore indisponível para carregar o projeto.");
+            MedicaoUI.mensagem("Dados temporariamente indisponíveis para carregar o projeto.");
             return;
         }
         try {
@@ -81,7 +81,7 @@ const MedicaoController = {
         }
         const numeroProjeto = this.projeto.numero || this.projeto.id;
         const numeroOrcamento = this.projeto.orcamento?.numero || this.estado.orcamentoId || "não informado";
-        const status = this.medicaoRemota?.status === "concluida" ? "medição concluída" : (this.medicaoRemota ? "medição salva no Firestore" : "rascunho local");
+        const status = this.medicaoRemota?.status === "concluida" ? "medição concluída" : (this.medicaoRemota ? "medição salva" : "rascunho local");
         elemento.textContent = `Projeto ${numeroProjeto} · Orçamento ${numeroOrcamento} · ${status}.`;
         elemento.hidden = false;
     },
@@ -131,18 +131,18 @@ const MedicaoController = {
             this.renderizarContexto();
             this.atualizarAcoesOperacionais();
             MedicaoUI.mensagem(
-                concluir ? "Medição concluída. A ordem de serviço já pode ser preparada." : "Medição salva no Firestore.",
+                concluir ? "Medição concluída. A ordem de serviço já pode ser preparada." : "Medição salva.",
                 "sucesso"
             );
             return resultado;
         } catch (erro) {
             console.error(erro);
-            MedicaoUI.mensagem("Não foi possível salvar a medição no Firestore.");
+            MedicaoUI.mensagem("Não foi possível salvar a medição.");
             return null;
         } finally {
             if (botao) {
                 botao.disabled = false;
-                botao.textContent = concluir ? "Concluir medição" : "Salvar no Firestore";
+                botao.textContent = concluir ? "Concluir medição" : "Salvar medição";
             }
         }
     },
@@ -240,7 +240,7 @@ const MedicaoController = {
         MedicaoUI.limparMedida();
         MedicaoUI.modoEdicao(false);
         MedicaoUI.renderizarMedidas([]);
-        MedicaoUI.mensagem("Rascunho local limpo. A medição já salva no Firestore foi preservada.", "sucesso");
+        MedicaoUI.mensagem("Rascunho local limpo. A medição já salva foi preservada.", "sucesso");
     }
 };
 

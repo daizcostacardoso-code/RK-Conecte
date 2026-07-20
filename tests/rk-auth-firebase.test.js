@@ -55,6 +55,7 @@ test("Sessão interna é derivada do usuário autenticado pelo Firebase", () => 
         photoURL: "",
         metadata: { lastSignInTime: "2026-07-20T12:00:00.000Z" }
     };
+    RKAuth.perfilAtual = { ativo: true, perfil: "admin", nome: "Caio RK" };
     RKAuth.resolvido = true;
 
     const sessao = RKAuth.obterSessao();
@@ -64,11 +65,26 @@ test("Sessão interna é derivada do usuário autenticado pelo Firebase", () => 
     assert.equal(sessao.email, "admin@rkvidracaria.com.br");
     assert.equal(sessao.usuario, "admin@rkvidracaria.com.br");
     assert.equal(sessao.nomeUsuario, "Caio RK");
+    assert.equal(sessao.perfil, "admin");
+    assert.equal(sessao.ativo, true);
     assert.equal(RKAuth.estaAutenticado(), true);
 
     RKAuth.usuarioAtual = null;
+    RKAuth.limparPerfilAtual();
     RKAuth.resolvido = false;
     delete global.localStorage;
+});
+
+test("Guard interpreta o perfil ativo retornado pelo serviço de dados", () => {
+    const perfil = RKAuth.converterCamposDocumento({
+        ativo: { booleanValue: true },
+        perfil: { stringValue: "funcionario" },
+        nome: { stringValue: "Equipe RK" },
+        historicoAcesso: { arrayValue: { values: [{ mapValue: { fields: { tipo: { stringValue: "acesso_criado" } } } }] } }
+    });
+    assert.equal(perfil.ativo, true);
+    assert.equal(perfil.perfil, "funcionario");
+    assert.equal(perfil.historicoAcesso[0].tipo, "acesso_criado");
 });
 
 test("Telas comerciais sensíveis permanecem classificadas como protegidas", () => {
@@ -82,6 +98,7 @@ test("Telas comerciais sensíveis permanecem classificadas como protegidas", () 
         "nota-servico.html",
         "caixa.html",
         "loading.html",
-        "produtos.html"
+        "produtos.html",
+        "acessos.html"
     ].forEach(pagina => assert.equal(RKAuth.paginaProtegida(pagina), true, pagina));
 });

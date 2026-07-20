@@ -10,7 +10,7 @@ const Login = {
         const autenticacao = window.RKAuth?.obterInstanciaFirebase();
 
         if (!autenticacao) {
-            this.mostrarMensagem("Não foi possível conectar ao serviço de autenticação.");
+            this.mostrarMensagem("Não foi possível conectar ao serviço de acesso.");
             return;
         }
 
@@ -20,7 +20,7 @@ const Login = {
         try {
             await autenticacao.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
             const credencial = await autenticacao.signInWithEmailAndPassword(email, senha);
-            if (window.RKAuth) RKAuth.processarEstado(credencial.user);
+            if (window.RKAuth) await RKAuth.processarEstado(credencial.user);
             else window.location.replace("dashboard-comercial.html");
         } catch (erro) {
             this.mostrarMensagem(this.mensagemErro(erro));
@@ -34,11 +34,14 @@ const Login = {
             this.mostrarMensagem("Sua sessão terminou. Entre novamente.");
         }
         if (erro === "auth_indisponivel") {
-            this.mostrarMensagem("A autenticação está temporariamente indisponível. Verifique a conexão.");
+            this.mostrarMensagem("O acesso está temporariamente indisponível. Verifique a conexão.");
+        }
+        if (erro === "acesso_negado") {
+            this.mostrarMensagem("Seu acesso não está ativo. Procure um administrador.");
         }
 
         window.addEventListener("rk:auth-error", event => {
-            this.mostrarMensagem(event.detail?.mensagem || "Falha ao iniciar a autenticação.");
+            this.mostrarMensagem(event.detail?.mensagem || "Falha ao iniciar o acesso.");
         });
     },
 
@@ -66,7 +69,7 @@ const Login = {
             "auth/wrong-password": "E-mail ou senha incorretos.",
             "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
             "auth/network-request-failed": "Falha de conexão. Verifique a internet e tente novamente.",
-            "auth/unauthorized-domain": "Este endereço ainda não foi autorizado no Firebase Authentication."
+            "auth/unauthorized-domain": "Este endereço ainda não está liberado para acesso."
         };
         return mensagens[codigo] || "Não foi possível entrar. Tente novamente.";
     }

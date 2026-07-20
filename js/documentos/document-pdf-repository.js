@@ -23,7 +23,7 @@ const DocumentPdfRepository = {
                 registro,
                 fonte: "firestore",
                 offline: true,
-                erros: ["Firestore indisponivel."]
+                erros: ["Dados temporariamente indisponiveis."]
             };
         }
 
@@ -62,7 +62,7 @@ const DocumentPdfRepository = {
                 registro,
                 fonte: "firestore",
                 offline: true,
-                erros: [erro.message || "Nao foi possivel salvar no Firestore."]
+                erros: [erro.message || "Nao foi possivel salvar o documento."]
             };
         }
     },
@@ -70,7 +70,7 @@ const DocumentPdfRepository = {
     async buscar(filtros = {}) {
         const filtrosNormalizados = this.normalizarFiltros(filtros);
         if (!this.firestoreDisponivel()) {
-            return { sucesso: false, registros: [], fonte: "firestore", filtros: filtrosNormalizados, erros: ["Firestore indisponivel."] };
+            return { sucesso: false, registros: [], fonte: "firestore", filtros: filtrosNormalizados, erros: ["Dados temporariamente indisponiveis."] };
         }
         const remoto = await this.buscarFirestore(filtrosNormalizados);
         return {
@@ -85,7 +85,7 @@ const DocumentPdfRepository = {
     async cancelar(registro = {}, opcoes = {}) {
         const id = registro.orcamentoId || registro.orcamento_id || registro.id || registro.numero;
         if (!id) throw new Error("Orcamento sem identificador para cancelamento.");
-        if (!this.firestoreDisponivel()) throw new Error("Firestore indisponivel.");
+        if (!this.firestoreDisponivel()) throw new Error("Dados temporariamente indisponiveis.");
         if (typeof OrcamentoAprovacaoService === "undefined" || typeof OrcamentoAprovacaoService.cancelar !== "function") {
             throw new Error("Servico comercial indisponivel para cancelar o orcamento.");
         }
@@ -194,7 +194,7 @@ const DocumentPdfRepository = {
             return {
                 sucesso: false,
                 registros: [],
-                erros: [erro.message || "Nao foi possivel buscar no Firestore."]
+                erros: [erro.message || "Nao foi possivel buscar os documentos."]
             };
         }
     },

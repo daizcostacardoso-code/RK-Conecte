@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.8.0`
+`v0.9.0`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -28,6 +28,15 @@ Medições concluídas são persistidas na coleção `medicoes`, com documento �
 por projeto, revisão e histórico. A conclusão libera uma ordem de serviço
 vinculada na coleção `notas_servico`; essa ordem conduz o projeto pelas etapas
 de produção, instalação e finalização sem apagar registros anteriores.
+
+Cada projeto aprovado também possui um registro financeiro único. Recebimentos
+parciais ou totais atualizam o saldo do projeto e criam a entrada correspondente
+no caixa na mesma transação, preservando vínculos e histórico.
+
+Administradores possuem uma tela própria para criar acessos, definir o perfil da
+equipe, ativar ou desativar contas e enviar recuperação de senha. A interface só é
+liberada após a confirmação de um perfil ativo e senhas nunca são armazenadas pela
+aplicação.
 
 ## Validação local
 

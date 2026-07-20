@@ -1,7 +1,7 @@
 const NotaServicoRepository = {
     async request(path, options = {}) {
         if (typeof RKFirestoreStore === "undefined" || typeof RKFirestoreStore.fetch !== "function") {
-            throw new Error("Firestore indisponivel.");
+            throw new Error("Dados temporariamente indisponiveis.");
         }
 
         const resposta = await RKFirestoreStore.fetch(path, {
@@ -9,7 +9,7 @@ const NotaServicoRepository = {
             ...options
         });
         const dados = await resposta.json().catch(() => null);
-        if (!resposta.ok) throw new Error(dados?.mensagem || "Nao foi possivel acessar as notas no Firestore.");
+        if (!resposta.ok) throw new Error(dados?.mensagem || "Nao foi possivel acessar as notas.");
         return dados;
     },
 

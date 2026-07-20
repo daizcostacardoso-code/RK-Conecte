@@ -3,7 +3,7 @@ const MedicaoOperacionalRepository = {
     colecaoProjetos: "projetos",
 
     async buscarPorProjeto(projetoId = "") {
-        if (!this.firestoreDisponivel()) return this.erro("Firestore indisponível.");
+        if (!this.firestoreDisponivel()) return this.erro("Dados temporariamente indisponíveis.");
         try {
             const id = MedicaoOperacionalModel.idMedicao(projetoId);
             const snapshot = await db.collection(this.colecaoMedicoes).doc(id).get();
@@ -18,7 +18,7 @@ const MedicaoOperacionalRepository = {
     },
 
     async salvar(projetoId = "", estado = {}, opcoes = {}) {
-        if (!this.firestoreDisponivel()) return this.erro("Firestore indisponível.");
+        if (!this.firestoreDisponivel()) return this.erro("Dados temporariamente indisponíveis.");
         const idProjeto = MedicaoOperacionalModel.texto(projetoId || estado.projetoId, 120);
         if (!idProjeto) return this.erro("Projeto obrigatório para salvar a medição.");
         try {

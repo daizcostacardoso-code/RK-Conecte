@@ -10,7 +10,7 @@ const ClienteRepository = {
                 signal: options.signal || controlador?.signal
             });
         } catch (_) {
-            throw new Error("Nao foi possivel acessar os dados no Firestore.");
+            throw new Error("Nao foi possivel acessar os dados.");
         } finally {
             if (timer) window.clearTimeout(timer);
         }

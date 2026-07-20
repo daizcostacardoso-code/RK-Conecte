@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=0.9.0"></script>
+    <script src="../js/shared/rk-auth.js?v=0.9.0" data-rk-auth="protected"></script>
+    <title>Controle de acessos - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <link rel="stylesheet" href="../css/acessos.css?v=0.9.0">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+    <meta name="theme-color" content="#083d67">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="acesso-page comercial-page">
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta"><img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria"><div><strong>RK Vidraçaria</strong><small>Gestão da equipe</small></div></div>
+        <nav><ul><li><a href="dashboard-comercial.html">Dashboard</a></li><li><a href="funcionario.html">Painel</a></li><li><a href="caixa.html">Financeiro</a></li><li><a class="login" href="login.html">Área da equipe</a></li></ul></nav>
+    </div>
+</header>
+
+<main class="acesso-main">
+    <div class="container acesso-shell">
+        <section class="acesso-cabecalho"><div><span>Administração</span><h1>Controle de acessos</h1><p>Cadastre a equipe, defina permissões e acompanhe a situação de cada acesso.</p></div></section>
+        <div id="acessoAviso" class="acesso-aviso" role="status" aria-live="polite"></div>
+        <div id="acessoBloqueio" class="acesso-bloqueio" hidden></div>
+
+        <div id="acessoConteudo">
+            <section class="acesso-painel" aria-labelledby="novoAcessoTitulo">
+                <div class="acesso-painel-topo"><div><h2 id="novoAcessoTitulo">Novo acesso</h2><p>A senha temporária aparece somente durante o cadastro e não fica armazenada.</p></div></div>
+                <form id="acessoForm" class="acesso-form" novalidate>
+                    <label><span>Nome *</span><input id="acessoNome" maxlength="120" autocomplete="name" required></label>
+                    <label><span>E-mail *</span><input id="acessoEmail" type="email" maxlength="254" autocomplete="off" required></label>
+                    <label><span>Perfil *</span><select id="acessoPerfil"><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select></label>
+                    <label class="acesso-senha-campo"><span>Senha temporária *</span><div><input id="acessoSenha" type="text" minlength="10" maxlength="72" autocomplete="new-password" required><button id="acessoGerarSenha" type="button">Gerar</button></div></label>
+                    <button class="botao" type="submit">Criar acesso</button>
+                </form>
+                <aside id="acessoCredencialCriada" class="acesso-credencial" hidden><div><strong>Acesso criado para <span id="acessoEmailCriado"></span></strong><p>Copie a senha e entregue diretamente ao usuário. Ela não poderá ser consultada novamente.</p></div><code id="acessoSenhaCriada"></code><button id="acessoCopiarSenha" type="button">Copiar senha</button></aside>
+            </section>
+
+            <section class="acesso-painel" aria-labelledby="equipeTitulo">
+                <div class="acesso-painel-topo acesso-lista-topo"><div><h2 id="equipeTitulo">Equipe autorizada</h2><p id="acessoResumo">Nenhum acesso carregado.</p></div><div class="acesso-filtros"><label><span>Situação</span><select id="acessoFiltro"><option value="">Todos</option><option value="ativo">Ativos</option><option value="inativo">Desativados</option></select></label><label><span>Buscar</span><input id="acessoBusca" type="search" placeholder="Nome ou e-mail"></label></div></div>
+                <div class="acesso-tabela-wrap"><table class="acesso-tabela"><thead><tr><th>Usuário</th><th>Perfil</th><th>Situação</th><th>Último acesso</th><th>Atualizado</th><th>Ações</th></tr></thead><tbody id="acessoTabelaCorpo"><tr><td colspan="6" class="acesso-vazio">Carregando acessos...</td></tr></tbody></table></div>
+            </section>
+        </div>
+    </div>
+</main>
+<footer><p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p></footer>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=0.9.0"></script>
+<script src="../js/acessos/acesso-model.js?v=0.9.0"></script>
+<script src="../js/acessos/acesso-repository.js?v=0.9.0"></script>
+<script src="../js/acessos/acesso-controller.js?v=0.9.0"></script>
+<script src="../js/shared/rk-navigation.js?v=0.9.0"></script>
+<script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

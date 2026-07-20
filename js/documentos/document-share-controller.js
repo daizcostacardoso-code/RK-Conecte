@@ -301,13 +301,13 @@ const DocumentShareController = {
         this.estado.buscando = false;
         this.estado.resultadosBusca = resultado.registros || [];
         this.estado.fonteBusca = resultado.fonte || "";
-        this.registrarAcao(`Busca de PDF executada em ${resultado.fonte || "Firestore"}.`);
+        this.registrarAcao("Busca de PDF concluída.");
 
         if (!this.estado.resultadosBusca.length) {
             return this.registrarMensagem("Nenhum PDF encontrado para os filtros informados.", "erro");
         }
 
-        return this.registrarMensagem(`${this.estado.resultadosBusca.length} PDF(s) encontrado(s) no Firestore.`, "sucesso");
+        return this.registrarMensagem(`${this.estado.resultadosBusca.length} PDF(s) encontrado(s).`, "sucesso");
     },
 
     limparFiltros() {
