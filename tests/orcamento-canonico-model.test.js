@@ -23,7 +23,7 @@ test("modelo canônico normaliza orçamento legado sem perder vínculos", () => 
     assert.equal(normalizado.id, "documento-legado");
     assert.equal(normalizado.numero, "000321");
     assert.equal(normalizado.status, "emitido");
-    assert.equal(normalizado.schemaVersion, 3);
+    assert.equal(normalizado.schemaVersion, 4);
     assert.equal(normalizado.fonteCanonica, "orcamentos_emitidos");
     assert.deepEqual(normalizado.vinculos, {
         solicitacaoId: "solicitacao-9",

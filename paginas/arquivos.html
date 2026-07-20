@@ -33,8 +33,9 @@
         .arquivos-mensagem { display: none; margin: 0; padding: 12px 14px; border-radius: 10px; background: #eaf4ff; color: #083d67; font-weight: 700; }
         .arquivos-mensagem.is-visible { display: block; }
         .arquivos-item-acoes { display: flex; gap: 7px; flex-wrap: wrap; }
-        .arquivos-item-acoes button { border: 1px solid #9fc1df; border-radius: 7px; background: #fff; color: #083d67; padding: 7px 10px; cursor: pointer; font-weight: 700; }
+        .arquivos-item-acoes button, .arquivos-item-acoes a { border: 1px solid #9fc1df; border-radius: 7px; background: #fff; color: #083d67; padding: 7px 10px; cursor: pointer; font-weight: 700; text-decoration: none; }
         .arquivos-item-acoes .arquivos-acao-aprovar { background: #087f5b; border-color: #087f5b; color: #fff; }
+        .arquivos-item-acoes .arquivos-acao-operacao { background: #083d67; border-color: #083d67; color: #fff; }
         .arquivos-item-acoes .arquivos-acao-recusar, .arquivos-item-acoes .arquivos-acao-cancelar { border-color: #c53030; color: #a11b1b; }
         .arquivos-status { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 9px; background: #edf3f8; color: #17324d; font-size: .82rem; font-weight: 800; }
         .arquivos-status.is-aprovado { background: #dcfce7; color: #166534; }.arquivos-status.is-recusado, .arquivos-status.is-cancelado { background: #fee2e2; color: #991b1b; }.arquivos-status.is-enviado { background: #dbeafe; color: #1d4ed8; }
@@ -304,11 +305,17 @@
 <script src="../js/firebase-config.js?v=2.2.0"></script>
 <script src="../js/config.js?v=2.5.0"></script>
 <script src="../js/storage.js?v=2.5.0"></script>
-<script src="../js/shared/rk-firestore-store.js?v=1.0.1"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-model.js?v=0.6.0"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-validator.js?v=0.6.0"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-repository.js?v=0.6.0"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-service.js?v=0.6.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=0.7.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-model.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-status.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-historico.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-model.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-operacional-model.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-operacional-repository.js?v=0.7.0"></script>
+<script src="../js/projetos/projeto-operacional-service.js?v=0.7.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-validator.js?v=0.7.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-repository.js?v=0.7.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-service.js?v=0.7.0"></script>
 <script src="../js/documentos/document-model.js?v=7.2.1"></script>
 <script src="../js/documentos/document-builder.js?v=7.2.1"></script>
 <script src="../js/documentos/document-validator.js?v=4.4.0"></script>
@@ -319,8 +326,8 @@
 <script src="../js/export/adapters/pdf-adapter.js?v=7.2.4"></script>
 <script src="../js/export/export-service.js?v=4.4.0"></script>
 <script src="../js/documentos/document-pdf-repository.js?v=0.6.0"></script>
-<script src="../js/documentos/document-archive-controller.js?v=0.6.0"></script>
-<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+<script src="../js/documentos/document-archive-controller.js?v=0.7.0"></script>
+<script src="../js/shared/rk-navigation.js?v=0.7.0"></script>
 <script src="../js/app-install.js?v=3.2.0"></script>
   <script src="../js/conecte-signature.js?v=20260718"></script>
 </body>

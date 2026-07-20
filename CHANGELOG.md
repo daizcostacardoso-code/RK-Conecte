@@ -1,5 +1,18 @@
 # Histórico de alterações
 
+## v0.7.0 — abertura do fluxo operacional
+
+- Conectada a aprovação comercial à abertura automática de um projeto operacional.
+- Adotado identificador determinístico para impedir projetos duplicados por orçamento.
+- Vinculados orçamento e projeto na mesma transação do Firestore.
+- Adicionada ação de reparo para orçamentos aprovados anteriormente e ainda sem projeto.
+- Restaurada uma tela própria para acompanhar e editar projetos operacionais.
+- Contextualizada a medição com cliente, obra e orçamento do projeto selecionado.
+- Isolados os rascunhos de medição por projeto e por dispositivo.
+- Propagado o cancelamento do orçamento para o projeto com histórico preservado.
+- Bloqueada a exclusão definitiva de projetos nas regras do Firestore.
+- Adicionados testes de idempotência, vínculo, cancelamento, contexto de medição e regras.
+
 ## v0.6.0 — orçamento canônico e fluxo comercial
 
 - Consolidada `orcamentos_emitidos` como fonte oficial dos orçamentos comerciais.

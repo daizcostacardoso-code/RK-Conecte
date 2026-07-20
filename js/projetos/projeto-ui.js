@@ -80,6 +80,7 @@ const ProjetoVisualUI = {
 
     emitirAcao(acao, id) {
         const mapa = {
+            detalhes: "aoSelecionarProjeto",
             editar: "aoEditarProjeto",
             inativar: "aoInativarProjeto"
         };
@@ -169,7 +170,7 @@ const ProjetoVisualUI = {
         if (!projetos.length) {
             tabelaCorpo.innerHTML = `
                 <tr>
-                    <td colspan="3" class="cadastro-estado-vazio">Nenhum projeto cadastrado.</td>
+                    <td colspan="5" class="cadastro-estado-vazio">Nenhum projeto cadastrado.</td>
                 </tr>
             `;
             return;
@@ -179,10 +180,15 @@ const ProjetoVisualUI = {
             <tr>
                 <td>
                     <strong>${this.escapar(projeto.descricao || projeto.nome || projeto.titulo || "Sem descricao")}</strong>
+                    ${projeto.orcamento?.numero ? `<small>Orçamento ${this.escapar(projeto.orcamento.numero)}</small>` : ""}
                 </td>
+                <td>${this.escapar(projeto.cliente?.nome || projeto.clienteNome || "Não informado")}</td>
+                <td><span class="projeto-status is-${this.escaparAtributo(projeto.status)}">${this.escapar(this.rotuloStatus(projeto.status))}</span></td>
                 <td>${this.escapar(this.formatarData(projeto.atualizadoEm || projeto.datas?.atualizacao))}</td>
                 <td>
                     <div class="cadastro-tabela-acoes">
+                        <a class="btn-pequeno botao" href="medicao-obra.html?projetoId=${encodeURIComponent(projeto.id)}&orcamentoId=${encodeURIComponent(projeto.orcamento?.id || "")}">Medição</a>
+                        <button type="button" class="btn-pequeno botao-claro" data-projeto-acao="detalhes" data-projeto-id="${this.escaparAtributo(projeto.id)}">Detalhes</button>
                         <button type="button" class="btn-pequeno botao-claro" data-projeto-acao="editar" data-projeto-id="${this.escaparAtributo(projeto.id)}">Editar</button>
                         <button type="button" class="btn-pequeno botao-claro" data-projeto-acao="inativar" data-projeto-id="${this.escaparAtributo(projeto.id)}">Inativar</button>
                     </div>
@@ -196,7 +202,7 @@ const ProjetoVisualUI = {
         if (!tabelaCorpo) return;
         tabelaCorpo.innerHTML = `
             <tr aria-busy="true">
-                <td colspan="3" class="cadastro-estado-vazio">${this.escapar(mensagem)}</td>
+                <td colspan="5" class="cadastro-estado-vazio">${this.escapar(mensagem)}</td>
             </tr>
         `;
     },
@@ -211,15 +217,25 @@ const ProjetoVisualUI = {
         }
 
         if (detalheResumo) {
-            detalheResumo.textContent = "Descricao do projeto selecionada.";
+            detalheResumo.textContent = `${projeto.numero || projeto.id} · ${this.rotuloStatus(projeto.status)}`;
         }
 
         if (detalheConteudo) {
             detalheConteudo.innerHTML = `
+                <div class="projeto-detalhe-grade">
+                    ${this.renderizarCampo("Cliente", projeto.cliente?.nome || projeto.clienteNome || "Não informado")}
+                    ${this.renderizarCampo("Orçamento", projeto.orcamento?.numero || "Não vinculado")}
+                    ${this.renderizarCampo("Status operacional", String(projeto.operacional?.status || "Não informado").replace(/_/g, " "))}
+                    ${this.renderizarCampo("Valor aprovado", this.formatarMoeda(projeto.financeiro?.valorTotal || projeto.orcamento?.total))}
+                </div>
                 <section class="cadastro-detalhe-bloco">
                     <h3>Descricao</h3>
                     <p>${this.escapar(projeto.descricao || projeto.observacoes || projeto.obra?.observacoes || "Sem descricao cadastrada.")}</p>
                 </section>
+                <div class="cadastro-form-acoes">
+                    <a class="botao" href="medicao-obra.html?projetoId=${encodeURIComponent(projeto.id)}&orcamentoId=${encodeURIComponent(projeto.orcamento?.id || "")}">Abrir medição</a>
+                    ${projeto.orcamento?.id ? `<a class="botao botao-claro" href="arquivos.html?numero=${encodeURIComponent(projeto.orcamento.numero || projeto.orcamento.id)}">Ver orçamento</a>` : ""}
+                </div>
             `;
         }
     },
@@ -278,6 +294,10 @@ const ProjetoVisualUI = {
         const data = new Date(valor);
         if (Number.isNaN(data.getTime())) return "nao informado";
         return data.toLocaleDateString("pt-BR");
+    },
+
+    formatarMoeda(valor) {
+        return Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     },
 
     escapar(valor) {

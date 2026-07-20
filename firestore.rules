@@ -81,6 +81,32 @@ service cloud.firestore {
         && textoEntre(dados.criadoEmISO, 20, 40);
     }
 
+    function projetoOperacionalValido() {
+      let projeto = request.resource.data;
+      return !projeto.keys().hasAny(['origem'])
+        || projeto.origem != 'orcamento_aprovado'
+        || (
+          projeto.keys().hasAll(['orcamento'])
+          && projeto.orcamento is map
+          && projeto.orcamento.keys().hasAll(['id'])
+          && textoEntre(projeto.orcamento.id, 1, 120)
+          && exists(/databases/$(database)/documents/orcamentos_emitidos/$(projeto.orcamento.id))
+          && get(/databases/$(database)/documents/orcamentos_emitidos/$(projeto.orcamento.id)).data.status == 'aprovado'
+        );
+    }
+
+    function vinculoOperacionalExistentePreservado() {
+      let anterior = resource.data;
+      let projeto = request.resource.data;
+      return anterior.keys().hasAll(['origem', 'orcamento'])
+        && projeto.keys().hasAll(['origem', 'orcamento'])
+        && anterior.origem == 'orcamento_aprovado'
+        && projeto.origem == anterior.origem
+        && anterior.orcamento is map
+        && projeto.orcamento is map
+        && anterior.orcamento.id == projeto.orcamento.id;
+    }
+
     // O formulário público usa apenas os valores de cálculo publicados.
     match /configuracoes/valores {
       allow read: if true;
@@ -120,7 +146,10 @@ service cloud.firestore {
     }
 
     match /projetos/{documento} {
-      allow read, write: if autorizado();
+      allow read: if autorizado();
+      allow create: if autorizado() && projetoOperacionalValido();
+      allow update: if autorizado() && (projetoOperacionalValido() || vinculoOperacionalExistentePreservado());
+      allow delete: if false;
     }
 
     match /servicos/{documento} {

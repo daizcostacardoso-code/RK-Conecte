@@ -205,7 +205,7 @@ const ClienteUI = {
     renderizarAcoesFluxo(cliente = {}) {
         return `
             <div class="cliente-fluxo-acoes secao-inteira">
-                <a class="botao" href="produtos.html#projetos">Criar/editar projeto</a>
+                <a class="botao" href="projetos.html">Criar/editar projeto</a>
                 <a class="botao botao-claro" href="orcamento-inteligente.html">Seguir para orcamento</a>
             </div>
         `;

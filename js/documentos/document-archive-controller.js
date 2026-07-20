@@ -120,7 +120,19 @@ const DocumentArchiveController = {
         const acoes = typeof OrcamentoAprovacaoService !== "undefined"
             ? OrcamentoAprovacaoService.acoesDisponiveis(registro)
             : [];
-        return acoes.map(acao => `<button type="button" class="arquivos-acao-${this.escaparAtributo(acao.chave)}" data-arquivo-acao="${this.escaparAtributo(acao.chave)}" data-registro-id="${this.escaparAtributo(registro.id)}">${this.escapar(acao.rotulo)}</button>`).join("");
+        const comerciais = acoes.map(acao => `<button type="button" class="arquivos-acao-${this.escaparAtributo(acao.chave)}" data-arquivo-acao="${this.escaparAtributo(acao.chave)}" data-registro-id="${this.escaparAtributo(registro.id)}">${this.escapar(acao.rotulo)}</button>`).join("");
+        return `${comerciais}${this.renderizarAtalhoOperacional(registro)}`;
+    },
+
+    renderizarAtalhoOperacional(registro = {}) {
+        if (registro.status !== "aprovado") return "";
+        const projetoId = String(registro.operacao?.projetoId || registro.vinculos?.projetoId || registro.projetoId || "").trim();
+        const operacaoAberta = projetoId && registro.operacao?.status === "aberta";
+        if (!operacaoAberta) {
+            return `<button type="button" class="arquivos-acao-operacao" data-arquivo-acao="abrir_operacao" data-registro-id="${this.escaparAtributo(registro.id)}">Abrir operação</button>`;
+        }
+        const url = `medicao-obra.html?projetoId=${encodeURIComponent(projetoId)}&orcamentoId=${encodeURIComponent(registro.id || "")}`;
+        return `<a class="arquivos-acao-operacao" href="${this.escaparAtributo(url)}">Abrir medição</a>`;
     },
 
     async tratarAcao(evento) {
@@ -130,6 +142,7 @@ const DocumentArchiveController = {
         const acao = botao.dataset.arquivoAcao;
         if (!registro) return this.mensagem("Orçamento não encontrado.");
         if (acao === "excluir") return this.solicitarExclusao([registro]);
+        if (acao === "abrir_operacao") return this.abrirOperacao(registro, botao);
         if (["detalhes", "emitir", "enviar", "aprovar", "recusar", "cancelar"].includes(acao)) return this.abrirDetalhes(registro, acao === "detalhes" ? "" : acao);
         await this.gerarPdf(registro, acao === "download");
     },
@@ -159,6 +172,7 @@ const DocumentArchiveController = {
             `</div>`,
             `<section class="arquivos-detalhes-secao"><h3>Documento comercial</h3><p>${this.escapar(registro.documento?.dados?.projeto?.nome || registro.projetoNome || "Proposta comercial")}</p>${itens.length ? `<ul>${itens.map(item => `<li>${this.escapar(item.nome || item.descricao || item.categoria || "Item")}</li>`).join("")}</ul>` : "<p>Itens não disponíveis neste registro.</p>"}</section>`,
             `<section class="arquivos-detalhes-secao"><h3>Decisão</h3><p>${this.escapar(this.resumoDecisao(aprovacao))}</p></section>`,
+            `<section class="arquivos-detalhes-secao"><h3>Operação</h3>${this.renderizarOperacao(registro)}</section>`,
             `<section class="arquivos-detalhes-secao"><h3>Histórico</h3>${this.renderizarHistorico(registro.historicoStatus || [])}</section>`,
             `<section class="arquivos-detalhes-secao arquivos-detalhes-acoes"><h3>Ações disponíveis</h3>${this.renderizarPainelAcao(registro, acoes)}</section>`
         ].join("");
@@ -181,16 +195,56 @@ const DocumentArchiveController = {
         return `<ol class="arquivos-historico">${historico.map(item => `<li><strong>${this.escapar(this.rotuloAcao(item.acao))}</strong><span>${this.escapar(this.rotuloStatus(item.statusAnterior || "emitido"))} → ${this.escapar(this.rotuloStatus(item.statusAtual))}</span><small>${this.escapar(this.formatarDataHora(item.realizadoEm))}${item.realizadoPor?.nome ? ` · ${this.escapar(item.realizadoPor.nome)}` : ""}</small>${item.observacao ? `<p>${this.escapar(item.observacao)}</p>` : ""}</li>`).join("")}</ol>`;
     },
 
-    tratarAcaoDetalhe(evento) {
+    renderizarOperacao(registro = {}) {
+        if (registro.status !== "aprovado") return "<p>A operação será disponibilizada após a aprovação comercial.</p>";
+        const projetoId = String(registro.operacao?.projetoId || registro.vinculos?.projetoId || registro.projetoId || "").trim();
+        const operacaoAberta = projetoId && registro.operacao?.status === "aberta";
+        if (!operacaoAberta) {
+            return `<p>Este orçamento aprovado ainda não possui projeto operacional.</p><div class="arquivos-item-acoes"><button type="button" class="arquivos-acao-operacao" data-detalhe-operacao>Abrir operação</button></div>`;
+        }
+        const projetoUrl = `projetos.html?projetoId=${encodeURIComponent(projetoId)}`;
+        const medicaoUrl = `medicao-obra.html?projetoId=${encodeURIComponent(projetoId)}&orcamentoId=${encodeURIComponent(registro.id || "")}`;
+        return `<p>Projeto <strong>${this.escapar(projetoId)}</strong> aberto e vinculado.</p><div class="arquivos-item-acoes"><a class="arquivos-acao-operacao" href="${this.escaparAtributo(projetoUrl)}">Ver projeto</a><a class="arquivos-acao-operacao" href="${this.escaparAtributo(medicaoUrl)}">Abrir medição</a></div>`;
+    },
+
+    async tratarAcaoDetalhe(evento) {
         const voltar = evento.target.closest("[data-detalhe-voltar]");
         if (voltar) {
             this.detalheAcao = "";
             return this.renderizarDetalhes();
         }
+        const operacao = evento.target.closest("[data-detalhe-operacao]");
+        if (operacao && this.detalheRegistro) {
+            return this.abrirOperacao(this.detalheRegistro, operacao);
+        }
         const botao = evento.target.closest("[data-detalhe-acao]");
         if (botao) {
             this.detalheAcao = botao.dataset.detalheAcao;
             this.renderizarDetalhes();
+        }
+    },
+
+    async abrirOperacao(registro = {}, botao = null) {
+        if (typeof OrcamentoAprovacaoService === "undefined") return this.mensagem("Serviço de aprovação indisponível.");
+        if (botao) botao.disabled = true;
+        this.mensagem("Abrindo operação...");
+        try {
+            const resultado = await OrcamentoAprovacaoService.abrirOperacao(registro.id);
+            if (!resultado.sucesso) {
+                this.mensagem((resultado.erros || ["Não foi possível abrir a operação."]).join(" "));
+                return resultado;
+            }
+            const atualizado = this.normalizarRegistro(resultado.registro);
+            this.registros = this.registros.map(item => String(item.id) === String(atualizado.id) ? atualizado : item);
+            if (this.detalheRegistro && String(this.detalheRegistro.id) === String(atualizado.id)) {
+                this.detalheRegistro = atualizado;
+            }
+            this.renderizar();
+            this.renderizarDetalhes();
+            this.mensagem(resultado.mensagem || "Operação aberta com sucesso.");
+            return resultado;
+        } finally {
+            if (botao?.isConnected) botao.disabled = false;
         }
     },
 
@@ -387,7 +441,7 @@ const DocumentArchiveController = {
     },
 
     rotuloAcao(acao) {
-        const rotulos = { orcamento_normalizado: "Registro compatibilizado", orcamento_emitido: "Orçamento emitido", orcamento_enviado: "Orçamento enviado", orcamento_aprovado: "Orçamento aprovado", orcamento_recusado: "Orçamento recusado", orcamento_cancelado: "Orçamento cancelado", nova_versao_emitida: "Nova versão emitida" };
+        const rotulos = { orcamento_normalizado: "Registro compatibilizado", orcamento_emitido: "Orçamento emitido", orcamento_enviado: "Orçamento enviado", orcamento_aprovado: "Orçamento aprovado", orcamento_recusado: "Orçamento recusado", orcamento_cancelado: "Orçamento cancelado", nova_versao_emitida: "Nova versão emitida", operacao_aberta: "Operação aberta" };
         return rotulos[acao] || String(acao || "Atualização").replace(/_/g, " ");
     },
 

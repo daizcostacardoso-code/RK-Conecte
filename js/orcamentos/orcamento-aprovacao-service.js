@@ -1,7 +1,67 @@
 const OrcamentoAprovacaoService = {
-    async aprovar(identificador, dados = {}) { return this.executarAcao(identificador, "aprovar", dados); },
+    async aprovar(identificador, dados = {}) {
+        const resultado = await this.executarAcao(identificador, "aprovar", dados);
+        if (!resultado.sucesso) return resultado;
+
+        try {
+            const abertura = await this.operacaoService().garantirAbertura(resultado.registro.id, {
+                orcamento: resultado.registro,
+                usuario: this.obterUsuarioAutenticado()
+            });
+            if (!abertura.sucesso) {
+                return {
+                    ...resultado,
+                    operacaoPendente: true,
+                    errosOperacao: abertura.erros || [],
+                    mensagem: "Orçamento aprovado. A abertura operacional ficou pendente e pode ser tentada novamente nos detalhes."
+                };
+            }
+            return {
+                ...resultado,
+                registro: abertura.orcamento,
+                projeto: abertura.projeto,
+                operacaoPendente: false,
+                operacaoIdempotente: abertura.idempotente,
+                mensagem: abertura.mensagem
+            };
+        } catch (erro) {
+            return {
+                ...resultado,
+                operacaoPendente: true,
+                errosOperacao: [erro.message || "Não foi possível abrir a operação."],
+                mensagem: "Orçamento aprovado. A abertura operacional ficou pendente e pode ser tentada novamente nos detalhes."
+            };
+        }
+    },
     async recusar(identificador, dados = {}) { return this.executarAcao(identificador, "recusar", dados); },
-    async cancelar(identificador, dados = {}) { return this.executarAcao(identificador, "cancelar", dados); },
+    async cancelar(identificador, dados = {}) {
+        const resultado = await this.executarAcao(identificador, "cancelar", dados);
+        if (!resultado.sucesso) return resultado;
+        const projetoId = resultado.registro.operacao?.projetoId || resultado.registro.vinculos?.projetoId;
+        if (!projetoId) return resultado;
+        try {
+            const cancelamento = await this.operacaoService().cancelarDeOrcamento(resultado.registro.id, {
+                usuario: this.obterUsuarioAutenticado(),
+                observacao: dados.observacao
+            });
+            if (!cancelamento.sucesso) {
+                return {
+                    ...resultado,
+                    operacaoPendente: true,
+                    errosOperacao: cancelamento.erros || [],
+                    mensagem: "Orçamento cancelado. O encerramento do projeto operacional ficou pendente."
+                };
+            }
+            return { ...resultado, projeto: cancelamento.projeto, operacaoPendente: false, mensagem: cancelamento.mensagem };
+        } catch (erro) {
+            return {
+                ...resultado,
+                operacaoPendente: true,
+                errosOperacao: [erro.message || "Não foi possível cancelar a operação."],
+                mensagem: "Orçamento cancelado. O encerramento do projeto operacional ficou pendente."
+            };
+        }
+    },
     async enviar(identificador, dados = {}) { return this.executarAcao(identificador, "enviar", dados); },
     async emitir(identificador, dados = {}) { return this.executarAcao(identificador, "emitir", dados); },
 
@@ -51,6 +111,25 @@ const OrcamentoAprovacaoService = {
         };
     },
 
+    async abrirOperacao(identificador, dados = {}) {
+        const usuario = this.obterUsuarioAutenticado();
+        if (!usuario) return this.respostaErro(["Faça login para abrir a operação."]);
+        try {
+            const resultado = await this.operacaoService().garantirAbertura(identificador, { ...dados, usuario });
+            if (!resultado.sucesso) return this.respostaErro(resultado.erros, resultado.orcamento);
+            return {
+                sucesso: true,
+                registro: resultado.orcamento,
+                projeto: resultado.projeto,
+                erros: [],
+                idempotente: resultado.idempotente,
+                mensagem: resultado.mensagem
+            };
+        } catch (erro) {
+            return this.respostaErro([erro.message || "Não foi possível abrir a operação."]);
+        }
+    },
+
     acoesDisponiveis(registro = {}) {
         return this.validator().acoesDisponiveis(registro);
     },
@@ -88,10 +167,19 @@ const OrcamentoAprovacaoService = {
         }
 
         const observacao = acao === "recusar" ? aprovacao.motivoRecusa : modelo.texto(dados.observacao);
+        const operacao = acao === "cancelar" && registro.operacao?.projetoId
+            ? {
+                ...registro.operacao,
+                status: "cancelada",
+                canceladaEm: agora,
+                canceladaPor: usuario
+            }
+            : registro.operacao;
         return {
             ...registro,
             status: validacao.destino,
             aprovacao,
+            operacao,
             historicoStatus: [
                 ...registro.historicoStatus,
                 modelo.criarHistorico({
@@ -162,6 +250,11 @@ const OrcamentoAprovacaoService = {
     repositorio() {
         if (typeof OrcamentoAprovacaoRepository === "undefined") throw new Error("Repositório de aprovação de orçamento indisponível.");
         return OrcamentoAprovacaoRepository;
+    },
+
+    operacaoService() {
+        if (typeof ProjetoOperacionalService === "undefined") throw new Error("Serviço de abertura operacional indisponível.");
+        return ProjetoOperacionalService;
     }
 };
 

@@ -135,7 +135,7 @@ test("repositório cria emissão canônica com histórico inicial", async () => 
 
     assert.equal(resultado.sucesso, true);
     assert.equal(resultado.registro.id, "ORC-000124");
-    assert.equal(resultado.registro.schemaVersion, 3);
+    assert.equal(resultado.registro.schemaVersion, 4);
     assert.equal(resultado.registro.status, "emitido");
     assert.equal(resultado.registro.historicoStatus[0].acao, "orcamento_emitido");
     assert.equal(firestore.mapa("orcamentos_emitidos").size, 1);
