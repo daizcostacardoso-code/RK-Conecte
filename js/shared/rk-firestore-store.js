@@ -18,7 +18,7 @@
     };
 
     function banco() {
-        if (typeof db === "undefined" || !db) throw new Error("Firestore indisponivel.");
+        if (typeof db === "undefined" || !db) throw new Error("Dados temporariamente indisponiveis.");
         return db;
     }
 
@@ -90,7 +90,7 @@
             id = "";
         }
         const config = RECURSOS[recurso];
-        if (!config) throw new Error(`Recurso Firestore desconhecido: ${recurso}.`);
+        if (!config) throw new Error(`Recurso desconhecido: ${recurso}.`);
         return { recurso, config, id: decodeURIComponent(id), url };
     }
 
@@ -237,7 +237,7 @@
         await banco().collection(rota.config.colecao).doc(id).set(registro, { merge: true });
         return resposta({
             ok: true,
-            mensagem: "Registro salvo no Firestore.",
+            mensagem: "Registro salvo.",
             dados: registro,
             id,
             insertId: id,
@@ -252,7 +252,7 @@
         const lote = banco().batch();
         encontrados.forEach(doc => lote.set(doc.ref, { ...entrada, [rota.config.id]: entrada[rota.config.id] || rota.id, atualizado_em: agora }, { merge: true }));
         await lote.commit();
-        return resposta({ ok: true, mensagem: "Registro atualizado no Firestore.", [rota.config.id]: rota.id });
+        return resposta({ ok: true, mensagem: "Registro atualizado.", [rota.config.id]: rota.id });
     }
 
     async function excluir(rota) {
@@ -309,7 +309,7 @@
             encontrados.forEach(doc => lote.delete(doc.ref));
         }
         await lote.commit();
-        return resposta({ ok: true, mensagem: "Registro excluido do Firestore." });
+        return resposta({ ok: true, mensagem: "Registro atualizado." });
     }
 
     async function fetchFirestore(caminho, opcoes = {}) {
@@ -322,7 +322,7 @@
             if (metodo === "DELETE") return excluir(rota);
             return resposta({ ok: false, mensagem: "Operacao nao suportada." }, 405);
         } catch (erro) {
-            return resposta({ ok: false, mensagem: erro.message || "Erro ao acessar o Firestore." }, 503);
+            return resposta({ ok: false, mensagem: erro.message || "Erro ao acessar os dados." }, 503);
         }
     }
 

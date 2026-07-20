@@ -6,12 +6,15 @@ const RKAuth = {
     eventoErro: "rk:auth-error",
     modoAtual: "protected",
     usuarioAtual: null,
+    perfilAtual: null,
     resolvido: false,
     erroInicializacao: null,
     _promessaAutenticacao: null,
     _resolverAutenticacao: null,
     _cancelarObservacao: null,
     _timerInicializacao: null,
+    _promessaPerfil: null,
+    _uidPerfil: "",
     paginasProtegidas: [
         "dashboard-comercial.html",
         "clientes.html",
@@ -26,7 +29,8 @@ const RKAuth = {
         "funcionario.html",
         "novo-orcamento.html",
         "valores.html",
-        "produtos.html"
+        "produtos.html",
+        "acessos.html"
     ],
 
     inicializar(opcoes = {}) {
@@ -40,7 +44,7 @@ const RKAuth = {
             if (["home", "public"].includes(this.modoAtual)) {
                 this.processarEstado(null, { redirecionar: false });
             } else {
-                this.falharAutenticacao(new Error("Firebase Authentication indisponível."));
+                this.falharAutenticacao(new Error("Serviço de acesso indisponível."));
             }
             return this._promessaAutenticacao;
         }
@@ -48,13 +52,13 @@ const RKAuth = {
         if (typeof window !== "undefined") {
             this._timerInicializacao = window.setTimeout(() => {
                 if (!this.resolvido) {
-                    this.falharAutenticacao(new Error("Tempo limite ao restaurar a autenticação."));
+                    this.falharAutenticacao(new Error("Tempo limite ao restaurar o acesso."));
                 }
             }, 12000);
         }
 
         this._cancelarObservacao = autenticacao.onAuthStateChanged(
-            usuario => this.processarEstado(usuario),
+            usuario => void this.processarEstado(usuario),
             erro => this.falharAutenticacao(erro)
         );
 
@@ -84,13 +88,35 @@ const RKAuth = {
             || (typeof window.firebase?.auth === "function" ? window.firebase.auth() : null);
     },
 
-    processarEstado(usuario, opcoes = {}) {
+    async processarEstado(usuario, opcoes = {}) {
         if (this._timerInicializacao && typeof window !== "undefined") {
             window.clearTimeout(this._timerInicializacao);
             this._timerInicializacao = null;
         }
 
+        const uidAnterior = String(this.usuarioAtual?.uid || "");
         this.usuarioAtual = usuario || null;
+        if (usuario && uidAnterior !== String(usuario.uid || "")) this.resolvido = false;
+        if (!usuario) this.limparPerfilAtual();
+
+        const exigePerfil = Boolean(usuario)
+            && typeof window !== "undefined"
+            && (this.modoAtual === "login" || (this.modoAtual === "protected" && this.paginaAtualProtegida()));
+        if (exigePerfil) {
+            try {
+                const perfil = await this.carregarPerfilAutorizado(usuario);
+                if (!perfil?.ativo || !["admin", "funcionario"].includes(perfil.perfil)) {
+                    await this.recusarAcesso();
+                    return null;
+                }
+                this.perfilAtual = perfil;
+            } catch (erro) {
+                this.usuarioAtual = null;
+                this.limparPerfilAtual();
+                this.falharAutenticacao(new Error("Não foi possível validar seu acesso. Tente novamente."));
+                return null;
+            }
+        }
         this.resolvido = true;
         this.erroInicializacao = null;
         const sessao = this.obterSessao();
@@ -101,6 +127,11 @@ const RKAuth = {
         }
 
         this.notificarEstado(sessao);
+
+        if (this.obterPaginaAtual() === "acessos.html" && sessao?.perfil !== "admin") {
+            this.redirecionarDashboard();
+            return null;
+        }
 
         if (opcoes.redirecionar === false) {
             this.liberarInterface();
@@ -129,7 +160,7 @@ const RKAuth = {
 
     falharAutenticacao(erro) {
         if (this.resolvido) return;
-        this.erroInicializacao = erro || new Error("Falha de autenticação.");
+        this.erroInicializacao = erro || new Error("Falha de acesso.");
         this.resolvido = true;
 
         if (this._resolverAutenticacao) {
@@ -160,8 +191,63 @@ const RKAuth = {
             email,
             nomeUsuario: this.usuarioAtual.displayName || preferencias.nomeUsuario || nomeEmail || "Funcionário RK",
             fotoUsuario: this.usuarioAtual.photoURL || preferencias.fotoUsuario || "",
-            entradaEm: this.usuarioAtual.metadata?.lastSignInTime || new Date().toISOString()
+            entradaEm: this.usuarioAtual.metadata?.lastSignInTime || new Date().toISOString(),
+            perfil: this.perfilAtual?.perfil || "",
+            ativo: this.perfilAtual ? this.perfilAtual.ativo === true : true
         };
+    },
+
+    async carregarPerfilAutorizado(usuario) {
+        const uid = String(usuario?.uid || "");
+        if (!uid) return null;
+        if (this._promessaPerfil && this._uidPerfil === uid) return this._promessaPerfil;
+        this._uidPerfil = uid;
+        this._promessaPerfil = (async () => {
+            const token = await usuario.getIdToken();
+            const configuracao = window.RK_FIREBASE_CONFIG || window.RKFirebase?.config || {};
+            if (!configuracao.projectId) throw new Error("Configuração do sistema indisponível.");
+            const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(configuracao.projectId)}/databases/(default)/documents/usuarios_autorizados/${encodeURIComponent(uid)}`;
+            const resposta = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+            if (resposta.status === 403 || resposta.status === 404) return null;
+            if (!resposta.ok) throw new Error("Falha ao consultar o perfil de acesso.");
+            const documento = await resposta.json();
+            return this.converterCamposDocumento(documento.fields || {});
+        })();
+        return this._promessaPerfil;
+    },
+
+    converterCamposDocumento(campos = {}) {
+        const converter = valor => {
+            if (!valor || typeof valor !== "object") return null;
+            if (Object.prototype.hasOwnProperty.call(valor, "stringValue")) return valor.stringValue;
+            if (Object.prototype.hasOwnProperty.call(valor, "booleanValue")) return valor.booleanValue;
+            if (Object.prototype.hasOwnProperty.call(valor, "integerValue")) return Number(valor.integerValue);
+            if (Object.prototype.hasOwnProperty.call(valor, "doubleValue")) return Number(valor.doubleValue);
+            if (valor.timestampValue) return valor.timestampValue;
+            if (valor.mapValue) return this.converterCamposDocumento(valor.mapValue.fields || {});
+            if (valor.arrayValue) return (valor.arrayValue.values || []).map(converter);
+            return null;
+        };
+        return Object.fromEntries(Object.entries(campos).map(([chave, valor]) => [chave, converter(valor)]));
+    },
+
+    async recusarAcesso() {
+        try { await this.obterInstanciaFirebase()?.signOut?.(); } catch (erro) {}
+        this.usuarioAtual = null;
+        this.limparPerfilAtual();
+        this.resolvido = true;
+        if (this._resolverAutenticacao) {
+            this._resolverAutenticacao(null);
+            this._resolverAutenticacao = null;
+        }
+        this.notificarEstado(null);
+        this.redirecionarLogin("acesso_negado");
+    },
+
+    limparPerfilAtual() {
+        this.perfilAtual = null;
+        this._promessaPerfil = null;
+        this._uidPerfil = "";
     },
 
     estaAutenticado() {
@@ -253,7 +339,7 @@ const RKAuth = {
     notificarErro(erro) {
         if (typeof window === "undefined" || typeof CustomEvent === "undefined") return;
         window.dispatchEvent(new CustomEvent(this.eventoErro, {
-            detail: { mensagem: erro?.message || "Falha de autenticação." }
+            detail: { mensagem: erro?.message || "Falha de acesso." }
         }));
     },
 
@@ -268,6 +354,7 @@ const RKAuth = {
             console.error("Não foi possível encerrar a sessão:", erro);
         } finally {
             this.usuarioAtual = null;
+            this.limparPerfilAtual();
             this.limparSessao();
             this.redirecionarLogin();
         }

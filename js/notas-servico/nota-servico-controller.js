@@ -51,7 +51,7 @@ const NotaServicoController = {
         const projetoId = NotaServicoModel.contexto.projetoId;
         if (!projetoId) return false;
         if (typeof db === "undefined" || !db || typeof db.collection !== "function") {
-            NotaServicoUI.mensagem("Firestore indisponível para carregar o projeto.");
+            NotaServicoUI.mensagem("Dados temporariamente indisponíveis para carregar o projeto.");
             return false;
         }
         try {
@@ -129,7 +129,7 @@ const NotaServicoController = {
             console.error("Nao foi possivel carregar as notas do Firestore:", erro);
             this.historico = NotaServicoModel.historico();
             NotaServicoUI.renderizarHistorico(this.historico);
-            NotaServicoUI.mensagem("Firestore indisponível. O histórico local foi mantido.");
+            NotaServicoUI.mensagem("Dados temporariamente indisponíveis. O histórico local foi mantido.");
             return false;
         }
     },
@@ -162,13 +162,13 @@ const NotaServicoController = {
             this.estado = NotaServicoModel.normalizar(await this.salvarRemoto(this.estado, { status: this.estado.status }));
             NotaServicoModel.salvarRascunho(this.estado);
             await this.carregarHistorico(false);
-            NotaServicoUI.marcarRascunho("Salvo no Firestore");
-            NotaServicoUI.mensagem("Rascunho salvo no Firestore.", "sucesso");
+            NotaServicoUI.marcarRascunho("Rascunho salvo");
+            NotaServicoUI.mensagem("Rascunho salvo.", "sucesso");
             return true;
         } catch (erro) {
             console.error("Nao foi possivel salvar o rascunho no Firestore:", erro);
             NotaServicoUI.marcarRascunho("Salvo somente neste dispositivo");
-            NotaServicoUI.mensagem("O rascunho ficou salvo neste dispositivo, mas não foi enviado ao Firestore.");
+            NotaServicoUI.mensagem("O rascunho ficou salvo neste dispositivo, mas não foi sincronizado.");
             return false;
         } finally {
             botao.disabled = false;
@@ -262,13 +262,13 @@ const NotaServicoController = {
                 await this.carregarHistorico(false);
                 this.renderizarContextoOperacional();
                 this.atualizarAcoesOperacionais();
-                NotaServicoUI.marcarRascunho("Nota salva no Firestore");
-                NotaServicoUI.mensagem("Nota emitida, salva no Firestore e PDF gerado com sucesso.", "sucesso");
+                NotaServicoUI.marcarRascunho("Nota salva");
+                NotaServicoUI.mensagem("Nota emitida, salva e PDF gerado com sucesso.", "sucesso");
             } catch (erroFirestore) {
                 console.error("PDF gerado, mas a nota nao foi salva no Firestore:", erroFirestore);
                 NotaServicoUI.marcarRascunho("Salvo somente neste dispositivo");
                 NotaServicoUI.renderizarHistorico(NotaServicoModel.historico());
-                NotaServicoUI.mensagem("O PDF foi gerado, mas a nota não foi salva no Firestore.");
+                NotaServicoUI.mensagem("O PDF foi gerado, mas a nota não foi sincronizada.");
             }
         } catch (erro) {
             console.error(erro);
@@ -354,7 +354,7 @@ const NotaServicoController = {
             NotaServicoModel.salvarRascunho(this.estado);
             NotaServicoUI.preencher(this.estado);
             this.cancelarEdicao();
-            NotaServicoUI.marcarRascunho("Nota carregada do Firestore");
+            NotaServicoUI.marcarRascunho("Nota carregada");
             window.scrollTo({ top: 0, behavior: "smooth" });
             return;
         }
@@ -375,7 +375,7 @@ const NotaServicoController = {
                 NotaServicoUI.mensagem("Nota cancelada com histórico preservado.", "sucesso");
             } catch (erro) {
                 console.error("Nao foi possivel cancelar a nota no Firestore:", erro);
-                NotaServicoUI.mensagem("Não foi possível cancelar a nota no Firestore.");
+                NotaServicoUI.mensagem("Não foi possível cancelar a nota.");
             }
         }
     }

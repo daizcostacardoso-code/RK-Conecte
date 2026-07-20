@@ -154,7 +154,8 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
         await assertSucceeds(setDoc(referencia, { teste: true }));
         await assertSucceeds(getDoc(referencia));
         await assertSucceeds(updateDoc(referencia, { atualizado: true }));
-        await assertSucceeds(deleteDoc(referencia));
+        if (caminho.startsWith("caixa_empresa/")) await assertFails(deleteDoc(referencia));
+        else await assertSucceeds(deleteDoc(referencia));
     }
 });
 
@@ -316,8 +317,70 @@ test("administrador gerencia perfis sem poder excluir o próprio acesso", async 
     }));
     await assertSucceeds(getDocs(collection(admin, "usuarios_autorizados")));
     await assertSucceeds(updateDoc(funcionario, { ativo: false }));
-    await assertSucceeds(deleteDoc(funcionario));
+    await assertFails(deleteDoc(funcionario));
+    await assertFails(updateDoc(doc(admin, "usuarios_autorizados", "admin-1"), { ativo: false }));
+    await assertFails(updateDoc(doc(admin, "usuarios_autorizados", "admin-1"), { perfil: "funcionario" }));
     await assertFails(deleteDoc(doc(admin, "usuarios_autorizados", "admin-1")));
+});
+
+test("funcionário registra somente o horário do próprio acesso", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    const proprio = doc(equipe, "usuarios_autorizados", "funcionario-1");
+    await assertSucceeds(updateDoc(proprio, {
+        ultimoAcessoEm: "2026-07-20T12:00:00.000Z",
+        atualizadoEmISO: "2026-07-20T12:00:00.000Z"
+    }));
+    await assertFails(updateDoc(proprio, { nome: "Nome alterado sem autorização" }));
+});
+
+test("financeiro operacional vincula projeto, recebimentos e caixa sem exclusão", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    await assertSucceeds(setDoc(doc(equipe, "orcamentos_emitidos", "orc-fin"), { numero: "000200", status: "aprovado" }));
+    await assertSucceeds(setDoc(doc(equipe, "projetos", "projeto-fin"), {
+        origem: "orcamento_aprovado",
+        status: "aprovado",
+        orcamento: { id: "orc-fin" },
+        historico: [{ tipo: "operacao_aberta" }]
+    }));
+    const financeiro = doc(equipe, "financeiro_operacional", "fin_projeto-fin");
+    await assertSucceeds(setDoc(financeiro, {
+        projetoId: "projeto-fin",
+        orcamentoId: "orc-fin",
+        valorContratadoCentavos: 100000,
+        valorRecebidoCentavos: 0,
+        saldoCentavos: 100000,
+        status: "pendente",
+        recebimentos: []
+    }));
+    await assertSucceeds(updateDoc(financeiro, {
+        valorRecebidoCentavos: 25000,
+        saldoCentavos: 75000,
+        status: "parcial",
+        recebimentos: [{ id: "rec-1", valorCentavos: 25000, data: "2026-07-20" }]
+    }));
+    await assertFails(updateDoc(financeiro, { projetoId: "outro-projeto" }));
+    await assertFails(updateDoc(financeiro, { valorRecebidoCentavos: 20000, saldoCentavos: 80000 }));
+    await assertFails(deleteDoc(financeiro));
+
+    const movimento = doc(equipe, "caixa_empresa", "cx_rec-1");
+    await assertSucceeds(setDoc(movimento, { tipo: "entrada", projeto_id: "projeto-fin", recebimento_id: "rec-1" }));
+    await assertFails(deleteDoc(movimento));
+});
+
+test("financeiro não aceita projeto inexistente nem totais inconsistentes", async () => {
+    await autorizar("funcionario-1");
+    const equipe = ambiente.authenticatedContext("funcionario-1").firestore();
+    await assertFails(setDoc(doc(equipe, "financeiro_operacional", "fin-sem-projeto"), {
+        projetoId: "sem-projeto",
+        orcamentoId: "orc-inexistente",
+        valorContratadoCentavos: 10000,
+        valorRecebidoCentavos: 2000,
+        saldoCentavos: 9000,
+        status: "parcial",
+        recebimentos: []
+    }));
 });
 
 test("coleção não mapeada permanece bloqueada até para usuário autorizado", async () => {

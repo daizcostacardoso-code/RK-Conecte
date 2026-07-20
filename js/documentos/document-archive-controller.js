@@ -57,7 +57,7 @@ const DocumentArchiveController = {
         if (!resultado.sucesso) {
             this.registros = [];
             this.renderizar();
-            return this.mensagem((resultado.erros || ["Não foi possível consultar o Firestore."]).join(" "));
+            return this.mensagem((resultado.erros || ["Não foi possível consultar os documentos."]).join(" "));
         }
         this.registros = (resultado.registros || []).map(registro => this.normalizarRegistro(registro)).filter(registro => this.atendeFiltros(registro));
         this.selecionados.clear();
@@ -291,7 +291,7 @@ const DocumentArchiveController = {
         const conteudo = document.getElementById("arquivosDetalhesConteudo");
         if (!conteudo) return;
         if (!this.exclusaoPendente.length) return this.mensagem("Os orçamentos selecionados já estão cancelados.");
-        conteudo.innerHTML = `<section class="arquivos-detalhes-secao"><h3>Cancelar orçamento${this.exclusaoPendente.length > 1 ? "s" : ""}</h3><p>O cancelamento preserva ${this.exclusaoPendente.length} registro(s) e seu histórico comercial no Firestore.</p><form id="arquivosExcluirFormulario" class="arquivos-detalhes-form"><label class="arquivos-confirmacao"><input type="checkbox" name="confirmado" required> Confirmo o cancelamento.</label><div class="arquivos-item-acoes"><button type="submit" class="btn-tabela-excluir">Cancelar orçamento${this.exclusaoPendente.length > 1 ? "s" : ""}</button></div></form></section>`;
+        conteudo.innerHTML = `<section class="arquivos-detalhes-secao"><h3>Cancelar orçamento${this.exclusaoPendente.length > 1 ? "s" : ""}</h3><p>O cancelamento preserva ${this.exclusaoPendente.length} registro(s) e seu histórico comercial.</p><form id="arquivosExcluirFormulario" class="arquivos-detalhes-form"><label class="arquivos-confirmacao"><input type="checkbox" name="confirmado" required> Confirmo o cancelamento.</label><div class="arquivos-item-acoes"><button type="submit" class="btn-tabela-excluir">Cancelar orçamento${this.exclusaoPendente.length > 1 ? "s" : ""}</button></div></form></section>`;
         const formulario = document.getElementById("arquivosExcluirFormulario");
         formulario?.addEventListener("submit", evento => this.confirmarExclusao(evento));
         const modal = document.getElementById("arquivosDetalhes");

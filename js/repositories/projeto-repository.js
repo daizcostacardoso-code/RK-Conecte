@@ -13,7 +13,7 @@ const ProjetoRepository = {
             || (typeof FirestoreAdapter !== "undefined" ? FirestoreAdapter : null);
 
         if (!StorageAdapterContract.validar(adapter)) {
-            throw new Error("ProjetoRepository precisa do FirestoreAdapter.");
+            throw new Error("Camada de dados dos projetos indisponível.");
         }
 
         this.adapter = adapter;

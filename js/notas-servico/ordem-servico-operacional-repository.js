@@ -4,7 +4,7 @@ const OrdemServicoOperacionalRepository = {
     colecaoMedicoes: "medicoes",
 
     async buscarPorProjeto(projetoId = "") {
-        if (!this.firestoreDisponivel()) return this.erro("Firestore indisponível.");
+        if (!this.firestoreDisponivel()) return this.erro("Dados temporariamente indisponíveis.");
         try {
             const id = OrdemServicoOperacionalModel.idOrdem(projetoId);
             const snapshot = await db.collection(this.colecaoOrdens).doc(id).get();
@@ -15,7 +15,7 @@ const OrdemServicoOperacionalRepository = {
     },
 
     async salvar(nota = {}, opcoes = {}) {
-        if (!this.firestoreDisponivel()) return this.erro("Firestore indisponível.");
+        if (!this.firestoreDisponivel()) return this.erro("Dados temporariamente indisponíveis.");
         const projetoId = OrdemServicoOperacionalModel.texto(opcoes.projetoId || nota.projetoId, 120);
         if (!projetoId) return this.erro("Projeto obrigatório para salvar a ordem de serviço.");
         try {

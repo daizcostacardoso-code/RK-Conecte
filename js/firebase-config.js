@@ -26,11 +26,6 @@ var db = null;
 
         if (typeof global.firebase.firestore === "function") {
             db = global.firebase.firestore();
-            db.enablePersistence({ synchronizeTabs: true }).catch(erro => {
-                if (erro?.code !== "failed-precondition" && erro?.code !== "unimplemented") {
-                    console.warn("Persistência offline do Firestore indisponível:", erro);
-                }
-            });
         }
 
         global.RKFirebase = {

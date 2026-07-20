@@ -1,5 +1,26 @@
 # Histórico de alterações
 
+## v0.9.0 — financeiro operacional e controle de acessos
+
+- Exposto o controle de acessos no menu superior das telas internas para administradores.
+- Feita a renderização do dashboard aguardar o perfil carregado antes de decidir os atalhos administrativos.
+- Restauradas dimensões uniformes para os atalhos em telas grandes, médias e móveis.
+- Convertida a tabela de usuários em cartões responsivos, sem rolagem lateral no celular.
+- Retirada a escrita automática de último acesso pelo navegador para eliminar falhas de permissão na abertura das telas.
+- Corrigida a exibição indevida do painel vazio de senha temporária antes da criação de um acesso.
+- Removido o uso da persistência local obsoleta do SDK e atualizada a metatag de aplicativo no dashboard.
+- Aberto um financeiro determinístico para cada projeto originado de orçamento aprovado.
+- Vinculados valores contratado, recebido e saldo ao projeto operacional.
+- Registrados recebimentos no financeiro e no caixa na mesma transação, sem duplicidade.
+- Adicionados estados pendente, parcial, quitado e cancelado com histórico preservado.
+- Protegidos lançamentos vinculados contra edição ou cancelamento manual pelo caixa.
+- Criada tela administrativa para cadastrar, ativar e desativar acessos e alterar perfis.
+- Incluídos geração de senha temporária e envio de recuperação sem armazenar senhas.
+- Bloqueadas a autodesativação e a remoção do próprio perfil administrativo.
+- Exigido perfil ativo antes de liberar qualquer tela interna.
+- Removidas da interface as referências visíveis à infraestrutura técnica interna.
+- Reforçadas as regras e adicionados testes de financeiro, acessos, interface e permissões.
+
 ## v0.8.0 — execução operacional canônica
 
 - Persistida uma medição determinística por projeto na coleção `medicoes`.

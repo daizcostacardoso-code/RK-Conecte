@@ -68,7 +68,7 @@ const ProjetoVisualController = {
     },
 
     async listarProjetos(filtros = {}) {
-        ProjetoVisualUI.renderizarCarregamentoLista("Carregando projetos do Firestore...");
+        ProjetoVisualUI.renderizarCarregamentoLista("Carregando projetos...");
         ProjetoVisualUI.mostrarAviso("Carregando projetos...", "info");
         const resultado = await this.executarListagem(filtros);
 

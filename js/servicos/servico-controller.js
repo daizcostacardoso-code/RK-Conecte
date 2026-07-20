@@ -101,7 +101,7 @@ const ServicoController = {
     },
 
     async listarServicos(filtros = {}) {
-        ServicoUI.renderizarCarregamentoLista("Carregando itens do Firestore...");
+        ServicoUI.renderizarCarregamentoLista("Carregando itens...");
         ServicoUI.mostrarAviso("Carregando itens...", "info");
         const resultado = await this.executarListagem(filtros);
 

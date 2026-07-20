@@ -33,7 +33,7 @@ const ProdutoController = {
     },
 
     async listarProdutos(filtros = ProdutoUI.obterFiltros()) {
-        ProdutoUI.renderizarCarregamentoLista('Carregando produtos do Firestore...');
+        ProdutoUI.renderizarCarregamentoLista('Carregando produtos...');
         ProdutoUI.mostrarAviso('Carregando produtos...', 'info');
         const resultado = await ProdutoService.listarProdutos(filtros);
         if (!resultado.sucesso) {

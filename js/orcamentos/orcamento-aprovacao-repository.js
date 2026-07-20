@@ -9,7 +9,7 @@ const OrcamentoAprovacaoRepository = {
         const modelo = this.modelo();
         const valor = modelo.texto(identificador);
         if (!valor) return { sucesso: false, erros: ["Informe o identificador do orçamento."], registro: null };
-        if (!this.firestoreDisponivel()) return { sucesso: false, erros: ["Firestore indisponível."], registro: null };
+        if (!this.firestoreDisponivel()) return { sucesso: false, erros: ["Dados temporariamente indisponíveis."], registro: null };
 
         try {
             const documento = await this.localizarDocumento(valor);
@@ -41,7 +41,7 @@ const OrcamentoAprovacaoRepository = {
     },
 
     async executarTransacao(id = "", executor) {
-        if (!this.firestoreDisponivel()) return { sucesso: false, erros: ["Firestore indisponível."], registro: null };
+        if (!this.firestoreDisponivel()) return { sucesso: false, erros: ["Dados temporariamente indisponíveis."], registro: null };
         const modelo = this.modelo();
 
         try {
@@ -63,7 +63,7 @@ const OrcamentoAprovacaoRepository = {
     },
 
     async registrarEmissao(registro = {}, opcoes = {}) {
-        if (!this.firestoreDisponivel()) return { sucesso: false, erros: ["Firestore indisponível."], registro: null };
+        if (!this.firestoreDisponivel()) return { sucesso: false, erros: ["Dados temporariamente indisponíveis."], registro: null };
         const modelo = this.modelo();
         const inicial = modelo.normalizarRegistro({ ...registro, status: registro.status || "emitido" });
         const identificador = modelo.texto(inicial.id || inicial.numero);

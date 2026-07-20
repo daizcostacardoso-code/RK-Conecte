@@ -52,7 +52,7 @@ const FirestoreAdapter = {
             : globalThis.RKFirebase?.db;
 
         if (!firestore || typeof firestore.collection !== "function") {
-            throw new Error("Firestore indisponivel. Verifique a conexao e tente novamente.");
+            throw new Error("Dados temporariamente indisponiveis. Verifique a conexao e tente novamente.");
         }
 
         return firestore;
@@ -61,7 +61,7 @@ const FirestoreAdapter = {
     obterColecao(collection) {
         const nome = this.colecoes[collection];
         if (!nome) {
-            throw new Error(`Colecao nao autorizada no FirestoreAdapter: ${collection || "vazia"}.`);
+            throw new Error(`Colecao nao autorizada: ${collection || "vazia"}.`);
         }
         return this.obterBanco().collection(nome);
     },
@@ -73,7 +73,7 @@ const FirestoreAdapter = {
 
     validarId(id) {
         if (!id || typeof id !== "string" || id.includes("/")) {
-            throw new Error("Id invalido para o FirestoreAdapter.");
+            throw new Error("Id invalido para a operacao.");
         }
     },
 

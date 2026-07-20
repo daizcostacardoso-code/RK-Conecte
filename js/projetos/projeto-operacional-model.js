@@ -172,6 +172,10 @@ const ProjetoOperacionalModel = {
         let cancelado = ProjetoModel.atualizar(atual, {
             status: "cancelado",
             ativo: false,
+            financeiro: {
+                ...atual.financeiro,
+                status: "cancelado"
+            },
             operacional: {
                 ...atual.operacional,
                 status: "cancelado",

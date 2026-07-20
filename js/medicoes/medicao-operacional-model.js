@@ -90,9 +90,9 @@ const MedicaoOperacionalModel = {
             : "medicao_salva";
         const historico = [...(anterior?.historico || [])];
         if (!historico.some(item => item.tipo === tipoEvento && tipoEvento === "medicao_concluida")) {
-            historico.push(this.evento(tipoEvento, status === this.statusConcluida ? "Medição concluída." : "Medição salva no Firestore.", usuario, { revisao }));
+            historico.push(this.evento(tipoEvento, status === this.statusConcluida ? "Medição concluída." : "Medição salva.", usuario, { revisao }));
         } else if (tipoEvento === "medicao_salva") {
-            historico.push(this.evento(tipoEvento, "Medição atualizada no Firestore.", usuario, { revisao }));
+            historico.push(this.evento(tipoEvento, "Medição atualizada.", usuario, { revisao }));
         }
         return {
             sucesso: true,

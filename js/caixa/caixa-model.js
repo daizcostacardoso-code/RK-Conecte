@@ -22,9 +22,13 @@ const CaixaModel = {
             diaReferencia: Number(dados.diaReferencia ?? dados.dia_referencia ?? referencia.diaReferencia) || referencia.diaReferencia,
             clienteId: dados.clienteId ?? dados.cliente_id ?? "",
             orcamentoId: dados.orcamentoId ?? dados.orcamento_id ?? "",
+            projetoId: dados.projetoId ?? dados.projeto_id ?? "",
+            financeiroId: dados.financeiroId ?? dados.financeiro_id ?? "",
+            recebimentoId: dados.recebimentoId ?? dados.recebimento_id ?? "",
             usuarioId: dados.usuarioId ?? dados.usuario_id ?? "",
             criadoEm: dados.criadoEm ?? dados.criado_em ?? "",
-            atualizadoEm: dados.atualizadoEm ?? dados.atualizado_em ?? ""
+            atualizadoEm: dados.atualizadoEm ?? dados.atualizado_em ?? "",
+            bloqueado: Boolean(dados.bloqueado || dados.financeiroId || dados.financeiro_id)
         };
     },
 

@@ -49,7 +49,7 @@ const ClienteController = {
     },
 
     async listarClientes(filtros = {}) {
-        ClienteUI.renderizarCarregamentoLista("Carregando clientes do Firestore...");
+        ClienteUI.renderizarCarregamentoLista("Carregando clientes...");
         ClienteUI.mostrarAviso("Carregando clientes...", "info");
         const resultado = await this.executarListagem(filtros);
 

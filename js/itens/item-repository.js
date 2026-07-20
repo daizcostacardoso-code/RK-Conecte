@@ -8,14 +8,14 @@ const CadastroItemRepository = {
                 ...options
             });
         } catch (_) {
-            throw new Error("Nao foi possivel acessar os dados no Firestore.");
+            throw new Error("Nao foi possivel acessar os dados.");
         }
 
         let dados = null;
         try { dados = await resposta.json(); } catch (_) { dados = null; }
 
         if (!resposta.ok) {
-            const mensagem = dados?.mensagem || dados?.message || dados?.erro || dados?.error || "Nao foi possivel concluir a operacao no Firestore.";
+            const mensagem = dados?.mensagem || dados?.message || dados?.erro || dados?.error || "Nao foi possivel concluir a operacao.";
             const erros = Array.isArray(dados?.erros) ? ` ${dados.erros.join(" ")}` : "";
             throw new Error(`${mensagem}${erros}`.trim());
         }

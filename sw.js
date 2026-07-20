@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.8.0';
+const RK_CACHE = 'rk-conecte-v0.9.0';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -11,10 +11,12 @@ const APP_SHELL = [
   '/paginas/medicao-obra.html',
   '/paginas/nota-servico.html',
   '/paginas/caixa.html',
+  '/paginas/acessos.html',
   '/css/style.css',
   '/css/medicao-obra.css',
   '/css/nota-servico.css',
   '/css/caixa-basico.css',
+  '/css/acessos.css',
   '/js/public-site.js',
   '/js/app-install.js',
   '/js/conecte-signature.js',
@@ -43,6 +45,11 @@ const APP_SHELL = [
   '/js/caixa/caixa-export.js',
   '/js/caixa/caixa-service.js',
   '/js/caixa/caixa-basico-controller.js',
+  '/js/caixa/financeiro-operacional-model.js',
+  '/js/caixa/financeiro-operacional-repository.js',
+  '/js/acessos/acesso-model.js',
+  '/js/acessos/acesso-repository.js',
+  '/js/acessos/acesso-controller.js',
   '/js/vendor/pdf-lib.min.js',
   '/imagens/logo.jpeg',
   '/assets/conecte-logo.png',

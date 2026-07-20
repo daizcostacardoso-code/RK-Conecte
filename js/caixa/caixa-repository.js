@@ -14,7 +14,7 @@ const CaixaRepository = {
                 signal: options.signal || controlador?.signal
             });
         } catch (_) {
-            throw new Error("Nao foi possivel acessar os dados no Firestore.");
+            throw new Error("Nao foi possivel acessar os dados do caixa.");
         } finally {
             if (timer) window.clearTimeout(timer);
         }
@@ -52,6 +52,9 @@ const CaixaRepository = {
             status: registro.status,
             clienteId: registro.cliente_id,
             orcamentoId: registro.orcamento_id,
+            projetoId: registro.projeto_id,
+            financeiroId: registro.financeiro_id,
+            recebimentoId: registro.recebimento_id,
             usuarioId: registro.usuario_id,
             mesReferencia: registro.mes_referencia,
             anoReferencia: registro.ano_referencia,
@@ -77,6 +80,9 @@ const CaixaRepository = {
             status: movimento.status,
             cliente_id: movimento.clienteId || null,
             orcamento_id: movimento.orcamentoId || null,
+            projeto_id: movimento.projetoId || null,
+            financeiro_id: movimento.financeiroId || null,
+            recebimento_id: movimento.recebimentoId || null,
             usuario_id: movimento.usuarioId || null,
             mes_referencia: movimento.mesReferencia || referencia.mesReferencia,
             ano_referencia: Number(movimento.anoReferencia) || referencia.anoReferencia,
