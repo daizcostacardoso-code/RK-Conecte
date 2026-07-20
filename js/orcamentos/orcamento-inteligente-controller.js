@@ -47,14 +47,8 @@ const OrcamentoInteligenteController = {
 
     configurarCatalogosService() {
         const criarAdapter = () => {
-            if (typeof criarLocalStorageAdapter === "function") {
-                return criarLocalStorageAdapter();
-            }
-
-            if (typeof criarMemoryAdapter === "function") {
-                return criarMemoryAdapter();
-            }
-
+            if (typeof criarFirestoreAdapter === "function") return criarFirestoreAdapter();
+            if (typeof FirestoreAdapter !== "undefined") return FirestoreAdapter;
             return null;
         };
 
@@ -71,13 +65,6 @@ const OrcamentoInteligenteController = {
             typeof ServicoService.configurar === "function"
         ) {
             ServicoService.configurar(ServicoRepository);
-        }
-
-        if (typeof ProdutoRepository !== "undefined" && !ProdutoRepository.adapter) {
-            const adapter = criarAdapter();
-            if (adapter) {
-                ProdutoRepository.configurar(adapter);
-            }
         }
 
         if (
@@ -145,7 +132,7 @@ const OrcamentoInteligenteController = {
             OrcamentoInteligenteUI.definirCarregamento(false);
         }
         if (!restaurado && !opcoes.limparRascunho) {
-            this.aplicarDemoInicial();
+            this.aplicarRascunhoInicial();
         }
         this.renderizarEtapaAtual();
         this.restaurarFormularioNovoItem();
@@ -920,8 +907,8 @@ const OrcamentoInteligenteController = {
             appState.setState("documentoAtual", resultado.documento);
         }
 
-        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.salvarFluxo === "function") {
-            RKE2EDemoState.salvarFluxo({
+        if (typeof RKDraftState !== "undefined" && typeof RKDraftState.salvarFluxo === "function") {
+            RKDraftState.salvarFluxo({
                 orcamentoAtual: this.contexto,
                 documentoAtual: resultado.documento
             });
@@ -1365,12 +1352,12 @@ const OrcamentoInteligenteController = {
         return resultado;
     },
 
-    aplicarDemoInicial() {
-        if (typeof RKE2EDemoState === "undefined" || typeof RKE2EDemoState.carregar !== "function") {
+    aplicarRascunhoInicial() {
+        if (typeof RKDraftState === "undefined" || typeof RKDraftState.carregar !== "function") {
             return false;
         }
 
-        const estado = RKE2EDemoState.carregar();
+        const estado = RKDraftState.carregar();
         if (!estado || !this.contexto) {
             return false;
         }
@@ -1397,9 +1384,8 @@ const OrcamentoInteligenteController = {
             appState.setState("orcamentoAtual", contexto);
         }
 
-        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.salvarFluxo === "function") {
-            RKE2EDemoState.salvarFluxo({
-                clientes: this.obterClientesParaPersistir(contexto.cliente),
+        if (typeof RKDraftState !== "undefined" && typeof RKDraftState.salvarFluxo === "function") {
+            RKDraftState.salvarFluxo({
                 clienteSelecionado: contexto.cliente || null,
                 projetoSelecionado: contexto.projeto || null,
                 projetoAtual: contexto.projeto || null,
@@ -1555,24 +1541,17 @@ const OrcamentoInteligenteController = {
     },
 
     async listarClientes() {
-        const clientesDemo = this.obterClientesDemo();
-
         try {
             if (typeof ClienteService !== "undefined" && typeof ClienteService.listarClientes === "function") {
                 const resultado = await ClienteService.listarClientes({ status: "ativo" });
-                if (resultado.sucesso && resultado.clientes.length) {
-                    return this.unirClientes(resultado.clientes, clientesDemo);
-                }
+                if (resultado.sucesso) return resultado.clientes || [];
+                throw new Error(resultado.erros?.join(" ") || "Falha ao listar clientes.");
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Clientes para o fluxo guiado.", erro);
+            this.errosCatalogoItens.push("Nao foi possivel carregar os clientes do Firestore.");
         }
-
-        if (clientesDemo.length) {
-            return clientesDemo;
-        }
-
-        return this.criarClientesApoio();
+        return [];
     },
 
     async listarProjetos() {
@@ -1583,50 +1562,37 @@ const OrcamentoInteligenteController = {
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Projetos para o fluxo guiado.", erro);
+            this.errosCatalogoItens.push("Nao foi possivel carregar os projetos do Firestore.");
         }
-
-        const demo = this.obterEstadoDemo();
-        return demo?.projetoSelecionado ? [demo.projetoSelecionado] : [];
+        return [];
     },
 
     async listarServicos() {
         try {
             if (typeof ServicoService !== "undefined" && typeof ServicoService.listarServicos === "function") {
                 const resultado = await ServicoService.listarServicos({ ativo: true });
-                if (resultado.sucesso && resultado.servicos.length) {
-                    return resultado.servicos;
-                }
+                if (resultado.sucesso) return resultado.servicos || [];
+                throw new Error(resultado.erros?.join(" ") || "Falha ao listar itens.");
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Servicos para o fluxo guiado.", erro);
+            this.errosCatalogoItens.push("Nao foi possivel carregar os itens do Firestore.");
         }
-
-        const demo = this.obterEstadoDemo();
-        if (demo?.orcamentoAtual?.servico) {
-            return [demo.orcamentoAtual.servico];
-        }
-
-        return this.criarServicosApoio();
+        return [];
     },
 
     async listarProdutos() {
         try {
             if (typeof ProdutoService !== "undefined" && typeof ProdutoService.listarProdutos === "function") {
                 const resultado = await ProdutoService.listarProdutos({ ativo: true });
-                if (resultado.sucesso && resultado.produtos.length) {
-                    return resultado.produtos;
-                }
+                if (resultado.sucesso) return resultado.produtos || [];
+                throw new Error(resultado.erros?.join(" ") || "Falha ao listar produtos.");
             }
         } catch (erro) {
             console.warn("Nao foi possivel listar Produtos para o fluxo guiado.", erro);
+            this.errosCatalogoItens.push("Nao foi possivel carregar os produtos do Firestore.");
         }
-
-        const demo = this.obterEstadoDemo();
-        if (Array.isArray(demo?.orcamentoAtual?.produtos) && demo.orcamentoAtual.produtos.length) {
-            return demo.orcamentoAtual.produtos;
-        }
-
-        return this.criarProdutosApoio();
+        return [];
     },
 
     async listarItensFirestore() {
@@ -1744,36 +1710,16 @@ const OrcamentoInteligenteController = {
         };
     },
 
-    obterEstadoDemo() {
-        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.carregar === "function") {
-            return RKE2EDemoState.carregar();
-        }
-
-        return null;
-    },
-
-    obterClientesDemo() {
-        const demo = this.obterEstadoDemo();
-        const clientes = Array.isArray(demo?.clientes) ? demo.clientes : [];
-        return this.unirClientes(clientes, demo?.clienteSelecionado ? [demo.clienteSelecionado] : []);
-    },
-
     persistirClientesFluxo(clienteAtual = null) {
-        if (typeof RKE2EDemoState === "undefined" || typeof RKE2EDemoState.salvarFluxo !== "function") {
+        if (typeof RKDraftState === "undefined" || typeof RKDraftState.salvarFluxo !== "function") {
             return false;
         }
 
-        RKE2EDemoState.salvarFluxo({
-            clientes: this.obterClientesParaPersistir(clienteAtual),
+        RKDraftState.salvarFluxo({
             clienteSelecionado: clienteAtual || this.contexto?.cliente || null
         });
 
         return true;
-    },
-
-    obterClientesParaPersistir(clienteAtual = null) {
-        const atual = clienteAtual ? [clienteAtual] : [];
-        return this.unirClientes(atual, this.dados.clientes || [], this.obterClientesDemo());
     },
 
     unirClientes(...listas) {
@@ -2380,65 +2326,6 @@ const OrcamentoInteligenteController = {
         return String(valor || "").trim();
     },
 
-    criarClientesApoio() {
-        return [
-            this.normalizarClienteApoio({
-                id: "cli_apoio_guiado",
-                nome: "Cliente balcao",
-                tipoPessoa: "fisica",
-                telefonePrincipal: "7399819768",
-                email: "cliente@exemplo.local"
-            })
-        ];
-    },
-
-    criarServicosApoio() {
-        return [
-            this.normalizarServicoApoio({
-                id: "srv_apoio_box",
-                nome: "Box de banheiro",
-                categoria: "box",
-                descricao: "Servico comercial temporario para fluxo guiado.",
-                tipoCalculo: "area_m2",
-                unidadeVenda: "m2",
-                ativo: true
-            }),
-            this.normalizarServicoApoio({
-                id: "srv_apoio_espelho",
-                nome: "Espelho sob medida",
-                categoria: "espelho",
-                descricao: "Servico comercial temporario para fluxo guiado.",
-                tipoCalculo: "area_m2",
-                unidadeVenda: "m2",
-                ativo: true
-            })
-        ];
-    },
-
-    criarProdutosApoio() {
-        return [
-            this.normalizarProdutoApoio({
-                id: "prd_apoio_vidro_temperado",
-                nome: "Vidro temperado 8mm",
-                categoria: "vidro",
-                subcategoria: "temperado",
-                unidadeVenda: "m2",
-                tipoCalculo: "area_m2",
-                precoVenda: 420,
-                ativo: true
-            }),
-            this.normalizarProdutoApoio({
-                id: "prd_apoio_kit_box",
-                nome: "Kit ferragens box",
-                categoria: "ferragem",
-                unidadeVenda: "unidade",
-                tipoCalculo: "unidade",
-                precoVenda: 180,
-                ativo: true
-            })
-        ];
-    },
-
     unirProjetos(...listas) {
         const mapa = new Map();
 
@@ -2483,48 +2370,6 @@ const OrcamentoInteligenteController = {
 
         return typeof ProjetoModel !== "undefined" && typeof ProjetoModel.normalizar === "function"
             ? ProjetoModel.normalizar(dados)
-            : dados;
-    },
-
-    criarProjetoApoio(cliente = {}) {
-        const dados = {
-            id: `prj_apoio_${cliente.id || "cliente"}`,
-            numero: "PRJ-APOIO",
-            codigo: "PRJ-APOIO",
-            titulo: `Orcamento guiado - ${cliente.nome || "Cliente"}`,
-            status: "rascunho",
-            cliente: {
-                id: cliente.id || "",
-                nome: cliente.nome || "",
-                telefone: cliente.telefonePrincipal || "",
-                email: cliente.email || ""
-            },
-            obra: {
-                endereco: "A definir",
-                cidade: "Porto Seguro"
-            }
-        };
-
-        return typeof ProjetoModel !== "undefined" && typeof ProjetoModel.normalizar === "function"
-            ? ProjetoModel.normalizar(dados)
-            : dados;
-    },
-
-    normalizarClienteApoio(dados) {
-        return typeof ClienteModel !== "undefined" && typeof ClienteModel.normalizar === "function"
-            ? ClienteModel.normalizar(dados)
-            : dados;
-    },
-
-    normalizarServicoApoio(dados) {
-        return typeof ServicoModel !== "undefined" && typeof ServicoModel.normalizar === "function"
-            ? ServicoModel.normalizar(dados)
-            : dados;
-    },
-
-    normalizarProdutoApoio(dados) {
-        return typeof ProdutoModel !== "undefined" && typeof ProdutoModel.normalizar === "function"
-            ? ProdutoModel.normalizar(dados)
             : dados;
     },
 

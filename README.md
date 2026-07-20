@@ -5,10 +5,14 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.4.3`
+`v0.5.0`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
+
+Projetos, clientes, produtos e itens de serviço usam o Firestore como fonte
+canônica. O navegador mantém somente preferências e rascunhos do fluxo em
+andamento; telas vazias não recebem registros demonstrativos automaticamente.
 
 ## Validação local
 

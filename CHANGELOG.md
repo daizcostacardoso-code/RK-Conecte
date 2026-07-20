@@ -1,5 +1,15 @@
 # Histórico de alterações
 
+## v0.5.0 — persistência canônica no Firestore
+
+- Implementado o adaptador real do Firestore para projetos e itens de serviço.
+- Removida a escolha automática de `localStorage` ou memória para dados permanentes.
+- Removidos clientes, produtos e projetos demonstrativos das telas operacionais.
+- Substituído o estado E2E por um rascunho de fluxo sem dados pré-criados.
+- Mantido armazenamento local somente para rascunhos e preferências de interface.
+- Adicionados estados explícitos de carregamento, vazio e erro nas listas principais.
+- Ampliados os testes de persistência, rascunho e ausência de dados simulados.
+
 ## v0.4.3 — regras seguras do Firestore
 
 - Fechadas para visitantes todas as coleções operacionais e financeiras.

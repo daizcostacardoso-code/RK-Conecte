@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.4.3`.
+- Versão: `v0.5.0`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -26,6 +26,10 @@ O projeto possui testes para clientes, numeração de orçamento, orçamento
 inteligente, PDFs, notas de serviço, operações do adaptador Firestore e regras
 de segurança executadas no Firebase Emulator.
 
+Projetos e itens de serviço não possuem mais fallback silencioso para memória ou
+armazenamento local. Falhas do Firestore são exibidas na interface, e a ausência
+de registros é representada por um estado vazio real.
+
 Use `npm run check` para validar a sintaxe e executar todos os testes.
 
 ## Segurança concluída na Sprint 0
@@ -39,3 +43,10 @@ Use `npm run check` para validar a sintaxe e executar todos os testes.
 - Os testes usam um projeto de demonstração e não acessam dados de produção.
 
 A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGURA.md).
+
+## Persistência consolidada na Sprint 1
+
+- Firestore é a fonte canônica dos cadastros permanentes.
+- `localStorage` permanece apenas para preferências e rascunhos em andamento.
+- O estado demonstrativo E2E não é carregado nas páginas de produção.
+- Dashboards e orçamentos não fabricam registros quando as coleções estão vazias.

@@ -33,6 +33,8 @@ const ProdutoController = {
     },
 
     async listarProdutos(filtros = ProdutoUI.obterFiltros()) {
+        ProdutoUI.renderizarCarregamentoLista('Carregando produtos do Firestore...');
+        ProdutoUI.mostrarAviso('Carregando produtos...', 'info');
         const resultado = await ProdutoService.listarProdutos(filtros);
         if (!resultado.sucesso) {
             ProdutoUI.renderizarLista([]);
@@ -40,6 +42,7 @@ const ProdutoController = {
             return resultado;
         }
         ProdutoUI.renderizarLista(resultado.produtos || []);
+        ProdutoUI.mostrarAviso('');
         return resultado;
     },
 

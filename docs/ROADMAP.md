@@ -25,10 +25,18 @@
 
 ## Sprint 1 — consolidação da V1
 
-- remover telas, módulos e estados antigos sem uso;
-- unificar orçamento, dashboard, arquivos e caixa;
+### Patch 4 — persistência canônica — concluído
+
+- remover o estado demonstrativo das páginas de produção;
+- usar Firestore nos cadastros permanentes de projetos e itens de serviço;
 - manter `localStorage` somente para rascunhos e preferências;
-- consolidar o fluxo comercial e o histórico.
+- apresentar estados explícitos de carregamento, vazio e erro.
+
+### Próximos passos
+
+- unificar orçamento, dashboard, arquivos e caixa;
+- consolidar o fluxo comercial e o histórico;
+- remover módulos antigos que permanecerem sem uso após a migração.
 
 ## Sprint 2 — fluxo operacional
 
