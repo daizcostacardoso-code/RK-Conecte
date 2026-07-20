@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-vidracaria-v7.2.1-jato';
+const RK_CACHE = 'rk-conecte-v0.4.1';
 const APP_SHELL = [
   '/',
   '/index.html',

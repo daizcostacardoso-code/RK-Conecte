@@ -1,15 +1,27 @@
 {
-    "hosting":  {
-                    "public":  ".",
-                    "ignore":  [
-                                   "firebase.json",
-                                   "**/.*",
-                                   "**/node_modules/**",
-                                   "docs/**",
-                                   "patchs/**"
-                               ]
-                },
-    "firestore":  {
-                      "rules":  "firestore.rules"
-                  }
+  "hosting": {
+    "public": ".",
+    "predeploy": [
+      "npm run check"
+    ],
+    "ignore": [
+      "firebase.json",
+      "firestore.rules",
+      "package.json",
+      "package-lock.json",
+      "README.md",
+      "CHANGELOG.md",
+      "LIMPEZA_REALIZADA.txt",
+      "**/.*",
+      "**/node_modules/**",
+      "docs/**",
+      "patchs/**",
+      "scripts/**",
+      "tests/**",
+      "tmp/**"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
 }

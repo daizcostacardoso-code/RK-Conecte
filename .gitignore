@@ -17,8 +17,13 @@ firebase-debug.*.log
 
 # Backups e patches locais
 patchs/
+tmp/
 *.bak
 *.backup
+
+# Resultados de validacao
+coverage/
+test-results/
 
 # Arquivos do sistema
 .DS_Store
