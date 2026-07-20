@@ -1,6 +1,7 @@
 const DashboardComercialController = {
     rootId: "dashboardComercialRoot",
     estado: null,
+    sessao: null,
 
     async carregar() {
         const [projetos, orcamentosEmitidos, movimentosCaixa] = await Promise.all([
@@ -14,6 +15,7 @@ const DashboardComercialController = {
         const resumoCaixa = this.montarResumoCaixa(movimentosCaixa);
 
         this.estado = {
+            sessao: this.sessao,
             carregadoEm: new Date().toISOString(),
             kpis: {
                 totalOrcamentos: resumoOrcamentos.total,
@@ -50,8 +52,20 @@ const DashboardComercialController = {
     },
 
     async iniciar() {
+        this.sessao = await this.aguardarSessao();
+        if (!this.sessao) return false;
         await this.carregar();
         return this.renderizar();
+    },
+
+    async aguardarSessao() {
+        if (typeof window === "undefined" || !window.RKAuth) return null;
+        if (typeof window.RKAuth.aguardarAutenticacao === "function") {
+            return window.RKAuth.aguardarAutenticacao();
+        }
+        return typeof window.RKAuth.obterSessao === "function"
+            ? window.RKAuth.obterSessao()
+            : null;
     },
 
     async obterOrcamentosEmitidos() {

@@ -233,6 +233,9 @@ const RKAuth = {
     },
 
     async registrarUltimoAcesso(usuario, perfil = {}) {
+        // Canais temporários de visualização publicam apenas o Hosting. Neles,
+        // as regras novas ainda não existem e esta auditoria geraria um 403.
+        if (this.ambientePreview()) return;
         const anterior = new Date(perfil.ultimoAcessoEm || 0).getTime();
         if (Number.isFinite(anterior) && Date.now() - anterior < 15 * 60 * 1000) return;
         try {
@@ -250,6 +253,11 @@ const RKAuth = {
         } catch (erro) {
             console.warn("Não foi possível registrar o último acesso:", erro);
         }
+    },
+
+    ambientePreview(hostname) {
+        const host = String(hostname || (typeof window !== "undefined" ? window.location?.hostname : "") || "").toLowerCase();
+        return host.endsWith(".web.app") && host.includes("--");
     },
 
     async recusarAcesso() {

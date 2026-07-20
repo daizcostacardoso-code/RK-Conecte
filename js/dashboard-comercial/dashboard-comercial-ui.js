@@ -11,7 +11,7 @@ const DashboardComercialUI = {
             `<section class="dashboard-comercial-shell" aria-labelledby="dashboardComercialTitulo">`,
             this.renderizarCabecalho(estado),
             `<div class="dashboard-comercial-content">`,
-            this.renderizarAtalhos(),
+            this.renderizarAtalhos(estado.sessao || {}),
             this.renderizarCards(estado.kpis || {}, estado.resumoOrcamentos || {}, estado.resumoObras || {}, estado.resumoCaixa || {}),
             `<div class="dashboard-comercial-operacao-grid">`,
             this.renderizarCaixa(estado.resumoCaixa || {}),
@@ -55,7 +55,7 @@ const DashboardComercialUI = {
         ].join("");
     },
 
-    renderizarAtalhos() {
+    renderizarAtalhos(sessao = {}) {
         const atalhos = [
             { rotulo: "Novo or&ccedil;amento", descricao: "Montar proposta", icone: "file", href: "orcamento-inteligente.html", destaque: true },
             { rotulo: "Ordens de servi&ccedil;o", descricao: "Produ&ccedil;&atilde;o e instala&ccedil;&atilde;o", icone: "note", href: "nota-servico.html" },
@@ -63,8 +63,12 @@ const DashboardComercialUI = {
             { rotulo: "Clientes", descricao: "Consultar cadastro", icone: "users", href: "clientes.html" },
             { rotulo: "Caixa", descricao: "Ver movimenta&ccedil;&otilde;es", icone: "wallet", href: "caixa.html" }
         ];
+        const administrador = sessao?.perfil === "admin";
+        if (administrador) {
+            atalhos.push({ rotulo: "Controle de acessos", descricao: "Equipe e permiss&otilde;es", icone: "shield", href: "acessos.html" });
+        }
         return [
-            `<nav class="dashboard-comercial-shortcuts" aria-label="Acesso r&aacute;pido">`,
+            `<nav class="dashboard-comercial-shortcuts${administrador ? " has-admin-access" : ""}" aria-label="Acesso r&aacute;pido">`,
             ...atalhos.map(atalho => [
                 `<a class="dashboard-comercial-shortcut${atalho.destaque ? " is-primary" : ""}" href="${this.escaparAtributo(atalho.href)}">`,
                 `<span class="dashboard-comercial-shortcut-icon" aria-hidden="true">${this.icone(atalho.icone)}</span>`,
@@ -218,6 +222,7 @@ const DashboardComercialUI = {
             note: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/>`,
             measure: `<path d="M3 17 17 3l4 4L7 21H3z"/><path d="m14 6 4 4M11 9l2 2M8 12l2 2"/>`,
             users: `<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/>`,
+            shield: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>`,
             wallet: `<path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h16v12H5a3 3 0 0 1-3-3V6"/><path d="M16 14h2"/>`,
             trend: `<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>`,
             building: `<path d="M3 21h18M6 21V5l6-3v19M18 21V9l-6-2M9 9h.01M9 13h.01M9 17h.01M15 13h.01M15 17h.01"/>`,

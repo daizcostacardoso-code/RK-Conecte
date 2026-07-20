@@ -2,6 +2,11 @@
 
 ## v0.9.0 — financeiro operacional e controle de acessos
 
+- Exposto o atalho administrativo de controle de acessos no dashboard principal.
+- Feita a renderização do dashboard aguardar o perfil carregado antes de decidir os atalhos administrativos.
+- Restauradas larguras uniformes para os atalhos em telas grandes, médias e móveis.
+- Evitado o registro de último acesso nos canais temporários que ainda usam as regras publicadas da versão anterior.
+- Removido o uso da persistência local obsoleta do SDK e atualizada a metatag de aplicativo no dashboard.
 - Aberto um financeiro determinístico para cada projeto originado de orçamento aprovado.
 - Vinculados valores contratado, recebido e saldo ao projeto operacional.
 - Registrados recebimentos no financeiro e no caixa na mesma transação, sem duplicidade.

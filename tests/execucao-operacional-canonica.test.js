@@ -57,7 +57,7 @@ test("dashboard inclui pendências de medição, produção e instalação", () 
     assert.match(controller, /emProducao/);
     assert.match(controller, /emInstalacao/);
     assert.match(controller, /this\.montarAcoes\(orcamentos, projetos\)/);
-    assert.match(html, /dashboard-comercial-controller\.js\?v=0\.9\.0/);
+    assert.match(html, /dashboard-comercial-controller\.js\?v=0\.9\.2/);
 });
 
 test("cancelamento comercial também encerra ordem operacional ativa", () => {

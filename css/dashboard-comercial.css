@@ -169,6 +169,10 @@ body.dashboard-comercial-page .dashboard-comercial-shortcuts {
     margin: 0;
 }
 
+body.dashboard-comercial-page .dashboard-comercial-shortcuts.has-admin-access {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 body.dashboard-comercial-page .dashboard-comercial-shortcut-icon::before { content: none !important; }
 
 body.dashboard-comercial-page .dashboard-comercial-shortcut {
@@ -355,7 +359,9 @@ body.dashboard-comercial-page .dashboard-comercial-activities { max-height: none
 .dashboard-comercial-inline-empty,.dashboard-comercial-empty p { margin: 12px 0 0; color: #8a99a6; font-size: .73rem; }
 
 @media (max-width: 1040px) {
-    body.dashboard-comercial-page .dashboard-comercial-shortcuts,.dashboard-comercial-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts,
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts.has-admin-access,
+    .dashboard-comercial-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
     .dashboard-comercial-operacao-grid,.dashboard-comercial-insights-grid { grid-template-columns: 1fr; }
 }
 

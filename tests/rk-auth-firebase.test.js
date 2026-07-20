@@ -87,6 +87,19 @@ test("Guard interpreta o perfil ativo retornado pelo serviço de dados", () => {
     assert.equal(perfil.historicoAcesso[0].tipo, "acesso_criado");
 });
 
+test("Auditoria de último acesso não envia escrita no canal temporário", async () => {
+    assert.equal(RKAuth.ambientePreview("rk-vidracaria--v0-9-0-exemplo.web.app"), true);
+    assert.equal(RKAuth.ambientePreview("rk-vidracaria.web.app"), false);
+    assert.equal(RKAuth.ambientePreview("localhost"), false);
+    let requisicaoEnviada = false;
+    global.window = { location: { hostname: "rk-vidracaria--v0-9-0-exemplo.web.app" } };
+    global.fetch = async () => { requisicaoEnviada = true; return { ok: true }; };
+    await RKAuth.registrarUltimoAcesso({ getIdToken: async () => "token", uid: "uid-admin" }, {});
+    assert.equal(requisicaoEnviada, false);
+    delete global.fetch;
+    delete global.window;
+});
+
 test("Telas comerciais sensíveis permanecem classificadas como protegidas", () => {
     [
         "dashboard-comercial.html",

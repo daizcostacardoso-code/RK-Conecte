@@ -17,6 +17,26 @@ test("tela administrativa controla criação, perfil, situação e recuperação
     assert.match(repositorio, /appSecundario/);
 });
 
+test("dashboard principal exibe o controle de acessos somente para administrador", () => {
+    const interfaceDashboard = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-ui.js"), "utf8");
+    const controller = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-controller.js"), "utf8");
+    const estilos = readFileSync(resolve(raiz, "css/dashboard-comercial.css"), "utf8");
+    assert.match(interfaceDashboard, /renderizarAtalhos\(estado\.sessao/);
+    assert.match(interfaceDashboard, /sessao\?\.perfil === "admin"/);
+    assert.match(interfaceDashboard, /href: "acessos\.html"/);
+    assert.match(interfaceDashboard, /Controle de acessos/);
+    assert.match(controller, /this\.sessao = await this\.aguardarSessao\(\)/);
+    assert.match(estilos, /shortcuts\.has-admin-access[\s\S]*repeat\(3/);
+    assert.doesNotMatch(estilos, /grid-template-columns:\s*repeat\(auto-fit/);
+});
+
+test("dashboard usa metatag atual e configuração sem persistência obsoleta", () => {
+    const html = readFileSync(resolve(raiz, "paginas/dashboard-comercial.html"), "utf8");
+    const configuracao = readFileSync(resolve(raiz, "js/firebase-config.js"), "utf8");
+    assert.match(html, /name="mobile-web-app-capable" content="yes"/);
+    assert.doesNotMatch(configuracao, /enable(?:MultiTabIndexedDb)?Persistence|enablePersistence/);
+});
+
 test("textos visíveis não expõem nomes da infraestrutura interna", () => {
     const paginas = ["login.html", "funcionario.html", "projetos.html", "medicao-obra.html", "nota-servico.html", "caixa.html", "acessos.html"];
     paginas.forEach(nome => {
