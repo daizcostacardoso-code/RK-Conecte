@@ -1,0 +1,172 @@
+const Eventos = {
+
+    iniciar() {
+        this.botaoAdicionar();
+        this.botaoNovo();
+        this.botaoPDF();
+        this.camposCalculo();
+        this.camposDesconto();
+        this.camposOrcamento();
+    },
+
+    botaoAdicionar() {
+        const btn = Util.$("btnAdicionarItem");
+
+        if (!btn) return;
+
+        btn.addEventListener("click", () => {
+            Orcamento.adicionarItem();
+        });
+    },
+
+    botaoNovo() {
+        const btn = Util.$("btnNovoOrcamento");
+
+        if (!btn) return;
+
+        btn.addEventListener("click", () => {
+            Orcamento.novo();
+        });
+    },
+
+    botaoPDF() {
+        const btn = Util.$("btnGerarPDF");
+
+        if (!btn) return;
+
+        btn.addEventListener("click", () => {
+            PDF.gerar();
+        });
+    },
+
+    camposCalculo() {
+        const campos = [
+            "categoria",
+            "descricaoItem",
+            "tipoVidro",
+            "espessura",
+            "cor",
+            "largura",
+            "altura",
+            "quantidade",
+            "valorM2",
+            "valorFerragens",
+            "valorServico",
+            "valorAdicional",
+            "descricaoAdicional",
+            "observacoesItem",
+            "acessorios"
+        ];
+
+        campos.forEach(id => {
+            const campo = Util.$(id);
+
+            if (!campo) return;
+
+            campo.addEventListener("input", () => {
+                this.atualizarObrigatoriedadeAdicional();
+                this.atualizarPrevia();
+            });
+
+            campo.addEventListener("change", () => {
+                this.atualizarObrigatoriedadeAdicional();
+                this.atualizarPrevia();
+            });
+        });
+    },
+
+    atualizarObrigatoriedadeAdicional() {
+        const valor = Util.$("valorAdicional");
+        const descricao = Util.$("descricaoAdicional");
+        if (!valor || !descricao) return;
+
+        const obrigatoria = Math.max(0, Util.numero(valor.value)) > 0;
+        descricao.required = obrigatoria;
+        descricao.setAttribute("aria-required", obrigatoria ? "true" : "false");
+    },
+
+    camposDesconto() {
+        const campos = [
+            "tipoDesconto",
+            "desconto",
+            "descontoValor",
+            "descontoPercentual",
+            "acrescimo",
+            "instalacao",
+            "frete",
+            "custoVidro",
+            "custoFerragens",
+            "custoMaoObra",
+            "custoTransporte",
+            "comissao"
+        ];
+
+        campos.forEach(id => {
+            const campo = Util.$(id);
+
+            if (!campo) return;
+
+            campo.addEventListener("input", () => {
+                Orcamento.atualizarTela();
+                Orcamento.salvar();
+            });
+
+            campo.addEventListener("change", () => {
+                Orcamento.atualizarTela();
+                Orcamento.salvar();
+            });
+        });
+    },
+
+    camposOrcamento() {
+        const campos = [
+            "numeroOrcamento",
+            "dataCriacao",
+            "dataValidade",
+            "statusOrcamento",
+            "vendedor",
+            "cliente",
+            "telefone",
+            "email",
+            "endereco",
+            "enderecoObra",
+            "observacoesObra",
+            "observacoes",
+            "formaPagamento",
+            "entradaPagamento",
+            "parcelasPagamento",
+            "observacaoPagamento"
+        ];
+
+        campos.forEach(id => {
+            const campo = Util.$(id);
+
+            if (!campo) return;
+
+            campo.addEventListener("input", () => {
+                Orcamento.salvar();
+            });
+
+            campo.addEventListener("change", () => {
+                Orcamento.salvar();
+            });
+        });
+    },
+
+    atualizarPrevia() {
+        const valores = Storage.carregar(Config.storage.valores, {});
+        const item = Formulario.lerItem();
+
+        if (!item.largura || !item.altura) {
+            if (Util.$("area")) Util.$("area").value = "";
+            if (Util.$("totalItem")) Util.$("totalItem").value = "";
+            if (Util.$("resultado")) Util.$("resultado").textContent = Util.moeda(0);
+            return;
+        }
+
+        const calculado = Calculos.calcularItem(item, valores);
+
+        Formulario.preencherCalculo(calculado);
+    }
+
+};

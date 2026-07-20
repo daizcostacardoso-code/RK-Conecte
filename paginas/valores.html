@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.4" data-rk-auth="protected"></script>
+    <title>Cadastro de Valores</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+
+<body class="pagina-valores">
+
+    <header>
+        <div class="container">
+            <div class="marca-header">
+                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+                <h1>Cadastro de Valores</h1>
+            </div>
+
+            <a href="funcionario.html" class="voltar">
+                Voltar
+            </a>
+        </div>
+    </header>
+
+    <section class="orcamento">
+
+        <div class="container">
+
+            <form class="formulario formulario-valores">
+
+                <div class="valores-intro">
+                    <h2>Tabela de preços</h2>
+                    <p>Os valores preenchidos ficam destacados para facilitar a conferência antes de montar o orçamento.</p>
+                </div>
+
+                <div class="valores-grid">
+
+                    <section class="card-valores">
+                        <div class="card-valores-titulo">
+                            <span class="icone-card">📋</span>
+                            <div>
+                                <h3>Valores do Vidro</h3>
+                                <p>Preço base por espessura em R$/m²</p>
+                            </div>
+                        </div>
+
+                        <div class="campos-valores duas-colunas">
+                            <label class="campo-valor">
+                                <span>Vidro 4 mm</span>
+                                <input id="mm4" inputmode="decimal" placeholder="Ex.: 100">
+                            </label>
+
+                            <label class="campo-valor">
+                                <span>Vidro 6 mm</span>
+                                <input id="mm6" inputmode="decimal" placeholder="Ex.: 150">
+                            </label>
+
+                            <label class="campo-valor">
+                                <span>Vidro 8 mm</span>
+                                <input id="mm8" inputmode="decimal" placeholder="Ex.: 200">
+                            </label>
+
+                            <label class="campo-valor">
+                                <span>Vidro 10 mm</span>
+                                <input id="mm10" inputmode="decimal" placeholder="Ex.: 250">
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="card-valores">
+                        <div class="card-valores-titulo">
+                            <span class="icone-card">🎨</span>
+                            <div>
+                                <h3>Adicionais por Cor</h3>
+                                <p>Informe valor fixo por m² ou percentual adicional</p>
+                            </div>
+                        </div>
+
+                        <div class="lista-cores">
+                            <div class="linha-cor">
+                                <strong>Incolor</strong>
+                                <label class="campo-valor compacto">
+                                    <span>Valor R$/m²</span>
+                                    <input id="valorIncolor" inputmode="decimal" placeholder="0,00">
+                                </label>
+                                <label class="campo-valor compacto">
+                                    <span>Percentual %</span>
+                                    <input id="percIncolor" inputmode="decimal" placeholder="0">
+                                </label>
+                            </div>
+
+                            <div class="linha-cor">
+                                <strong>Fumê</strong>
+                                <label class="campo-valor compacto">
+                                    <span>Valor R$/m²</span>
+                                    <input id="valorFume" inputmode="decimal" placeholder="0,00">
+                                </label>
+                                <label class="campo-valor compacto">
+                                    <span>Percentual %</span>
+                                    <input id="percFume" inputmode="decimal" placeholder="0">
+                                </label>
+                            </div>
+
+                            <div class="linha-cor">
+                                <strong>Verde</strong>
+                                <label class="campo-valor compacto">
+                                    <span>Valor R$/m²</span>
+                                    <input id="valorVerde" inputmode="decimal" placeholder="0,00">
+                                </label>
+                                <label class="campo-valor compacto">
+                                    <span>Percentual %</span>
+                                    <input id="percVerde" inputmode="decimal" placeholder="0">
+                                </label>
+                            </div>
+
+                            <div class="linha-cor">
+                                <strong>Bronze</strong>
+                                <label class="campo-valor compacto">
+                                    <span>Valor R$/m²</span>
+                                    <input id="valorBronze" inputmode="decimal" placeholder="0,00">
+                                </label>
+                                <label class="campo-valor compacto">
+                                    <span>Percentual %</span>
+                                    <input id="percBronze" inputmode="decimal" placeholder="0">
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card-valores card-valores-destaque">
+                        <div class="card-valores-titulo">
+                            <span class="icone-card">🪟</span>
+                            <div>
+                                <h3>Alumínio</h3>
+                                <p>Valor do alumínio por metro reto. Ex.: R$100/m => 100cm = R$100 e 150cm = R$150.</p>
+                            </div>
+                        </div>
+
+                        <label class="campo-valor campo-grande">
+                            <span>Alumínio Geral (R$/metro)</span>
+                            <input id="aluminio" inputmode="decimal" placeholder="Ex.: 10">
+                        </label>
+                    </section>
+
+                </div>
+
+                <div class="acoes-formulario">
+                    <button type="button" id="btnSalvarValores">
+                        Salvar Valores
+                    </button>
+                    <button type="button" id="btnLimparValores" class="btn-secundario">
+                        Limpar Valores
+                    </button>
+                </div>
+
+                <p id="mensagemValores" class="mensagem-sucesso"></p>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+    <script src="../js/config.js?v=2.1.0"></script>
+    <script src="../js/firebase-config.js?v=2.1.0"></script>
+    <script src="../js/util.js?v=2.1.0"></script>
+    <script src="../js/valores.js?v=2.1.0"></script>
+
+    <script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+
+</html>

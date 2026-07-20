@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.4" data-rk-auth="public"></script>
+    <title>Solicitar Orçamento | RK Vidraçaria</title>
+    <meta name="description" content="Envie seu pedido de orçamento para a RK Vidraçaria com produtos, medidas e observações para retorno da equipe.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://rk-vidracaria.web.app/paginas/orcamento.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Solicitar Orçamento | RK Vidraçaria">
+    <meta property="og:description" content="Pedido público de orçamento para vidros sob medida, box, espelhos, fachadas e serviços de vidraçaria.">
+    <meta property="og:url" content="https://rk-vidracaria.web.app/paginas/orcamento.html">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80">
+    <link rel="stylesheet" href="../css/style.css?v=5.8.1">
+    <link rel="icon" type="image/png" href="../imagens/icons/icon-192.png">
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="public-page public-quote">
+
+<header class="public-header">
+    <div class="container public-header__inner">
+        <a class="public-brand" href="../index.html" aria-label="RK Vidra&ccedil;aria - in&iacute;cio">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidra&ccedil;aria" width="52" height="52">
+            <span>
+                <strong>RK Vidra&ccedil;aria</strong>
+                <small>Solicitar or&ccedil;amento</small>
+            </span>
+        </a>
+
+        <button class="public-menu-toggle" type="button" aria-expanded="false" aria-controls="publicMenu">Menu</button>
+
+        <nav class="public-nav" aria-label="Navega&ccedil;&atilde;o principal">
+            <ul id="publicMenu">
+                <li><a href="../index.html">In&iacute;cio</a></li>
+                <li><a href="servicos-publico.html">Servi&ccedil;os</a></li>
+                <li><a href="produtos-publico.html">Produtos</a></li>
+                <li><a href="galeria.html">Galeria</a></li>
+                <li><a href="contato.html">Contato</a></li>
+                <li><a class="public-nav__cta rk-nav-ativo" href="orcamento.html" aria-current="page">Or&ccedil;amento</a></li>
+                <li><a class="login nav-login-button" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<section class="orcamento">
+    <div class="container">
+        <h2>Monte seu pedido de orçamento</h2>
+        <p>Informe os produtos desejados. Nossa equipe receberá seu pedido no painel e retornará com o orçamento final.</p>
+
+        <form id="formSolicitacaoOrcamento" class="formulario formulario-cliente" novalidate>
+            <div class="card-form">
+                <h2>Dados do Cliente</h2>
+
+                <label>Nome completo</label>
+                <input type="text" id="cliente" placeholder="Digite seu nome" required>
+
+                <label>Telefone / WhatsApp</label>
+                <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+
+                <label>E-mail</label>
+                <input type="email" id="email" placeholder="Seu e-mail">
+
+                <label>Endereço do serviço</label>
+                <input type="text" id="endereco" placeholder="Rua, número, bairro e cidade">
+            </div>
+
+            <div class="card-form">
+                <h2>Dados da peça</h2>
+
+                <div class="linha3">
+                    <div>
+                        <label>Tipo</label>
+                        <select id="tipoVidro" required>
+                            <option value="">Escolha uma opção</option>
+                            <option value="Porta">Porta</option>
+                            <option value="Janela">Janela</option>
+                            <option value="Vidro Fixo">Vidro Fixo</option>
+                            <option value="Box de Banheiro">Box de Banheiro</option>
+                            <option value="Guarda-Corpo">Guarda-Corpo</option>
+                            <option value="Espelho">Espelho</option>
+                            <option value="Prateleira">Prateleira</option>
+                            <option value="Fachada de vidro">Fachada de vidro</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Espessura</label>
+                        <select id="espessura">
+                            <option value="4">4 mm</option>
+                            <option value="6">6 mm</option>
+                            <option value="8">8 mm</option>
+                            <option value="10">10 mm</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Cor</label>
+                        <select id="cor">
+                            <option value="incolor">Incolor</option>
+                            <option value="fume">Fumê</option>
+                            <option value="verde">Verde</option>
+                            <option value="bronze">Bronze</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-form">
+                <h2>Medidas</h2>
+
+                <div class="linha4">
+                    <div>
+                        <label>Altura (cm)</label>
+                        <input id="altura" type="number" placeholder="Ex.: 150" min="0" step="1">
+                    </div>
+
+                    <div>
+                        <label>Largura (cm)</label>
+                        <input id="largura" type="number" placeholder="Ex.: 100" min="0" step="1">
+                    </div>
+
+                    <div>
+                        <label>Quantidade</label>
+                        <input id="quantidade" type="number" value="1" min="1" step="1">
+                    </div>
+
+                    <div>
+                        <label>Área</label>
+                        <input id="area" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-form card-adicionar-produto">
+                <h2>Adicionar produto</h2>
+                <p class="ajuda-form">Confira os dados do produto e clique em adicionar. Os valores serão calculados pela equipe da RK.</p>
+                <button type="button" id="btnAdicionarItemCliente" class="btn-adicionar-cliente">+ Adicionar produto à lista</button>
+            </div>
+
+            <div class="secao-inteira">
+                <h2>Itens adicionados</h2>
+                <table id="tabelaItensCliente">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Produto</th>
+                            <th>Medidas</th>
+                            <th>Espessura</th>
+                            <th>Cor</th>
+                            <th>Qtd.</th>
+                            <th>Área aproximada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card-form">
+                <h2>Observações</h2>
+                <textarea id="observacoes" rows="5" placeholder="Ex.: local de instalação, detalhes do acabamento, urgência, melhor horário para contato..."></textarea>
+            </div>
+
+            <div class="card-form resumo-orcamento resumo-cliente-sem-valores">
+                <div class="linha-total">
+                    <span>Produtos adicionados</span>
+                    <strong id="totalItensCliente">0</strong>
+                </div>
+                <small class="ajuda-form">Após o envio, a equipe da RK revisará medidas, alumínio, acessórios e instalação para retornar com o valor final.</small>
+            </div>
+
+            <button type="submit">Enviar pedido para RK Vidraçaria</button>
+            <p id="mensagemSolicitacao" class="mensagem-sucesso"></p>
+            <div id="popupSolicitacao" class="rk-popup" aria-live="polite">
+                <div class="rk-popup-card">
+                    <button type="button" id="fecharPopupSolicitacao" class="rk-popup-fechar">×</button>
+                    <div class="rk-popup-icone">✓</div>
+                    <h3>Pedido enviado!</h3>
+                    <p>A RK Vidraçaria recebeu sua solicitação. Em breve nossa equipe entrará em contato.</p>
+                    <small>Você também pode falar pelo WhatsApp: (73) 9981-9768</small>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<footer class="public-footer">
+    <div class="container public-footer__grid">
+        <div class="public-footer__brand">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria" width="48" height="48" loading="lazy">
+            <div>
+                <strong>RK Vidraçaria</strong>
+                <p>Vidros sob medida para residências, comércios e obras em Porto Seguro.</p>
+            </div>
+        </div>
+        <div>
+            <h2>Links rápidos</h2>
+            <a href="servicos-publico.html">Serviços</a>
+            <a href="produtos-publico.html">Produtos</a>
+            <a href="galeria.html">Galeria</a>
+            <a href="orcamento.html">Orçamento</a>
+        </div>
+        <div>
+            <h2>Contato</h2>
+            <a href="tel:+5573999819768">(73) 9981-9768</a>
+            <a href="https://wa.me/5573999819768" target="_blank" rel="noopener">WhatsApp</a>
+            <span>Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</span>
+        </div>
+        <div>
+            <h2>Redes sociais</h2>
+            <a href="https://wa.me/5573999819768" target="_blank" rel="noopener">WhatsApp</a>
+            <a href="contato.html">Contato pelo site</a>
+        </div>
+    </div>
+    <div class="public-footer__bottom">
+        <span>&copy; 2026 RK Vidraçaria. Todos os direitos reservados.</span>
+    </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=2.2.0"></script>
+<script src="../js/config.js?v=2.2.0"></script>
+<script src="../js/storage.js?v=2.2.0"></script>
+<script src="../js/util.js?v=2.2.0"></script>
+<script src="../js/calculos.js?v=2.2.0"></script>
+<script src="../js/orcamento-cliente.js?v=5.6.7"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+
+    <script src="../js/app-install.js?v=3.2.0"></script>
+    <script src="../js/public-site.js?v=5.0.1"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

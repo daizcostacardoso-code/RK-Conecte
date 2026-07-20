@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.4" data-rk-auth="protected"></script>
+    <title>Medição de Obra - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+    <link rel="stylesheet" href="../css/medicao-obra.css?v=1.0.2">
+    <meta name="theme-color" content="#083d67">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body class="medicao-page comercial-page">
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+            <div>
+                <strong>RK Vidraçaria</strong>
+                <small>Centro Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">Início</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="orcamento-inteligente.html">Orçamento</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="medicao-main">
+    <div class="container medicao-shell">
+        <section class="medicao-cabecalho">
+            <div><span class="medicao-label">Ficha técnica</span><h1>Medição de Obra</h1><p>Registre as dimensões da obra e gere uma ficha A4 sem valores comerciais.</p></div>
+        </section>
+
+        <div id="medicaoAviso" class="medicao-aviso" role="status" aria-live="polite"></div>
+
+        <section class="medicao-painel" aria-labelledby="dadosGeraisTitulo">
+            <h2 id="dadosGeraisTitulo">Dados gerais</h2>
+            <div class="medicao-grid medicao-grid--geral">
+                <label><span>Nome do cliente *</span><input id="clienteNome" autocomplete="name" maxlength="120"></label>
+                <label><span>CPF/CNPJ</span><input id="clienteDocumento" inputmode="numeric" maxlength="24"></label>
+                <label><span>Telefone</span><input id="clienteTelefone" type="tel" autocomplete="tel" maxlength="30"></label>
+                <label class="medicao-campo-largo"><span>Endereço da obra</span><input id="obraEndereco" autocomplete="street-address" maxlength="180"></label>
+                <label><span>Responsável pela medição</span><input id="responsavel" maxlength="100"></label>
+                <label><span>Data da medição</span><input id="dataMedicao" type="date"></label>
+                <label class="medicao-campo-total"><span>Observações gerais</span><textarea id="observacoesGerais" rows="3" maxlength="1000"></textarea></label>
+            </div>
+        </section>
+
+        <section class="medicao-painel" aria-labelledby="novaMedidaTitulo">
+            <div class="medicao-painel-topo"><div><h2 id="novaMedidaTitulo">Adicionar medida</h2><p>Informe altura × largura em centímetros.</p></div><span id="modoEdicao" hidden>Editando medida</span></div>
+            <form id="formMedida" novalidate>
+                <div class="medicao-grid medicao-grid--medida">
+                    <label><span>Quantidade *</span><input id="medidaQuantidade" type="number" min="1" step="1" value="1" inputmode="numeric" required></label>
+                    <label><span>Tipo *</span><select id="medidaTipo" required><option value="">Selecione</option><option>Janela</option><option>Porta</option><option>Báscula</option><option>Box</option><option>Sacada</option><option>Guarda-corpo</option><option>Espelho</option><option>Vidro fixo</option><option>Fachada</option><option>Outro</option></select></label>
+                    <label class="medicao-campo-largo"><span>Descrição/modelo</span><input id="medidaDescricao" maxlength="160"></label>
+                    <label><span>Altura (cm) *</span><input id="medidaAltura" type="text" inputmode="decimal" placeholder="Ex.: 104,5" required></label>
+                    <label><span>Largura (cm) *</span><input id="medidaLargura" type="text" inputmode="decimal" placeholder="Ex.: 200" required></label>
+                    <label class="medicao-campo-largo"><span>Observação</span><input id="medidaObservacao" maxlength="240"></label>
+                </div>
+                <div class="medicao-acoes-form">
+                    <button class="botao" id="btnSalvarMedida" type="submit">Adicionar medida</button>
+                    <button class="botao-claro" id="btnLimparMedida" type="button">Limpar</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="medicao-painel" aria-labelledby="medidasTitulo">
+            <div class="medicao-painel-topo"><div><h2 id="medidasTitulo">Medidas cadastradas</h2><p id="medidasResumo">Nenhuma medida cadastrada.</p></div></div>
+            <div class="medicao-tabela-wrap">
+                <table class="medicao-tabela"><thead><tr><th>Quant.</th><th>Tipo</th><th>Descrição</th><th>Medidas</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="medidasCorpo"></tbody></table>
+            </div>
+        </section>
+
+        <div class="medicao-acoes-finais">
+            <button class="botao" id="btnGerarPdf" type="button">Gerar PDF</button>
+            <button class="botao-claro medicao-perigo" id="btnLimparTudo" type="button">Limpar medição completa</button>
+        </div>
+    </div>
+</main>
+<footer><p>&copy; 2026 RK Vidraçaria - Todos os direitos reservados.</p><p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p></footer>
+<script src="../js/vendor/pdf-lib.min.js"></script>
+<script src="../js/medicoes/medicao-model.js?v=1.0.0"></script>
+<script src="../js/medicoes/medicao-pdf.js?v=1.0.2"></script>
+<script src="../js/medicoes/medicao-ui.js?v=1.0.1"></script>
+<script src="../js/medicoes/medicao-controller.js?v=1.0.1"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

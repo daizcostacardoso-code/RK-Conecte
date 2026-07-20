@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.4" data-rk-auth="protected"></script>
+    <title>Arquivos - RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+    <meta name="theme-color" content="#083d67">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+    <style>
+        .arquivos-page .arquivos-main { padding: 26px 0 38px; }
+        .arquivos-shell { display: grid; gap: 18px; }
+        .arquivos-card { background: #fff; border: 1px solid rgba(8,61,103,.14); border-radius: 16px; padding: 18px; box-shadow: 0 12px 30px rgba(8,61,103,.08); }
+        .arquivos-topo { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+        .arquivos-label { display: block; color: #00727a; font-weight: 800; text-transform: uppercase; font-size: .82rem; margin-bottom: 4px; }
+        .arquivos-topo h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.15rem); color: #061b34; }
+        .arquivos-topo p { margin: 6px 0 0; color: #53657a; }
+        .arquivos-filtros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .arquivos-filtros label { display: grid; gap: 6px; color: #17324d; font-weight: 700; }
+        .arquivos-filtros input, .arquivos-filtros select { width: 100%; border: 1px solid #c9d9e8; border-radius: 10px; padding: 12px; font: inherit; background: #f8fbff; }
+        .arquivos-acoes { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .arquivos-lista { overflow-x: auto; }
+        .arquivos-tabela { width: 100%; border-collapse: collapse; min-width: 760px; }
+        .arquivos-tabela th, .arquivos-tabela td { text-align: left; padding: 13px 12px; border-bottom: 1px solid #e5edf5; }
+        .arquivos-tabela th { color: #435a70; background: #f4f8fc; font-size: .88rem; text-transform: uppercase; }
+        .arquivos-vazio { color: #647487; font-weight: 700; }
+        .arquivos-mensagem { display: none; margin: 0; padding: 12px 14px; border-radius: 10px; background: #eaf4ff; color: #083d67; font-weight: 700; }
+        .arquivos-mensagem.is-visible { display: block; }
+        .arquivos-item-acoes { display: flex; gap: 7px; flex-wrap: wrap; }
+        .arquivos-item-acoes button { border: 1px solid #9fc1df; border-radius: 7px; background: #fff; color: #083d67; padding: 7px 10px; cursor: pointer; font-weight: 700; }
+        .arquivos-item-acoes .arquivos-acao-aprovar { background: #087f5b; border-color: #087f5b; color: #fff; }
+        .arquivos-item-acoes .arquivos-acao-recusar, .arquivos-item-acoes .arquivos-acao-cancelar { border-color: #c53030; color: #a11b1b; }
+        .arquivos-status { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 9px; background: #edf3f8; color: #17324d; font-size: .82rem; font-weight: 800; }
+        .arquivos-status.is-aprovado { background: #dcfce7; color: #166534; }.arquivos-status.is-recusado, .arquivos-status.is-cancelado { background: #fee2e2; color: #991b1b; }.arquivos-status.is-enviado { background: #dbeafe; color: #1d4ed8; }
+        .arquivos-preview[hidden] { display: none; }
+        .arquivos-preview-topo { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .arquivos-preview-topo h2 { margin: 0; color: #061b34; }
+        .arquivos-preview-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .arquivos-preview-acoes a, .arquivos-preview-acoes button { border: 0; border-radius: 7px; background: #0b48b6; color: #fff; padding: 9px 13px; cursor: pointer; font: inherit; font-weight: 700; text-decoration: none; }
+        .arquivos-pdf { width: 100%; height: min(72vh, 820px); min-height: 520px; border: 1px solid #c9d9e8; border-radius: 10px; background: #f4f8fc; }
+        .arquivos-modal { width: min(760px, calc(100vw - 26px)); max-height: min(86vh, 860px); border: 0; border-radius: 16px; padding: 0; box-shadow: 0 24px 60px rgba(6,27,52,.28); }.arquivos-modal::backdrop { background: rgba(6,27,52,.55); }
+        .arquivos-modal-conteudo { padding: 20px; overflow: auto; }.arquivos-modal-topo { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid #e5edf5; padding: 16px 20px; }.arquivos-modal-topo h2 { margin: 0; color: #061b34; }.arquivos-modal-fechar { border: 0; background: #edf3f8; color: #083d67; border-radius: 8px; min-width: 40px; min-height: 40px; font-size: 1.25rem; cursor: pointer; }
+        .arquivos-detalhes-resumo p { display: flex; gap: 10px; justify-content: space-between; align-items: center; margin: 0; color: #061b34; font-size: 1.1rem; }.arquivos-detalhes-resumo dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0 0; }.arquivos-detalhes-resumo dl div { background: #f5f9fd; border-radius: 9px; padding: 10px; }.arquivos-detalhes-resumo dt { font-size: .76rem; color: #53657a; font-weight: 800; text-transform: uppercase; }.arquivos-detalhes-resumo dd { margin: 4px 0 0; color: #17324d; font-weight: 700; }
+        .arquivos-detalhes-secao { border-top: 1px solid #e5edf5; margin-top: 18px; padding-top: 16px; }.arquivos-detalhes-secao h3 { margin: 0 0 8px; color: #083d67; }.arquivos-detalhes-secao p { color: #435a70; }.arquivos-detalhes-secao ul { margin: 0; padding-left: 20px; color: #435a70; }.arquivos-historico { display: grid; gap: 10px; margin: 0; padding-left: 22px; }.arquivos-historico li { color: #17324d; }.arquivos-historico span, .arquivos-historico small { display: block; color: #53657a; margin-top: 2px; }.arquivos-historico p { margin: 4px 0 0; }
+        .arquivos-detalhes-form { display: grid; gap: 12px; }.arquivos-detalhes-form label { display: grid; gap: 6px; color: #17324d; font-weight: 700; }.arquivos-detalhes-form textarea { width: 100%; min-height: 86px; box-sizing: border-box; border: 1px solid #c9d9e8; border-radius: 9px; padding: 10px; font: inherit; }.arquivos-confirmacao { display: flex !important; grid-template-columns: auto 1fr; align-items: center; }
+        @media (max-width: 900px) { .arquivos-filtros { grid-template-columns: 1fr; } .arquivos-detalhes-resumo dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 600px) { .arquivos-item-acoes button { min-height: 44px; padding: 9px 12px; } .arquivos-detalhes-resumo dl { grid-template-columns: 1fr; } .arquivos-modal-conteudo { padding: 16px; } }
+
+
+        /* Mobile: transforma cada orçamento em um cartão compacto e mantém as ações visíveis. */
+        @media (max-width: 700px) {
+            .arquivos-page .arquivos-main { padding: 12px 0 26px; }
+            .arquivos-shell { gap: 10px; }
+            .arquivos-card { padding: 12px; border-radius: 12px; }
+            .arquivos-lista { overflow: visible; padding: 8px; }
+
+            .arquivos-tabela {
+                width: 100%;
+                min-width: 0;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .arquivos-tabela thead,
+            .arquivos-tabela thead tr { display: block; }
+            .arquivos-tabela thead th { display: none; }
+            .arquivos-tabela thead th:first-child {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                padding: 2px 3px 8px !important;
+                border: 0;
+                background: transparent;
+                color: #435a70;
+                font-size: 11px !important;
+                text-transform: none;
+            }
+            .arquivos-tabela thead th:first-child::after { content: "Selecionar todos"; }
+
+            .arquivos-tabela tbody {
+                display: grid;
+                gap: 8px;
+            }
+
+            .arquivos-tabela tbody tr {
+                display: grid;
+                grid-template-columns: 24px minmax(0, 1fr) auto;
+                grid-template-areas:
+                    "selecao numero status"
+                    "selecao cliente valor"
+                    "selecao data data"
+                    "acoes acoes acoes";
+                column-gap: 8px;
+                row-gap: 3px;
+                width: 100%;
+                padding: 9px;
+                border: 1px solid #dce7f1;
+                border-radius: 10px;
+                background: #fff;
+                box-shadow: 0 3px 10px rgba(8,61,103,.06);
+                box-sizing: border-box;
+            }
+
+            .arquivos-tabela tbody td {
+                display: flex;
+                align-items: center;
+                min-width: 0;
+                padding: 0 !important;
+                border: 0;
+                line-height: 1.25;
+            }
+
+            .arquivos-tabela tbody td:nth-child(1) {
+                grid-area: selecao;
+                align-items: flex-start;
+                padding-top: 1px !important;
+            }
+            .arquivos-tabela tbody td:nth-child(2) {
+                grid-area: numero;
+                overflow: hidden;
+                color: #061b34;
+                font-size: 13px;
+                font-weight: 900;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .arquivos-tabela tbody td:nth-child(2)::before {
+                content: "#";
+                margin-right: 2px;
+                color: #668099;
+                font-weight: 700;
+            }
+            .arquivos-tabela tbody td:nth-child(3) {
+                grid-area: cliente;
+                overflow: hidden;
+                color: #42576c;
+                font-size: 12px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .arquivos-tabela tbody td:nth-child(4) {
+                grid-area: data;
+                color: #6b7d8f;
+                font-size: 11px;
+            }
+            .arquivos-tabela tbody td:nth-child(4)::before {
+                content: "Emissão: ";
+                margin-right: 4px;
+                font-weight: 800;
+            }
+            .arquivos-tabela tbody td:nth-child(5) {
+                grid-area: status;
+                justify-self: end;
+            }
+            .arquivos-tabela tbody td:nth-child(5) .arquivos-status {
+                max-width: 100%;
+                padding: 3px 7px;
+                font-size: 10px;
+                white-space: nowrap;
+            }
+            .arquivos-tabela tbody td:nth-child(6) {
+                grid-area: valor;
+                justify-self: end;
+                color: #061b34;
+                font-size: 13px;
+                font-weight: 900;
+                white-space: nowrap;
+            }
+            .arquivos-tabela tbody td:nth-child(7) {
+                grid-area: acoes;
+                width: 100%;
+                margin-top: 5px;
+                padding-top: 7px !important;
+                border-top: 1px solid #e5edf5;
+            }
+
+            .arquivos-tabela input[type="checkbox"] {
+                width: 18px !important;
+                min-width: 18px !important;
+                height: 18px !important;
+                min-height: 18px !important;
+                margin: 0;
+            }
+
+            .arquivos-tabela .arquivos-item-acoes {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 6px;
+                width: 100%;
+            }
+            body.rk-internal-ui .arquivos-tabela .arquivos-item-acoes button,
+            .arquivos-tabela .arquivos-item-acoes button {
+                width: auto !important;
+                min-width: 0 !important;
+                min-height: 34px !important;
+                padding: 6px 5px !important;
+                overflow: hidden;
+                font-size: 10.5px !important;
+                line-height: 1.1 !important;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .arquivos-tabela tbody tr.arquivos-linha-vazia {
+                display: block;
+                padding: 14px;
+            }
+            .arquivos-tabela .arquivos-vazio {
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .arquivos-tabela .arquivos-item-acoes {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+<body class="arquivos-page comercial-page">
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+            <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+            <div>
+                <strong>RK Vidraçaria</strong>
+                <small>Centro Comercial</small>
+            </div>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../index.html">Início</a></li>
+                <li><a href="dashboard-comercial.html">Dashboard</a></li>
+                <li><a href="orcamento-inteligente.html">Orçamento</a></li>
+                <li><a class="login" href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<main class="arquivos-main">
+    <div class="container arquivos-shell">
+        <section class="arquivos-card arquivos-topo">
+            <div>
+                <span class="arquivos-label">Arquivos</span>
+                <h1>Arquivos de orçamentos</h1>
+                <p>Localize orçamentos salvos no banco e gere novamente o PDF para visualizar ou baixar.</p>
+            </div>
+        </section>
+        <p id="arquivosMensagem" class="arquivos-mensagem" role="status" aria-live="polite"></p>
+        <section class="arquivos-card" aria-label="Filtros de arquivos">
+            <div class="arquivos-filtros">
+                <label><span>Cliente</span><input type="search" id="filtroArquivoCliente" placeholder="Nome do cliente"></label>
+                <label><span>CPF/CNPJ</span><input type="search" id="filtroArquivoDocumento" placeholder="Documento do cliente"></label>
+                <label><span>Número do orçamento</span><input type="search" id="filtroArquivoNumero" placeholder="Ex.: ORC-0001"></label>
+                <label><span>Status</span><select id="filtroArquivoStatus"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="emitido">Emitido</option><option value="enviado">Enviado</option><option value="aprovado">Aprovado</option><option value="recusado">Recusado</option><option value="expirado">Expirado</option><option value="cancelado">Cancelado</option></select></label>
+                <label><span>Data inicial</span><input type="date" id="filtroArquivoDataInicial"></label>
+                <label><span>Data final</span><input type="date" id="filtroArquivoDataFinal"></label>
+                <label><span>Valor mínimo</span><input type="number" id="filtroArquivoValorMinimo" placeholder="R$ 0,00" min="0" step="0.01"></label>
+                <label><span>Valor máximo</span><input type="number" id="filtroArquivoValorMaximo" placeholder="R$ 0,00" min="0" step="0.01"></label>
+            </div>
+            <div class="arquivos-acoes" style="margin-top:14px;">
+                <button class="botao cadastro-btn-principal" id="btnBuscarArquivos" type="button">Buscar</button>
+                <button class="botao botao-claro" id="btnLimparArquivos" type="button">Limpar filtros</button>
+                <button class="botao btn-tabela-excluir" id="btnExcluirArquivosSelecionados" type="button" disabled>Excluir selecionados</button>
+            </div>
+        </section>
+        <section class="arquivos-card arquivos-lista">
+            <table class="arquivos-tabela">
+                <thead><tr><th><input type="checkbox" id="arquivosSelecionarTodos" aria-label="Selecionar todos os orçamentos"></th><th>Número</th><th>Cliente</th><th>Data</th><th>Status</th><th>Valor</th><th>Arquivo</th></tr></thead>
+                <tbody id="arquivosCorpo"><tr class="arquivos-linha-vazia"><td colspan="7" class="arquivos-vazio">Carregando orçamentos...</td></tr></tbody>
+            </table>
+        </section>
+        <section class="arquivos-card arquivos-preview" id="arquivosPreview" hidden aria-labelledby="arquivosPreviewTitulo">
+            <div class="arquivos-preview-topo">
+                <h2 id="arquivosPreviewTitulo">Preview do PDF</h2>
+                <div class="arquivos-preview-acoes">
+                    <a id="arquivosAbrirPdf" href="#" target="_blank" rel="noopener">Abrir PDF</a>
+                    <a id="arquivosBaixarPdf" href="#" download>Baixar PDF</a>
+                    <button id="arquivosFecharPreview" type="button">Fechar</button>
+                </div>
+            </div>
+            <object id="arquivosPdfObjeto" class="arquivos-pdf" type="application/pdf" title="Preview do PDF">
+                Seu navegador não conseguiu exibir o PDF. Use o botão Baixar PDF.
+            </object>
+        </section>
+        <dialog class="arquivos-modal" id="arquivosDetalhes" aria-labelledby="arquivosDetalhesTitulo">
+            <div class="arquivos-modal-topo"><h2 id="arquivosDetalhesTitulo">Detalhes do orçamento</h2><button class="arquivos-modal-fechar" id="arquivosDetalhesFechar" type="button" aria-label="Fechar detalhes">×</button></div>
+            <div class="arquivos-modal-conteudo" id="arquivosDetalhesConteudo"></div>
+        </dialog>
+    </div>
+</main>
+<footer><p>© 2026 RK Vidraçaria - Todos os direitos reservados.</p><p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p></footer>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=2.2.0"></script>
+<script src="../js/config.js?v=2.5.0"></script>
+<script src="../js/storage.js?v=2.5.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.1"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-model.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-validator.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-repository.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-service.js?v=1.0.0"></script>
+<script src="../js/documentos/document-model.js?v=7.2.1"></script>
+<script src="../js/documentos/document-builder.js?v=7.2.1"></script>
+<script src="../js/documentos/document-validator.js?v=4.4.0"></script>
+<script src="../js/documentos/document-renderer.js?v=4.4.0"></script>
+<script src="../js/documentos/document-html-renderer.js?v=7.2.1"></script>
+<script src="../js/export/export-model.js?v=5.3.0"></script>
+<script src="../js/export/export-validator.js?v=4.4.0"></script>
+<script src="../js/export/adapters/pdf-adapter.js?v=7.2.4"></script>
+<script src="../js/export/export-service.js?v=4.4.0"></script>
+<script src="../js/documentos/document-pdf-repository.js?v=6.0.4"></script>
+<script src="../js/documentos/document-archive-controller.js?v=6.0.4"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

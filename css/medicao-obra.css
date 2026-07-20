@@ -1,0 +1,55 @@
+.medicao-page { background: #f4f7f6; color: #17201f; }
+.medicao-main { min-height: calc(100vh - 180px); padding: 28px 0 48px; }
+.medicao-shell { max-width: 1120px; display: grid; gap: 18px; }
+.medicao-cabecalho, .medicao-painel { border: 1px solid #dce7e3; border-radius: 10px; background: #fff; box-shadow: 0 8px 24px rgba(17,24,39,.05); }
+.medicao-cabecalho { padding: 24px; background: linear-gradient(135deg,#fff,#eef8f5); }
+.medicao-cabecalho h1 { margin: 3px 0 6px; font-size: clamp(1.55rem,3vw,2.15rem); color: #13201d; }
+.medicao-cabecalho p, .medicao-painel-topo p { margin: 0; color: #5c6b67; }
+.medicao-label { color: #0f766e; font-size: .78rem; font-weight: 800; text-transform: uppercase; }
+.medicao-painel { padding: 20px; }
+.medicao-painel h2 { margin: 0 0 16px; font-size: 1.05rem; color: #25302e; }
+.medicao-painel-topo { display: flex; justify-content: space-between; gap: 16px; align-items: start; margin-bottom: 16px; }
+.medicao-painel-topo h2 { margin-bottom: 4px; }
+#modoEdicao { padding: 5px 9px; border-radius: 999px; background: #fff3cd; color: #765b00; font-size: .8rem; font-weight: 700; }
+.medicao-grid { display: grid; gap: 15px; }
+.medicao-grid--geral { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.medicao-grid--medida { grid-template-columns: minmax(110px,.5fr) minmax(160px,1fr) repeat(2,minmax(130px,.7fr)); }
+.medicao-grid label { display: grid; gap: 6px; min-width: 0; }
+.medicao-grid label > span { color: #394744; font-size: .84rem; font-weight: 700; }
+.medicao-grid input, .medicao-grid select, .medicao-grid textarea { width: 100%; min-height: 42px; border: 1px solid #cbd8d3; border-radius: 7px; background: #fff; color: #17201f; padding: 9px 11px; font: inherit; box-sizing: border-box; }
+.medicao-grid textarea { resize: vertical; }
+.medicao-grid input:focus, .medicao-grid select:focus, .medicao-grid textarea:focus { border-color: #0f766e; outline: 3px solid rgba(15,118,110,.14); }
+.medicao-campo-largo { grid-column: span 2; }
+.medicao-campo-total { grid-column: 1 / -1; }
+.medicao-acoes-form, .medicao-acoes-finais { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.medicao-acoes-form button, .medicao-acoes-finais button { min-height: 43px; border-radius: 7px; padding: 9px 16px; cursor: pointer; font: inherit; font-weight: 700; }
+.medicao-perigo { color: #a12626; border-color: #e3bcbc; }
+.medicao-aviso { display: none; border-radius: 8px; padding: 11px 14px; font-weight: 650; }
+.medicao-aviso.is-visible { display: block; }
+.medicao-aviso--erro { border: 1px solid #efb7b7; background: #fff0f0; color: #8b1f1f; }
+.medicao-aviso--sucesso { border: 1px solid #aad8c4; background: #edfaf4; color: #12603e; }
+.medicao-tabela-wrap { overflow-x: auto; }
+.medicao-tabela { width: 100%; border-collapse: collapse; min-width: 800px; }
+.medicao-tabela th, .medicao-tabela td { padding: 11px 10px; border-bottom: 1px solid #e5ece9; text-align: left; vertical-align: top; }
+.medicao-tabela th { background: #f4f8f7; color: #41504c; font-size: .78rem; text-transform: uppercase; }
+.medicao-tabela td { color: #293633; font-size: .9rem; overflow-wrap: anywhere; }
+.medicao-tabela-acoes { display: flex; gap: 6px; }
+.medicao-tabela-acoes button { border: 1px solid #bdd3cd; border-radius: 5px; background: #fff; color: #0f665f; padding: 5px 8px; cursor: pointer; }
+.medicao-vazio { text-align: center !important; color: #687773 !important; padding: 22px !important; }
+@media (max-width: 800px) {
+  .medicao-main { padding: 16px 0 32px; }
+  .medicao-grid--geral, .medicao-grid--medida { grid-template-columns: 1fr 1fr; }
+  .medicao-campo-largo { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .medicao-aviso.is-visible { position: fixed; left: 12px; right: 12px; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 1400; display: block; width: auto; max-width: none; margin: 0; box-shadow: 0 12px 32px rgba(15,23,42,.24); }
+  .medicao-shell { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+  .medicao-shell > *, .medicao-painel, .medicao-cabecalho { min-width: 0; max-width: 100%; }
+  .medicao-tabela-wrap { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+  .medicao-grid--geral, .medicao-grid--medida { grid-template-columns: 1fr; }
+  .medicao-campo-largo, .medicao-campo-total { grid-column: auto; }
+  .medicao-cabecalho, .medicao-painel { padding: 16px; }
+  .medicao-painel-topo { flex-direction: column; }
+  .medicao-acoes-form, .medicao-acoes-finais { display: grid; grid-template-columns: 1fr; }
+  .medicao-acoes-form button, .medicao-acoes-finais button { width: 100%; }
+}

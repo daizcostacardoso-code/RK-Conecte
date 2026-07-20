@@ -1,0 +1,29 @@
+.env
+node_modules/
+npm-debug.log*
+
+# Dependencias
+
+# Firebase local
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Variaveis e segredos
+.env.*
+!.env.example
+*service-account*.json
+*serviceAccount*.json
+
+# Backups e patches locais
+patchs/
+*.bak
+*.backup
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log

@@ -1,0 +1,49 @@
+.caixa-basico-page { background: #f3f7fb; }
+.caixa-basico-page header nav .rk-nav-principal a.login { position: static !important; inset: auto !important; }
+.caixa-basico-main { overflow-x: hidden; padding: 28px 0 44px; }
+.caixa-basico-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.caixa-basico-shell > * { min-width: 0; }
+.caixa-basico-cabecalho { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.caixa-basico-label { display: block; margin-bottom: 4px; color: #08757d; font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.caixa-basico-cabecalho h1 { margin: 0; color: #071d36; }
+.caixa-basico-cabecalho p { margin: 5px 0 0; color: #52677b; }
+.caixa-basico-resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.caixa-basico-resumo-card, .caixa-basico-painel { border: 1px solid #cbd9e6; border-radius: 16px; background: #fff; box-shadow: 0 12px 30px rgba(8, 61, 103, .08); }
+.caixa-basico-resumo-card { min-height: 112px; display: grid; align-content: center; gap: 7px; padding: 20px; border-left-width: 5px; }
+.caixa-basico-resumo-card span { color: #566b7e; font-weight: 800; }
+.caixa-basico-resumo-card strong { color: #102b45; font-size: clamp(24px, 3vw, 34px); line-height: 1.1; }
+.caixa-basico-resumo-card.entrada { border-left-color: #16875b; }
+.caixa-basico-resumo-card.entrada strong { color: #13734f; }
+.caixa-basico-resumo-card.saida { border-left-color: #c64747; }
+.caixa-basico-resumo-card.saida strong { color: #a72f2f; }
+.caixa-basico-resumo-card.saldo { border-left-color: #126bff; }
+.caixa-basico-resumo-card.saldo.negativo strong { color: #a72f2f; }
+.caixa-basico-painel { padding: 20px; }
+.caixa-basico-painel-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+.caixa-basico-painel-topo h2 { margin: 0; color: #102b45; }
+.caixa-basico-painel-topo p { margin: 4px 0 0; color: #607487; }
+.caixa-basico-form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.caixa-basico-campo { display: grid; align-content: start; gap: 7px; }
+.caixa-basico-campo-largo { grid-column: span 2; }
+.caixa-basico-campo span, .caixa-basico-filtros span { color: #253e56; font-weight: 800; }
+.caixa-basico-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.caixa-basico-aviso { display: none; border-radius: 10px; padding: 12px 15px; font-weight: 800; }
+.caixa-basico-aviso.visivel { display: block; background: #e7f7ef; color: #146341; }
+.caixa-basico-aviso.erro { display: block; background: #fff0f0; color: #9d2929; }
+.caixa-basico-painel-topo-lista { align-items: flex-end; }
+.caixa-basico-filtros { display: grid; grid-template-columns: 150px minmax(220px, 320px); gap: 10px; }
+.caixa-basico-filtros label { display: grid; gap: 6px; }
+.caixa-basico-tabela-wrap { overflow-x: auto; border: 1px solid #d8e3ed; border-radius: 12px; }
+.caixa-basico-tabela { width: 100%; border-collapse: collapse; }
+.caixa-basico-tabela th { background: #eaf4fc; color: #173b5c; text-align: left; white-space: nowrap; }
+.caixa-basico-tabela td { border-top: 1px solid #e3ebf2; color: #24394d; }
+.caixa-basico-tabela td:nth-child(5) { font-weight: 900; white-space: nowrap; }
+.caixa-basico-tipo { display: inline-flex; border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 900; }
+.caixa-basico-tipo.entrada { background: #e5f7ee; color: #126842; }
+.caixa-basico-tipo.saida { background: #ffeaea; color: #9f2e2e; }
+.caixa-basico-valor.entrada { color: #126842; }
+.caixa-basico-valor.saida { color: #9f2e2e; }
+.caixa-basico-excluir { min-height: 38px !important; border: 1px solid #e3aaaa; border-radius: 8px; background: #fff4f4; color: #922b2b; font-weight: 800; padding: 8px 11px !important; cursor: pointer; }
+.caixa-basico-vazio { padding: 28px !important; color: #607487 !important; text-align: center; }
+@media (max-width: 900px) { .caixa-basico-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .caixa-basico-painel-topo-lista { align-items: stretch; flex-direction: column; } .caixa-basico-filtros { width: 100%; grid-template-columns: 1fr 2fr; } }
+@media (max-width: 650px) { .caixa-basico-main { padding-top: 18px; } .caixa-basico-resumo, .caixa-basico-form-grid, .caixa-basico-filtros { grid-template-columns: minmax(0, 1fr); } .caixa-basico-campo-largo { grid-column: auto; } .caixa-basico-painel { padding: 15px; } .caixa-basico-resumo-card { min-height: 92px; padding: 16px; } .caixa-basico-acoes > * { width: 100%; } .caixa-basico-tabela { min-width: 680px; } }

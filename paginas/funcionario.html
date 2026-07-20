@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="../js/shared/rk-auth.js?v=5.3.4" data-rk-auth="protected"></script>
+    <title>Painel RK Vidraçaria</title>
+    <link rel="stylesheet" href="../css/style.css?v=5.9.2">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+
+    <meta name="theme-color" content="#083d67">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="marca-header marca-header-compacta">
+                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+                <div>
+                    <strong>RK Vidraçaria</strong>
+                    <small>Sistema interno</small>
+                </div>
+            </div>
+            <div class="usuario-topo">
+                <div class="usuario-foto" id="fotoUsuarioTopo">RK</div>
+                <div>
+                    <strong id="nomeUsuarioTopo">Funcionário RK</strong>
+                    <small id="loginUsuarioTopo">admin</small>
+                </div>
+                <button type="button" class="btn-pequeno btn-cinza" onclick="Funcionario.sair()">Sair</button>
+            </div>
+    </div>
+</header>
+
+<section class="painel painel-dashboard">
+    <div class="container">
+
+        <div class="dashboard-topo">
+            <div>
+                <h2>Dashboard</h2>
+                <p>Acompanhe os orçamentos e solicitações recebidas pelo site.</p>
+            </div>
+
+            <div class="dashboard-acoes">
+                <a href="novo-orcamento.html" id="btnNovoOrcamentoPainel" class="botao">+ Novo Orçamento</a>
+                <a href="nota-servico.html" class="botao botao-claro">Emitir Nota de Serviço</a>
+                <a href="valores.html" class="botao botao-claro">⚙ Valores</a>
+            </div>
+        </div>
+
+        <nav class="abas-painel" aria-label="Navegação do painel">
+            <button type="button" class="aba-ativa" data-aba="dashboard">Dashboard</button>
+            <button type="button" data-aba="caixa">Caixa</button>
+            <button type="button" data-aba="solicitacoes" id="abaSolicitacoesBotao" class="aba-com-alerta">Solicitações <span id="alertaSolicitacoes" class="badge-solicitacoes oculto">!</span></button>
+            <button type="button" data-aba="ferramentas">Ferramentas</button>
+            <button type="button" data-aba="configuracoes">Configurações</button>
+        </nav>
+
+        <div class="dashboard-cards secao-aba" data-secao="dashboard">
+            <div class="dashboard-card">
+                <span>Orçamentos feitos</span>
+                <strong id="qtdOrcamentosFeitos">0</strong>
+                <small>PDFs/orçamentos gerados</small>
+            </div>
+
+            <div class="dashboard-card">
+                <span>Solicitações no site</span>
+                <strong id="qtdSolicitacoesSite">0</strong>
+                <small>Pedidos enviados pelo contato</small>
+            </div>
+
+            <div class="dashboard-card">
+                <span>Em andamento</span>
+                <strong id="qtdEmAndamento">0</strong>
+                <small>Orçamento atual salvo</small>
+            </div>
+
+            <div class="dashboard-card destaque">
+                <span>Total atual</span>
+                <strong id="valorOrcamentoAtual">R$ 0,00</strong>
+                <small>Soma do orçamento aberto</small>
+            </div>
+
+            <div class="dashboard-card caixa-card lucro">
+                <span>Lucro estimado</span>
+                <strong id="caixaLucroEstimado">R$ 0,00</strong>
+                <small>Entradas - gastos</small>
+            </div>
+        </div>
+
+        <div class="dashboard-box caixa-empresa-box secao-aba" data-secao="caixa">
+            <div class="box-cabecalho caixa-cabecalho">
+                <div>
+                    <h3>Caixa da empresa</h3>
+                    <p>Registre entradas, pagamentos de funcionários, despesas e investimentos para acompanhar o resultado.</p>
+                </div>
+                <button type="button" id="btnLimparCaixa" class="btn-pequeno btn-cinza">Cancelar todos</button>
+            </div>
+
+            <div class="caixa-resumo-grid">
+                <div class="caixa-resumo-card entrada">
+                    <span>Entradas</span>
+                    <strong id="caixaTotalEntradas">R$ 0,00</strong>
+                </div>
+                <div class="caixa-resumo-card saida">
+                    <span>Gastos</span>
+                    <strong id="caixaTotalSaidas">R$ 0,00</strong>
+                </div>
+                <div class="caixa-resumo-card lucro">
+                    <span>Lucro/Saldo</span>
+                    <strong id="caixaSaldo">R$ 0,00</strong>
+                </div>
+                <div class="caixa-resumo-card funcionarios">
+                    <span>Funcionários</span>
+                    <strong id="caixaFuncionarios">R$ 0,00</strong>
+                </div>
+            </div>
+
+            <form id="formCaixa" class="form-caixa">
+                <div class="campo campo-duplo">
+                    <label for="caixaDescricao">Descrição</label>
+                    <input type="text" id="caixaDescricao" placeholder="Ex: Entrada orçamento João, salário, combustível" required>
+                </div>
+
+                <div class="campo">
+                    <label for="caixaCategoria">Categoria</label>
+                    <select id="caixaCategoria" required>
+                        <option value="entrada">Entrada / Recebimento</option>
+                        <option value="funcionario">Funcionário</option>
+                        <option value="despesa">Despesa da empresa</option>
+                        <option value="material">Compra de material</option>
+                        <option value="outro">Outro gasto</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="caixaValor">Valor</label>
+                    <input type="text" id="caixaValor" placeholder="0,00" inputmode="decimal" required>
+                </div>
+
+                <div class="campo">
+                    <label for="caixaData">Data</label>
+                    <input type="date" id="caixaData" required>
+                </div>
+
+                <div class="campo">
+                    <label for="caixaFormaPagamento">Forma de pagamento</label>
+                    <select id="caixaFormaPagamento">
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão de crédito">Cartão de crédito</option>
+                        <option value="Cartão de débito">Cartão de débito</option>
+                        <option value="Boleto">Boleto</option>
+                        <option value="Transferência">Transferência</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="caixaOrigem">Origem</label>
+                    <select id="caixaOrigem">
+                        <option value="Manual">Manual</option>
+                        <option value="Orçamento">Orçamento</option>
+                        <option value="Serviço">Serviço</option>
+                        <option value="Produto">Produto</option>
+                        <option value="Ajuste">Ajuste</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="caixaResponsavel">Responsável</label>
+                    <input type="text" id="caixaResponsavel" placeholder="Nome de quem lançou">
+                </div>
+
+                <div class="campo">
+                    <label for="caixaStatus">Status</label>
+                    <select id="caixaStatus">
+                        <option value="confirmado">Confirmado</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+
+                <div class="campo campo-cheio">
+                    <label for="caixaObservacao">Observação</label>
+                    <textarea id="caixaObservacao" rows="3" placeholder="Detalhes do pagamento, compra, funcionário ou ajuste"></textarea>
+                </div>
+
+                <button type="submit" class="botao">Registrar valor</button>
+                <small id="caixaMensagem" class="mensagem-caixa"></small>
+            </form>
+
+            <div class="caixa-filtros">
+                <div class="campo">
+                    <label for="filtroCaixaDataInicial">Data inicial</label>
+                    <input type="date" id="filtroCaixaDataInicial">
+                </div>
+                <div class="campo">
+                    <label for="filtroCaixaDataFinal">Data final</label>
+                    <input type="date" id="filtroCaixaDataFinal">
+                </div>
+                <div class="campo">
+                    <label for="filtroCaixaCategoria">Categoria</label>
+                    <select id="filtroCaixaCategoria">
+                        <option value="">Todas</option>
+                        <option value="entrada">Entrada / Recebimento</option>
+                        <option value="funcionario">Funcionário</option>
+                        <option value="despesa">Despesa da empresa</option>
+                        <option value="material">Compra de material</option>
+                        <option value="outro">Outro gasto</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="filtroCaixaTipo">Tipo</label>
+                    <select id="filtroCaixaTipo">
+                        <option value="">Todos</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="filtroCaixaStatus">Status</label>
+                    <select id="filtroCaixaStatus">
+                        <option value="">Todos</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="filtroCaixaFormaPagamento">Forma de pagamento</label>
+                    <select id="filtroCaixaFormaPagamento">
+                        <option value="">Todas</option>
+                        <option value="Não informado">Não informado</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão de crédito">Cartão de crédito</option>
+                        <option value="Cartão de débito">Cartão de débito</option>
+                        <option value="Boleto">Boleto</option>
+                        <option value="Transferência">Transferência</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="filtroCaixaOrigem">Origem</label>
+                    <select id="filtroCaixaOrigem">
+                        <option value="">Todas</option>
+                        <option value="Manual">Manual</option>
+                        <option value="Orçamento">Orçamento</option>
+                        <option value="Serviço">Serviço</option>
+                        <option value="Produto">Produto</option>
+                        <option value="Ajuste">Ajuste</option>
+                    </select>
+                </div>
+                <button type="button" id="btnLimparFiltrosCaixa" class="btn-pequeno btn-cinza">Limpar filtros</button>
+            </div>
+
+            <div class="caixa-relatorios">
+                <div class="box-cabecalho mini">
+                    <h4>Resumo para relatórios</h4>
+                    <div class="caixa-exportacoes">
+                        <button type="button" id="btnExportarCaixaCsv" class="btn-pequeno">Exportar CSV</button>
+                        <button type="button" id="btnExportarCaixaJson" class="btn-pequeno btn-cinza">Exportar JSON</button>
+                    </div>
+                </div>
+                <div class="caixa-relatorios-grid">
+                    <div class="caixa-relatorio-card">
+                        <span>Total por categoria</span>
+                        <div id="relatorioTotalCategoria" class="caixa-relatorio-lista"></div>
+                    </div>
+                    <div class="caixa-relatorio-card">
+                        <span>Total por forma de pagamento</span>
+                        <div id="relatorioTotalFormaPagamento" class="caixa-relatorio-lista"></div>
+                    </div>
+                    <div class="caixa-relatorio-card">
+                        <span>Total por origem</span>
+                        <div id="relatorioTotalOrigem" class="caixa-relatorio-lista"></div>
+                    </div>
+                    <div class="caixa-relatorio-card destaque">
+                        <span>Total do mês atual</span>
+                        <strong id="relatorioTotalMesAtual">R$ 0,00</strong>
+                        <span>Saldo confirmado</span>
+                        <strong id="relatorioSaldoConfirmado">R$ 0,00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="caixa-lista-wrap">
+                <div class="box-cabecalho mini">
+                    <h4>Últimos lançamentos</h4>
+                    <small id="caixaQuantidadeLancamentos">0 registros</small>
+                </div>
+                <div id="listaCaixa" class="lista-caixa"></div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid secao-aba" data-secao="solicitacoes">
+            <div class="dashboard-box">
+                <div class="box-cabecalho">
+                    <h3>Solicitações recebidas pelo site</h3>
+                    <button type="button" id="btnLimparSolicitacoes" class="btn-pequeno btn-cinza">Limpar</button>
+                </div>
+
+                <div id="listaSolicitacoes" class="lista-solicitacoes"></div>
+            </div>
+
+            <div class="dashboard-box">
+                <h3>Orçamento em andamento</h3>
+                <div id="orcamentoAtualResumo" class="orcamento-atual-resumo"></div>
+
+                <div class="atalhos-dashboard">
+                    <a href="novo-orcamento.html" class="botao">Continuar Orçamento</a>
+                    <a href="contato.html" class="botao botao-claro">Ver página de contato</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-box ferramentas-box secao-aba" data-secao="ferramentas">
+            <div class="box-cabecalho">
+                <div>
+                    <h3>Ferramentas rápidas</h3>
+                    <p>Calculadora, anotações e lembretes para apoiar o dia a dia da vidraçaria.</p>
+                </div>
+            </div>
+
+            <div class="ferramentas-grid">
+                <div class="ferramenta-card calculadora-card">
+                    <h4>Calculadora</h4>
+                    <input type="text" id="calcDisplay" readonly value="0" class="calc-display">
+                    <div class="calc-grid">
+                        <button type="button" onclick="Funcionario.calcLimpar()">C</button>
+                        <button type="button" onclick="Funcionario.calcApagar()">⌫</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('/')">÷</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('*')">×</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('7')">7</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('8')">8</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('9')">9</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('-')">−</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('4')">4</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('5')">5</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('6')">6</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('+')">+</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('1')">1</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('2')">2</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('3')">3</button>
+                        <button type="button" class="calc-igual" onclick="Funcionario.calcResultado()">=</button>
+                        <button type="button" class="calc-zero" onclick="Funcionario.calcAdicionar('0')">0</button>
+                        <button type="button" onclick="Funcionario.calcAdicionar('.')">,</button>
+                    </div>
+                </div>
+
+                <div class="ferramenta-card anotacoes-card">
+                    <div class="box-cabecalho mini">
+                        <h4>Anotações e lembretes</h4>
+                        <button type="button" class="btn-pequeno btn-cinza" onclick="Funcionario.limparAnotacoes()">Limpar</button>
+                    </div>
+                    <label for="anotacoesFuncionario">Anotações do dia</label>
+                    <textarea id="anotacoesFuncionario" rows="8" placeholder="Ex: comprar silicone, retornar cliente, conferir medida..."></textarea>
+
+                    <form id="formLembrete" class="form-lembrete">
+                        <div class="campo">
+                            <label for="lembreteTexto">Novo lembrete</label>
+                            <input type="text" id="lembreteTexto" placeholder="Ex: ligar para cliente às 15h">
+                        </div>
+                        <div class="campo">
+                            <label for="lembreteData">Data</label>
+                            <input type="datetime-local" id="lembreteData">
+                        </div>
+                        <button type="submit" class="botao">Adicionar lembrete</button>
+                    </form>
+                    <div id="listaLembretes" class="lista-lembretes"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-box configuracoes-box secao-aba" data-secao="configuracoes">
+            <div class="box-cabecalho">
+                <div>
+                    <h3>Configurações do sistema</h3>
+                    <p>Personalize usuário, login, senha, foto, dados da empresa e valores usados no orçamento.</p>
+                </div>
+                <a href="valores.html" class="botao botao-claro">Abrir valores detalhados</a>
+            </div>
+
+            <form id="formConfiguracoesSistema" class="form-configuracoes">
+                <div class="config-card usuario-config-card">
+                    <h4>Usuário do painel</h4>
+                    <div class="perfil-config-preview">
+                        <div class="usuario-foto grande" id="fotoUsuarioPreview">RK</div>
+                        <div>
+                            <strong id="nomeUsuarioPreview">Funcionário RK</strong>
+                            <small>Foto pode ser URL ou imagem em base64 local</small>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="campo"><label for="cfgNomeUsuario">Nome do usuário</label><input type="text" id="cfgNomeUsuario" placeholder="Ex: Caio"></div>
+                        <div class="campo"><label for="cfgUsuario">Login</label><input type="text" id="cfgUsuario" placeholder="admin"></div>
+                        <div class="campo"><label for="cfgSenha">Senha</label><input type="password" id="cfgSenha" placeholder="1234"></div>
+                        <div class="campo"><label for="cfgFotoUsuario">Foto do usuário</label><input type="file" id="cfgFotoUsuario" accept="image/*"></div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>Dados da empresa</h4>
+                    <div class="grid-2">
+                        <div class="campo"><label for="cfgNomeEmpresa">Nome da empresa</label><input type="text" id="cfgNomeEmpresa"></div>
+                        <div class="campo"><label for="cfgTelefoneEmpresa">Telefone</label><input type="text" id="cfgTelefoneEmpresa"></div>
+                        <div class="campo campo-cheio"><label for="cfgEnderecoEmpresa">Endereço</label><input type="text" id="cfgEnderecoEmpresa"></div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>Valores rápidos</h4>
+                    <p class="texto-ajuda">Use aqui para ajustes rápidos. A tela Valores continua disponível para configuração completa.</p>
+                    <div class="grid-3">
+                        <div class="campo"><label for="cfgAluminioMetro">Alumínio por metro reto</label><input type="text" id="cfgAluminioMetro" inputmode="decimal" placeholder="Ex: 100,00"></div>
+                        <div class="campo"><label for="cfgAcessorioPadrao">Acessórios padrão</label><input type="text" id="cfgAcessorioPadrao" inputmode="decimal" placeholder="Ex: 0,00"></div>
+                        <div class="campo"><label for="cfgMargemSeguranca">Margem extra %</label><input type="text" id="cfgMargemSeguranca" inputmode="decimal" placeholder="Ex: 0"></div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>Lembretes na tela</h4>
+                    <p class="texto-ajuda">Escolha de quanto em quanto tempo o sistema deve mostrar lembretes pendentes no painel.</p>
+                    <div class="grid-3">
+                        <div class="campo">
+                            <label for="cfgLembreteIntervalo">Mostrar a cada</label>
+                            <select id="cfgLembreteIntervalo">
+                                <option value="0">Não mostrar automaticamente</option>
+                                <option value="1">1 minuto</option>
+                                <option value="5">5 minutos</option>
+                                <option value="10">10 minutos</option>
+                                <option value="15">15 minutos</option>
+                                <option value="30">30 minutos</option>
+                                <option value="60">1 hora</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="cfgLembreteQuantidade">Quantidade por aviso</label>
+                            <select id="cfgLembreteQuantidade">
+                                <option value="1">1 lembrete</option>
+                                <option value="3">Até 3 lembretes</option>
+                                <option value="5">Até 5 lembretes</option>
+                            </select>
+                        </div>
+                        <div class="campo campo-botao-teste">
+                            <label>Teste rápido</label>
+                            <button type="button" class="botao botao-claro" onclick="Funcionario.mostrarLembretesPendentes(true)">Mostrar agora</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acoes-config">
+                    <button type="submit" class="botao">Salvar configurações</button>
+                    <button type="button" id="btnResetarConfig" class="botao botao-claro">Restaurar padrão</button>
+                    <small id="mensagemConfig" class="mensagem-caixa"></small>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</section>
+
+<div id="lembreteToast" class="lembrete-toast" aria-live="polite"></div>
+
+<footer class="rodape-sistema-discreto">
+    <div class="rodape-status">
+        <span id="temperaturaAtual">Temperatura: carregando...</span>
+        <span class="rodape-separador">•</span>
+    </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=2.6.0"></script>
+<script src="../js/config.js?v=2.6.0"></script>
+<script src="../js/storage.js?v=2.6.0"></script>
+<script src="../js/util.js?v=2.6.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.1"></script>
+<script src="../js/caixa/caixa-model.js?v=2.1.0"></script>
+<script src="../js/caixa/caixa-validator.js?v=2.1.0"></script>
+<script src="../js/caixa/caixa-repository.js?v=2.1.1"></script>
+<script src="../js/caixa/caixa-export.js?v=2.1.0"></script>
+<script src="../js/caixa/caixa-service.js?v=2.1.0"></script>
+<script src="../js/funcionario.js?v=5.7.0"></script>
+
+    <script src="../js/app-install.js?v=3.2.0"></script>
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

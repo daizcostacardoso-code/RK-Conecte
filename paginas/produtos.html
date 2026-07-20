@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<script data-rk-auth="protected" src="../js/shared/rk-auth.js?v=5.3.4"></script>
+<title>Produtos - RK Vidraçaria</title>
+<link href="../css/style.css?v=5.9.2" rel="stylesheet"/>
+<script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+<meta content="#083d67" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="RK Vidraçaria" name="apple-mobile-web-app-title"/>
+<link href="../manifest.webmanifest" rel="manifest"/>
+<link href="../imagens/icons/icon-192.png" rel="apple-touch-icon"/>
+
+<style>
+/* Ajustes locais da tela de Produtos */
+.produtos-admin-page .cadastro-modulo > .container {
+    display: block;
+}
+.produtos-admin-page .cadastro-abas {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1px solid rgba(8, 61, 103, 0.14);
+    border-radius: 14px;
+    background: #fff;
+}
+.produtos-admin-page .cadastro-abas button {
+    width: auto;
+}
+.produtos-admin-page .cadastro-aba-painel {
+    width: 100%;
+}
+.produtos-admin-page .cadastro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 0.95fr);
+    gap: 14px;
+    align-items: stretch;
+}
+.produtos-admin-page .cadastro-lista-painel,
+.produtos-admin-page .cadastro-form-painel {
+    min-width: 0;
+}
+.produtos-admin-page .cadastro-form-painel .cadastro-painel-topo {
+    align-items: flex-start;
+    gap: 12px;
+}
+@media (max-width: 900px) {
+    .produtos-admin-page .cadastro-grid {
+        grid-template-columns: 1fr;
+    }
+    .produtos-admin-page .cadastro-form-painel .cadastro-painel-topo {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+<body class="produtos-page cadastro-page produtos-admin-page">
+<header>
+<div class="container">
+<div class="marca-header marca-header-compacta">
+<img alt="Logo RK Vidraçaria" src="../imagens/logo.jpeg"/>
+<div>
+<strong>RK Vidraçaria</strong>
+<small>Centro Comercial</small>
+</div>
+</div>
+<nav>
+<ul>
+<li><a href="../index.html">Início</a></li>
+<li><a href="clientes.html">Clientes</a></li>
+<li><a href="orcamento-inteligente.html">Orçamento Inteligente</a></li>
+<li><a class="login" href="login.html">Login</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main class="cadastro-modulo">
+<div class="container">
+<nav aria-label="Cadastros comerciais" class="cadastro-abas" role="tablist">
+<button aria-controls="abaProdutos" aria-selected="true" class="cadastro-aba-ativa" data-cadastro-aba="produtos" id="abaBotaoProdutos" role="tab" type="button">Produtos</button>
+<button aria-controls="abaItens" aria-selected="false" data-cadastro-aba="itens" id="abaBotaoItens" role="tab" type="button">Itens</button>
+<button aria-controls="abaTamanhos" aria-selected="false" data-cadastro-aba="tamanhos" id="abaBotaoTamanhos" role="tab" type="button">Tamanhos</button>
+<button aria-controls="abaDependencias" aria-selected="false" data-cadastro-aba="dependencias" id="abaBotaoDependencias" role="tab" type="button">Dependências</button>
+</nav>
+
+<section aria-labelledby="abaBotaoProdutos" class="cadastro-aba-painel cadastro-aba-painel-ativa" data-cadastro-painel="produtos" id="abaProdutos" role="tabpanel">
+<section aria-label="Filtros de produtos" class="cadastro-filtros cadastro-filtros-duas">
+<label>
+<span>Pesquisar</span>
+<input id="buscaProduto" placeholder="Descrição do produto" type="search"/>
+</label>
+<label>
+<span>Status</span>
+<select id="filtroProdutoStatus">
+<option value="">Todos</option>
+<option value="ativo">Ativos</option>
+<option value="inativo">Inativos</option>
+</select>
+</label>
+</section>
+<div aria-live="polite" class="cadastro-aviso" id="produtosAviso"></div>
+<section class="cadastro-grid">
+<div class="cadastro-painel cadastro-lista-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2>Lista de produtos</h2>
+<p id="produtosResumo">0 produtos cadastrados</p>
+</div>
+</div>
+<div class="cadastro-tabela-wrap">
+<table class="cadastro-tabela">
+<thead>
+<tr>
+<th>ID</th>
+<th>Unidade</th>
+<th>Descrição</th>
+<th>Custo</th>
+<th>Venda</th>
+<th>Status</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="produtosTabelaCorpo">
+<tr><td class="cadastro-estado-vazio" colspan="7">Nenhum produto cadastrado.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<aside class="cadastro-painel cadastro-form-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2 id="produtoFormTitulo">Cadastro de produto</h2>
+<p>Produto é o material, insumo, acessório ou serviço usado nos itens.</p>
+</div>
+</div>
+<form class="cadastro-form" id="formProduto" novalidate="">
+<input id="produtoId" name="produto_id" type="hidden"/>
+<label class="cadastro-campo">
+<span>Categoria</span>
+<select id="produtoCategoriaId" name="categoria_id" required="">
+<option value="">Selecione</option>
+</select>
+</label>
+<label class="cadastro-campo">
+<span>Unidade de medida</span>
+<select id="produtoUnidadeId" name="unidade_id" required="">
+<option value="">Selecione</option>
+</select>
+</label>
+<label class="cadastro-campo cadastro-campo-cheio">
+<span>Descrição</span>
+<input id="produtoDescricao" maxlength="200" name="descricao" required="" type="text"/>
+</label>
+<label class="cadastro-campo">
+<span>Valor de custo</span>
+<input id="produtoValorCusto" inputmode="decimal" min="0" name="valor_custo" required="" step="0.01" type="number"/>
+</label>
+<label class="cadastro-campo">
+<span>Valor de venda</span>
+<input id="produtoValorVenda" inputmode="decimal" min="0" name="valor_venda" required="" step="0.01" type="number"/>
+</label>
+<label class="cadastro-campo">
+<span>Status</span>
+<select id="produtoAtivo" name="ativo">
+<option value="true">Ativo</option>
+<option value="false">Inativo</option>
+</select>
+</label>
+<div class="cadastro-form-acoes cadastro-campo-cheio">
+<button class="botao cadastro-btn-principal" type="submit">Salvar produto</button>
+<button class="botao botao-claro" type="reset">Limpar</button>
+</div>
+</form>
+</aside>
+</section>
+</section>
+<section aria-labelledby="abaBotaoItens" class="cadastro-aba-painel" data-cadastro-painel="itens" hidden="" id="abaItens" role="tabpanel">
+<div aria-live="polite" class="cadastro-aviso" id="itensAviso"></div>
+<section class="cadastro-grid">
+<div class="cadastro-painel cadastro-lista-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2>Lista de itens</h2>
+<p id="itensResumo">0 itens cadastrados</p>
+</div>
+</div>
+<div class="cadastro-tabela-wrap">
+<table class="cadastro-tabela">
+<thead>
+<tr>
+<th>ID</th>
+<th>Categoria</th>
+<th>Descrição</th>
+<th>Status</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="itensTabelaCorpo">
+<tr><td class="cadastro-estado-vazio" colspan="5">Nenhum item cadastrado.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<aside class="cadastro-painel cadastro-form-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2 id="itemFormTitulo">Cadastro de item</h2>
+<p>Item é o conjunto que será montado com produtos dependentes, como Box frontal 8mm.</p>
+</div>
+</div>
+<form class="cadastro-form" id="formItem" novalidate="">
+<input id="itemId" name="item_id" type="hidden"/>
+<label class="cadastro-campo">
+<span>Categoria do item</span>
+<select id="itemCategoriaId" name="categoria_item_id" required="">
+<option value="">Selecione</option>
+</select>
+</label>
+<label class="cadastro-campo cadastro-campo-cheio">
+<span>Descrição</span>
+<input id="itemDescricao" maxlength="200" name="descricao" required="" type="text"/>
+</label>
+<label class="cadastro-campo">
+<span>Status</span>
+<select id="itemAtivo" name="ativo">
+<option value="true">Ativo</option>
+<option value="false">Inativo</option>
+</select>
+</label>
+<div class="cadastro-form-acoes cadastro-campo-cheio">
+<button class="botao cadastro-btn-principal" type="submit">Salvar item</button>
+<button class="botao botao-claro" type="reset">Limpar</button>
+</div>
+</form>
+</aside>
+</section>
+</section>
+<section aria-labelledby="abaBotaoTamanhos" class="cadastro-aba-painel" data-cadastro-painel="tamanhos" hidden="" id="abaTamanhos" role="tabpanel">
+<div aria-live="polite" class="cadastro-aviso" id="tamanhosAviso"></div>
+<section class="cadastro-grid">
+<div class="cadastro-painel cadastro-lista-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2>Lista de tamanhos</h2>
+<p id="tamanhosResumo">0 tamanhos cadastrados</p>
+</div>
+</div>
+<div class="cadastro-tabela-wrap">
+<table class="cadastro-tabela">
+<thead>
+<tr>
+<th>ID</th>
+<th>Item</th>
+<th>Descricao</th>
+<th>Altura</th>
+<th>Largura</th>
+<th>Status</th>
+<th>Acoes</th>
+</tr>
+</thead>
+<tbody id="tamanhosTabelaCorpo">
+<tr><td class="cadastro-estado-vazio" colspan="7">Nenhum tamanho padrao cadastrado.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<aside class="cadastro-painel cadastro-form-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2 id="tamanhoFormTitulo">Cadastro de tamanho padrao</h2>
+<p>Tamanho padrao deve ser vinculado a um item ja cadastrado e ativo.</p>
+</div>
+</div>
+<form class="cadastro-form" id="formTamanho" novalidate="">
+<input id="tamanhoId" name="tamanho_id" type="hidden"/>
+<label class="cadastro-campo">
+<span>Item</span>
+<select id="tamanhoItemId" name="item_id" required="">
+<option value="">Selecione</option>
+</select>
+</label>
+<label class="cadastro-campo cadastro-campo-cheio">
+<span>Descricao</span>
+<input id="tamanhoDescricao" maxlength="100" name="descricao" required="" type="text"/>
+</label>
+<label class="cadastro-campo">
+<span>Altura (cm)</span>
+<input id="tamanhoAltura" inputmode="decimal" min="0" name="altura" required="" step="0.01" type="number"/>
+</label>
+<label class="cadastro-campo">
+<span>Largura (cm)</span>
+<input id="tamanhoLargura" inputmode="decimal" min="0" name="largura" required="" step="0.01" type="number"/>
+</label>
+<label class="cadastro-campo">
+<span>Status</span>
+<select id="tamanhoAtivo" name="ativo">
+<option value="true">Ativo</option>
+<option value="false">Inativo</option>
+</select>
+</label>
+<div class="cadastro-form-acoes cadastro-campo-cheio">
+<button class="botao cadastro-btn-principal" type="submit">Salvar tamanho</button>
+<button class="botao botao-claro" type="reset">Limpar</button>
+</div>
+</form>
+</aside>
+</section>
+</section>
+<section aria-labelledby="abaBotaoDependencias" class="cadastro-aba-painel" data-cadastro-painel="dependencias" hidden="" id="abaDependencias" role="tabpanel">
+<div aria-live="polite" class="cadastro-aviso" id="dependenciasAviso"></div>
+<section class="cadastro-grid">
+<div class="cadastro-painel cadastro-lista-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2>Lista de dependências</h2>
+<p id="dependenciasResumo">0 dependências cadastradas</p>
+</div>
+</div>
+<div class="cadastro-tabela-wrap">
+<table class="cadastro-tabela">
+<thead>
+<tr>
+<th>ID</th>
+<th>Item</th>
+<th>Produto</th>
+<th>Quantidade</th>
+<th>Obrigatório</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="dependenciasTabelaCorpo">
+<tr><td class="cadastro-estado-vazio" colspan="6">Nenhuma dependência cadastrada.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<aside class="cadastro-painel cadastro-form-painel">
+<div class="cadastro-painel-topo">
+<div>
+<h2 id="dependenciaFormTitulo">Cadastro de dependência</h2>
+<p>Dependência deve usar apenas itens e produtos já cadastrados e ativos.</p>
+</div>
+</div>
+<form class="cadastro-form" id="formDependencia" novalidate="">
+<input id="dependenciaId" name="dependencia_id" type="hidden"/>
+<label class="cadastro-campo">
+<span>Item</span>
+<select id="dependenciaItemId" name="item_id" required="">
+<option value="">Selecione</option>
+</select>
+</label>
+<label class="cadastro-campo">
+<span>Produto</span>
+<select id="dependenciaProdutoId" name="produto_id" required="">
+<option value="">Selecione</option>
+</select>
+</label>
+<label class="cadastro-campo">
+<span>Quantidade</span>
+<input id="dependenciaQuantidade" inputmode="decimal" min="0" name="quantidade" required="" step="0.001" type="number" value="1"/>
+</label>
+<label class="cadastro-campo">
+<span>Obrigatório</span>
+<select id="dependenciaObrigatorio" name="obrigatorio">
+<option value="true">Sim</option>
+<option value="false">Não</option>
+</select>
+</label>
+<label class="cadastro-campo cadastro-campo-cheio">
+<span>Observação</span>
+<input id="dependenciaObservacao" maxlength="255" name="observacao" type="text"/>
+</label>
+<div class="cadastro-form-acoes cadastro-campo-cheio">
+<button class="botao cadastro-btn-principal" type="submit">Salvar dependência</button>
+<button class="botao botao-claro" type="reset">Limpar</button>
+</div>
+</form>
+</aside>
+</section>
+</section>
+</div>
+</main>
+<footer>
+<p>© 2026 RK Vidraçaria - Todos os direitos reservados.</p>
+<p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p>
+</footer>
+<script src="../js/config.js?v=5.4.0"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-config.js?v=3.0.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.1"></script>
+<script src="../js/util.js?v=5.4.0"></script>
+<script src="../js/core/event-types.js?v=5.1A"></script>
+<script src="../js/core/event-bus.js?v=5.1A"></script>
+<script src="../js/core/app-state-events.js?v=5.1A"></script>
+<script src="../js/core/app-state.js?v=5.1A"></script>
+<script src="../js/core/app-state-service.js?v=5.1A"></script>
+<script src="../js/produtos/produto-model.js?v=5.6.0"></script>
+<script src="../js/produtos/produto-validator.js?v=5.6.1"></script>
+<script src="../js/produtos/produto-factory.js?v=5.6.0"></script>
+<script src="../js/produtos/produto-repository.js?v=6.1.0"></script>
+<script src="../js/produtos/produto-service.js?v=5.6.2"></script>
+<script src="../js/usecases/produtos/criar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/buscar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/listar-produtos-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/atualizar-produto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/produtos/excluir-produto-usecase.js?v=5.4.1"></script>
+<script src="../js/produtos/produto-ui.js?v=5.6.3"></script>
+<script src="../js/produtos/produto-controller.js?v=5.6.3"></script>
+<script src="../js/itens/item-repository.js?v=6.1.0"></script>
+<script src="../js/itens/item-service.js?v=5.6.4"></script>
+<script src="../js/itens/item-ui.js?v=5.6.4"></script>
+<script src="../js/itens/item-controller.js?v=5.6.4"></script>
+<script src="../js/dependencias/dependencia-repository.js?v=6.1.0"></script>
+<script src="../js/dependencias/dependencia-service.js?v=5.6.5"></script>
+<script src="../js/dependencias/dependencia-ui.js?v=5.6.5"></script>
+<script src="../js/dependencias/dependencia-controller.js?v=5.6.5"></script>
+<script src="../js/tamanhos/tamanho-repository.js?v=6.1.0"></script>
+<script src="../js/tamanhos/tamanho-service.js?v=5.6.7"></script>
+<script src="../js/tamanhos/tamanho-ui.js?v=5.6.7"></script>
+<script src="../js/tamanhos/tamanho-controller.js?v=5.6.6"></script>
+<script src="../js/servicos/servico-model.js?v=5.6.7"></script>
+<script src="../js/servicos/servico-validator.js?v=5.6.0"></script>
+<script src="../js/servicos/servico-factory.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-repository.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-service.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/criar-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/buscar-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/listar-servicos-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/atualizar-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/servicos/excluir-servico-usecase.js?v=5.4.0"></script>
+<script src="../js/servicos/servico-ui.js?v=5.6.7"></script>
+<script src="../js/servicos/servico-controller.js?v=5.6.7"></script>
+<script src="../js/projetos/projeto-status.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-historico.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-model.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-validator.js?v=5.4.0"></script>
+<script src="../js/repositories/projeto-repository.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-storage.js?v=5.4.0"></script>
+<script src="../js/projetos/projeto-service.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/criar-projeto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/listar-projetos-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/atualizar-projeto-usecase.js?v=5.4.0"></script>
+<script src="../js/usecases/projetos/excluir-projeto-usecase.js?v=5.4.0"></script>
+<script src="../js/shared/rk-e2e-demo-state.js?v=5.1A"></script>
+<script src="../js/projetos/projeto-ui.js?v=5.6.0"></script>
+<script src="../js/projetos/projeto-controller.js?v=5.6.1"></script>
+<script src="../js/produtos/produto-admin-tabs.js?v=5.6.6"></script>
+<script src="../js/shared/rk-navigation.js?v=5.3.5"></script>
+<script src="../js/app-install.js?v=3.2.0"></script>
+
+<script>
+(function () {
+    function removerAcoesIndesejadas() {
+        document.querySelectorAll('button, a').forEach(function (el) {
+            var texto = (el.textContent || '').trim().toLowerCase();
+            if (texto === 'ver' || texto === 'usar') {
+                var wrapper = el.closest('button, a');
+                if (wrapper) wrapper.remove();
+            }
+        });
+    }
+
+    removerAcoesIndesejadas();
+
+    var observer = new MutationObserver(removerAcoesIndesejadas);
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
+  <script src="../js/conecte-signature.js?v=20260718"></script>
+</body>
+</html>

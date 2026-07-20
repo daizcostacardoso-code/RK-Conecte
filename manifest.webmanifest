@@ -1,0 +1,113 @@
+{
+  "id": "/",
+  "name": "RK Vidra\u00e7aria",
+  "short_name": "RK Vidra\u00e7aria",
+  "description": "Vidra\u00e7aria em Porto Seguro com or\u00e7amento p\u00fablico, cat\u00e1logo de produtos, servi\u00e7os e atendimento por WhatsApp.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/index.html?app=1",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f8fb",
+  "theme_color": "#083d67",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/imagens/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagens/icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/imagens/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Solicitar or\u00e7amento",
+      "short_name": "Or\u00e7amento",
+      "url": "/paginas/orcamento.html?app=1",
+      "description": "Enviar pedido de or\u00e7amento para a RK Vidra\u00e7aria.",
+      "icons": [
+        {
+          "src": "/imagens/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Servi\u00e7os",
+      "short_name": "Servi\u00e7os",
+      "url": "/paginas/servicos-publico.html?app=1",
+      "description": "Conhecer servi\u00e7os de box, espelhos, fachadas e fechamentos.",
+      "icons": [
+        {
+          "src": "/imagens/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "WhatsApp",
+      "short_name": "WhatsApp",
+      "url": "/paginas/contato.html?app=1",
+      "description": "Abrir os canais de contato da RK Vidra\u00e7aria.",
+      "icons": [
+        {
+          "src": "/imagens/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

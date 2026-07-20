@@ -1,0 +1,10 @@
+LIMPEZA E AJUSTE REALIZADOS
+
+- Removidas as telas de Aprovação, Conversão, Produção e Documento antigo.
+- Criada a nova tela paginas/arquivos.html.
+- Menu principal atualizado: Dashboard, Clientes, Produtos, Orçamento, Arquivos e Sair.
+- Atalhos removidos para Aprovação e Produção.
+- Lógicas removidas: js/conversao, js/producao, js/usecases/conversao, js/usecases/producao e js/usecases/comercial.
+- A tela Arquivos recebeu filtros visuais para buscar orçamentos já feitos, sem implementar a lógica ainda.
+- Mantidos HTML, CSS, JS e Firebase necessários ao funcionamento atual.
+- A aplicação utiliza exclusivamente o Firestore, sem API, MySQL ou sincronização paralela.
