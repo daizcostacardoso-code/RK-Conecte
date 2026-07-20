@@ -1,1 +1,1 @@
-window.RK_VERSION = "v0.5.0";
+window.RK_VERSION = "v0.6.0";

@@ -2,7 +2,7 @@
 
 ## Base técnica
 
-- Versão: `v0.5.0`.
+- Versão: `v0.6.0`.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.
@@ -50,3 +50,13 @@ A publicação deve seguir o checklist de [PUBLICACAO_SEGURA.md](PUBLICACAO_SEGU
 - `localStorage` permanece apenas para preferências e rascunhos em andamento.
 - O estado demonstrativo E2E não é carregado nas páginas de produção.
 - Dashboards e orçamentos não fabricam registros quando as coleções estão vazias.
+
+## Fluxo comercial consolidado na Sprint 1
+
+- `orcamentos_emitidos` é a fonte canônica de orçamentos finalizados.
+- O rascunho de orçamento é local por dispositivo e não usa mais o documento global `orcamentos/atual`.
+- Registros canônicos preservam solicitação, cliente, projeto, número, revisão, status e histórico.
+- Reemissões reutilizam o documento localizado pelo número para evitar duplicidades.
+- Dashboard, arquivos e detalhes do cliente leem os mesmos registros comerciais.
+- Cancelamentos preservam o documento e acrescentam um evento ao histórico.
+- A coleção legada `orcamentos` permanece somente para leitura durante a compatibilização.

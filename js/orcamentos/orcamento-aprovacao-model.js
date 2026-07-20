@@ -10,30 +10,128 @@ const OrcamentoAprovacaoStatus = Object.freeze({
 
 const OrcamentoAprovacaoModel = {
     status: OrcamentoAprovacaoStatus,
+    schemaVersion: 3,
+    colecaoCanonica: "orcamentos_emitidos",
 
     normalizarRegistro(registro = {}) {
         const base = this.copiar(registro);
+        const documento = base.documento || base.documentoComercial || {};
+        const dadosDocumento = documento.dados || base.dados || {};
+        const metadados = dadosDocumento.metadados || documento.metadados || base.metadados || {};
+        const cliente = this.primeiroObjeto(base.cliente, base.registro?.cliente, dadosDocumento.cliente);
+        const projeto = this.primeiroObjeto(base.projeto, base.registro?.projeto, dadosDocumento.projeto);
+        const numero = this.texto(
+            base.numero
+            || base.numero_orcamento
+            || base.registro?.numero
+            || metadados.numeroOrcamento
+            || metadados.orcamentoNumero
+            || projeto.numero
+            || projeto.id
+            || base.id
+        );
+        const id = this.texto(base.id || base.orcamento_id || numero);
+        const vinculos = this.normalizarVinculos(base, cliente, projeto, metadados);
         const status = this.normalizarStatus(base.status || base.aprovacao?.status);
-        const aprovacao = this.normalizarAprovacao(base.aprovacao, status);
+        const aprovacao = this.normalizarAprovacao({
+            ...(base.aprovacao || {}),
+            versaoOrcamento: base.aprovacao?.versaoOrcamento || base.revisao || base.versaoOrcamento
+        }, status);
         const historicoOriginal = Array.isArray(base.historicoStatus) ? base.historicoStatus : [];
+        const criadoEmISO = this.dataISO(
+            base.criadoEmISO
+            || base.criado_em
+            || base.criadoEm
+            || base.dataEmissao
+            || metadados.geradoEm
+            || metadados.criadoEm
+        );
+        const atualizadoEmISO = this.dataISO(
+            base.atualizadoEmISO
+            || base.atualizado_em
+            || base.atualizadoEm
+            || metadados.atualizadoEm
+            || criadoEmISO
+        ) || this.agoraISO();
         const historicoStatus = historicoOriginal.length
             ? historicoOriginal.map(item => this.normalizarHistorico(item, status))
             : [this.criarHistorico({
+                id: this.idHistoricoNormalizacao(id || numero),
                 statusAnterior: null,
                 statusAtual: status,
                 acao: "orcamento_normalizado",
                 observacao: "Registro anterior compatibilizado com o fluxo comercial.",
-                realizadoEm: base.criadoEmISO || base.dataEmissao || this.agoraISO(),
+                realizadoEm: criadoEmISO || atualizadoEmISO,
                 origem: "normalizacao"
             })];
 
         return {
             ...base,
+            id,
+            orcamento_id: id,
+            numero,
+            numero_orcamento: numero,
+            cliente,
+            projeto,
+            clienteNome: this.texto(base.clienteNome || base.nomeCliente || cliente.nome),
+            clienteNomeBusca: this.normalizarBusca(base.clienteNomeBusca || base.clienteNome || base.nomeCliente || cliente.nome),
+            vinculos,
+            solicitacaoId: vinculos.solicitacaoId,
+            clienteId: vinculos.clienteId,
+            projetoId: vinculos.projetoId,
+            revisao: aprovacao.versaoOrcamento,
+            schemaVersion: Math.max(this.schemaVersion, Number.parseInt(base.schemaVersion, 10) || 0),
+            fonteCanonica: this.colecaoCanonica,
             status,
             aprovacao,
             historicoStatus,
-            atualizadoEmISO: this.dataISO(base.atualizadoEmISO || base.atualizadoEm || base.criadoEmISO || base.dataEmissao) || this.agoraISO()
+            criadoEmISO: criadoEmISO || atualizadoEmISO,
+            atualizadoEmISO
         };
+    },
+
+    normalizarVinculos(registro = {}, cliente = {}, projeto = {}, metadados = {}) {
+        const vinculos = registro.vinculos && typeof registro.vinculos === "object" ? registro.vinculos : {};
+        return {
+            solicitacaoId: this.texto(
+                vinculos.solicitacaoId
+                || registro.solicitacaoId
+                || registro.origemSolicitacaoId
+                || metadados.solicitacaoId
+            ),
+            clienteId: this.texto(
+                vinculos.clienteId
+                || registro.clienteId
+                || cliente.id
+                || cliente.cliente_id
+                || metadados.clienteId
+            ),
+            projetoId: this.texto(
+                vinculos.projetoId
+                || registro.projetoId
+                || projeto.id
+                || projeto.projeto_id
+                || metadados.projetoId
+            )
+        };
+    },
+
+    idHistoricoNormalizacao(identificador = "") {
+        const chave = this.chave(identificador) || "legado";
+        return `hist_normalizacao_${chave}`;
+    },
+
+    normalizarBusca(valor) {
+        return this.texto(valor)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/\s+/g, " ")
+            .trim();
+    },
+
+    primeiroObjeto(...valores) {
+        return valores.find(valor => valor && typeof valor === "object" && Object.keys(valor).length) || {};
     },
 
     normalizarStatus(valor, padrao = OrcamentoAprovacaoStatus.EMITIDO) {
@@ -124,17 +222,20 @@ const OrcamentoAprovacaoModel = {
     },
 
     obterCliente(registro = {}) {
-        return registro.cliente || registro.documento?.dados?.cliente || registro.dados?.cliente || {};
+        return this.primeiroObjeto(registro.cliente, registro.registro?.cliente, registro.documento?.dados?.cliente, registro.dados?.cliente);
     },
 
     obterItens(registro = {}) {
-        const itens = registro.itens || registro.documento?.dados?.produtos || registro.dados?.produtos || [];
-        return Array.isArray(itens) ? itens : [];
+        const candidatos = [registro.itens, registro.registro?.itens, registro.documento?.dados?.produtos, registro.dados?.produtos];
+        return candidatos.find(itens => Array.isArray(itens) && itens.length)
+            || candidatos.find(Array.isArray)
+            || [];
     },
 
     obterTotal(registro = {}) {
-        const totais = registro.totais || registro.documento?.dados?.totais || registro.dados?.totais || {};
+        const totais = this.primeiroObjeto(registro.totais, registro.registro?.totais, registro.documento?.dados?.totais, registro.dados?.totais);
         const valor = registro.total ?? registro.totalGeral ?? registro.valorTotal ?? registro.totalFinal
+            ?? registro.registro?.total ?? registro.registro?.totalGeral ?? registro.registro?.valorTotal ?? registro.registro?.totalFinal
             ?? totais.totalGeral ?? totais.totalFinal ?? totais.total;
         return this.numero(valor);
     },

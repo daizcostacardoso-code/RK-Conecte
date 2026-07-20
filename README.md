@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.5.0`
+`v0.6.0`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -13,6 +13,11 @@ Não existe API Node ou sincronização com MySQL nesta base.
 Projetos, clientes, produtos e itens de serviço usam o Firestore como fonte
 canônica. O navegador mantém somente preferências e rascunhos do fluxo em
 andamento; telas vazias não recebem registros demonstrativos automaticamente.
+
+Orçamentos emitidos usam exclusivamente a coleção `orcamentos_emitidos`, com
+identidade estável, vínculos de solicitação, cliente e projeto, revisão, status
+e histórico comercial. A coleção antiga `orcamentos/atual` permanece somente
+para leitura de compatibilidade e não recebe novas gravações.
 
 ## Validação local
 

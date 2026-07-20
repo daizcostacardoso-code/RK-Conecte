@@ -100,7 +100,7 @@ const DocumentArchiveController = {
         }
         corpo.innerHTML = this.registros.map(registro => `
             <tr>
-                <td><input type="checkbox" data-arquivo-selecao value="${this.escaparAtributo(registro.id)}" aria-label="Selecionar orçamento ${this.escaparAtributo(registro.numero || registro.id)}" ${this.selecionados.has(String(registro.id)) ? "checked" : ""}></td>
+                <td><input type="checkbox" data-arquivo-selecao value="${this.escaparAtributo(registro.id)}" aria-label="Selecionar orçamento ${this.escaparAtributo(registro.numero || registro.id)}" ${this.selecionados.has(String(registro.id)) ? "checked" : ""} ${registro.status === "cancelado" ? "disabled" : ""}></td>
                 <td>${this.escapar(registro.numero || registro.id || "-")}</td>
                 <td>${this.escapar(registro.clienteNome || registro.cliente?.nome || "-")}</td>
                 <td>${this.formatarData(registro.dataEmissao)}</td>
@@ -111,7 +111,6 @@ const DocumentArchiveController = {
                     ${this.renderizarBotoesComerciais(registro)}
                     <button type="button" data-arquivo-acao="preview" data-registro-id="${this.escaparAtributo(registro.id)}">Ver PDF</button>
                     <button type="button" data-arquivo-acao="download" data-registro-id="${this.escaparAtributo(registro.id)}">Baixar</button>
-                    <button type="button" class="btn-tabela-excluir" data-arquivo-acao="excluir" data-registro-id="${this.escaparAtributo(registro.id)}">Excluir</button>
                 </div></td>
             </tr>`).join("");
         this.atualizarControlesSelecao();
@@ -234,10 +233,11 @@ const DocumentArchiveController = {
 
     solicitarExclusao(registros) {
         this.detalheRegistro = null;
-        this.exclusaoPendente = registros;
+        this.exclusaoPendente = registros.filter(registro => registro.status !== "cancelado");
         const conteudo = document.getElementById("arquivosDetalhesConteudo");
         if (!conteudo) return;
-        conteudo.innerHTML = `<section class="arquivos-detalhes-secao"><h3>Excluir orçamento${registros.length > 1 ? "s" : ""}</h3><p>Esta ação remove ${registros.length} registro(s) do Firestore e não pode ser desfeita.</p><form id="arquivosExcluirFormulario" class="arquivos-detalhes-form"><label class="arquivos-confirmacao"><input type="checkbox" name="confirmado" required> Confirmo a exclusão definitiva.</label><div class="arquivos-item-acoes"><button type="submit" class="btn-tabela-excluir">Excluir definitivamente</button></div></form></section>`;
+        if (!this.exclusaoPendente.length) return this.mensagem("Os orçamentos selecionados já estão cancelados.");
+        conteudo.innerHTML = `<section class="arquivos-detalhes-secao"><h3>Cancelar orçamento${this.exclusaoPendente.length > 1 ? "s" : ""}</h3><p>O cancelamento preserva ${this.exclusaoPendente.length} registro(s) e seu histórico comercial no Firestore.</p><form id="arquivosExcluirFormulario" class="arquivos-detalhes-form"><label class="arquivos-confirmacao"><input type="checkbox" name="confirmado" required> Confirmo o cancelamento.</label><div class="arquivos-item-acoes"><button type="submit" class="btn-tabela-excluir">Cancelar orçamento${this.exclusaoPendente.length > 1 ? "s" : ""}</button></div></form></section>`;
         const formulario = document.getElementById("arquivosExcluirFormulario");
         formulario?.addEventListener("submit", evento => this.confirmarExclusao(evento));
         const modal = document.getElementById("arquivosDetalhes");
@@ -251,24 +251,26 @@ const DocumentArchiveController = {
         if (!new FormData(formulario).get("confirmado")) return;
         const botao = formulario.querySelector("button[type='submit']");
         botao.disabled = true;
-        const excluidos = [];
+        const cancelados = [];
         const erros = [];
         for (const registro of this.exclusaoPendente) {
             try {
-                await DocumentPdfRepository.excluir(registro);
-                excluidos.push(String(registro.id));
+                const atualizado = await DocumentPdfRepository.cancelar(registro, {
+                    observacao: "Orçamento cancelado em lote pelo arquivo comercial."
+                });
+                cancelados.push(this.normalizarRegistro(atualizado));
             } catch (_) {
                 erros.push(registro.numero || registro.id);
             }
         }
-        const ids = new Set(excluidos);
-        this.registros = this.registros.filter(registro => !ids.has(String(registro.id)));
-        excluidos.forEach(id => this.selecionados.delete(id));
+        const porId = new Map(cancelados.map(registro => [String(registro.id), registro]));
+        this.registros = this.registros.map(registro => porId.get(String(registro.id)) || registro);
+        cancelados.forEach(registro => this.selecionados.delete(String(registro.id)));
         this.exclusaoPendente = [];
         this.renderizar();
         this.fecharPreview();
         this.fecharDetalhes();
-        this.mensagem(erros.length ? `${excluidos.length} excluído(s). Não foi possível excluir: ${erros.join(", ")}.` : `${excluidos.length} orçamento(s) excluído(s).`);
+        this.mensagem(erros.length ? `${cancelados.length} cancelado(s). Não foi possível cancelar: ${erros.join(", ")}.` : `${cancelados.length} orçamento(s) cancelado(s) com histórico preservado.`);
     },
 
     alterarSelecao(evento) {
@@ -280,9 +282,9 @@ const DocumentArchiveController = {
     },
 
     selecionarTodos(marcar) {
-        if (marcar) this.registros.forEach(registro => this.selecionados.add(String(registro.id)));
+        if (marcar) this.registros.filter(registro => registro.status !== "cancelado").forEach(registro => this.selecionados.add(String(registro.id)));
         else this.selecionados.clear();
-        document.querySelectorAll("[data-arquivo-selecao]").forEach(campo => { campo.checked = marcar; });
+        document.querySelectorAll("[data-arquivo-selecao]").forEach(campo => { campo.checked = marcar && !campo.disabled; });
         this.atualizarControlesSelecao();
     },
 
@@ -291,12 +293,13 @@ const DocumentArchiveController = {
         const botao = document.getElementById("btnExcluirArquivosSelecionados");
         if (botao) {
             botao.disabled = quantidade === 0;
-            botao.textContent = quantidade ? `Excluir selecionados (${quantidade})` : "Excluir selecionados";
+            botao.textContent = quantidade ? `Cancelar selecionados (${quantidade})` : "Cancelar selecionados";
         }
         const todos = document.getElementById("arquivosSelecionarTodos");
         if (todos) {
-            todos.checked = this.registros.length > 0 && quantidade === this.registros.length;
-            todos.indeterminate = quantidade > 0 && quantidade < this.registros.length;
+            const elegiveis = this.registros.filter(registro => registro.status !== "cancelado").length;
+            todos.checked = elegiveis > 0 && quantidade === elegiveis;
+            todos.indeterminate = quantidade > 0 && quantidade < elegiveis;
         }
     },
 

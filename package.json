@@ -1,6 +1,6 @@
 {
   "name": "rk-conecte",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Sistema web da RK Vidraçaria para atendimento, orçamentos e operação interna.",
   "scripts": {

@@ -112,57 +112,18 @@ const Orcamento = {
 
     async salvarNaNuvem(dados, mostrarAviso = false) {
         if (typeof OrcamentoStorage !== "undefined") {
-            const salvo = await OrcamentoStorage.salvarAtual(dados);
-
-            if (!salvo && mostrarAviso) {
-                alert("Não foi possível salvar o orçamento na nuvem. Ele ficou salvo neste dispositivo.");
-            }
-
-            return salvo;
+            return OrcamentoStorage.salvarAtual(dados);
         }
 
-        try {
-            if (typeof db === "undefined" || !db) {
-                throw new Error("Firebase não carregado. Verifique firebase-config.js.");
-            }
-
-            await db.collection("orcamentos")
-                .doc("atual")
-                .set(dados, { merge: true });
-
-            return true;
-        } catch (erro) {
-            console.error("Erro ao salvar orçamento no Firestore:", erro);
-
-            if (mostrarAviso) {
-                alert("Não foi possível salvar o orçamento na nuvem. Ele ficou salvo neste dispositivo.");
-            }
-
-            return false;
-        }
+        Storage.salvar(Config.storage.orcamentoAtual, dados);
+        return true;
     },
 
     async carregarDaNuvem() {
         if (typeof OrcamentoStorage !== "undefined") {
             return OrcamentoStorage.carregarAtual();
         }
-
-        try {
-            if (typeof db === "undefined" || !db) {
-                throw new Error("Firebase não carregado. Verifique firebase-config.js.");
-            }
-
-            const documento = await db.collection("orcamentos")
-                .doc("atual")
-                .get();
-
-            if (!documento.exists) return null;
-
-            return documento.data();
-        } catch (erro) {
-            console.error("Erro ao carregar orçamento do Firestore:", erro);
-            return null;
-        }
+        return Storage.carregar(Config.storage.orcamentoAtual, null);
     },
 
     async carregar() {
@@ -291,11 +252,6 @@ const Orcamento = {
 
         // Apaga qualquer orçamento salvo no navegador.
         Storage.remover(Config.storage.orcamentoAtual);
-
-        if (typeof db !== "undefined" && db) {
-            db.collection("orcamentos").doc("atual").set(this.estadoVazio(), { merge: true })
-                .catch(erro => console.error("Erro ao limpar orçamento na nuvem:", erro));
-        }
 
         // Limpa a lista em memória e força o array vazio.
         Itens.limpar();

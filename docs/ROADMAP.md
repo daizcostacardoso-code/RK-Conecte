@@ -32,10 +32,18 @@
 - manter `localStorage` somente para rascunhos e preferências;
 - apresentar estados explícitos de carregamento, vazio e erro.
 
+### Patch 5 — orçamento canônico e fluxo comercial — concluído
+
+- consolidar `orcamentos_emitidos` como fonte oficial dos orçamentos;
+- remover o rascunho global `orcamentos/atual` das gravações de produção;
+- preservar vínculos entre solicitação, cliente, projeto e orçamento;
+- sincronizar Dashboard, arquivos e histórico do cliente;
+- trocar exclusão definitiva por cancelamento auditável.
+
 ### Próximos passos
 
-- unificar orçamento, dashboard, arquivos e caixa;
-- consolidar o fluxo comercial e o histórico;
+- conectar aprovação comercial à abertura da operação;
+- vincular os recebimentos do caixa ao orçamento aprovado;
 - remover módulos antigos que permanecerem sem uso após a migração.
 
 ## Sprint 2 — fluxo operacional

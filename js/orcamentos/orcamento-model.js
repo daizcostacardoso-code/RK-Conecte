@@ -21,7 +21,11 @@ const OrcamentoModel = {
     },
 
     montar(dadosAnteriores = {}) {
-        const cliente = Formulario.lerCliente();
+        const clienteFormulario = Formulario.lerCliente();
+        const cliente = {
+            ...clienteFormulario,
+            id: dadosAnteriores.cliente?.id || dadosAnteriores.clienteId || dadosAnteriores.vinculos?.clienteId || ""
+        };
         const obra = Formulario.lerObra();
         const itens = Itens.todos().map(item => this.normalizarItem(item));
         const ajustes = Formulario.lerResumoFinanceiro();
@@ -35,10 +39,16 @@ const OrcamentoModel = {
         const numero = Util.$("numeroOrcamento")?.value?.trim() || dadosAnteriores.numero || "";
         const dataCriacao = Util.$("dataCriacao")?.value || datasAnteriores.criacao || this.dataHoje();
         const dataValidade = Util.$("dataValidade")?.value || datasAnteriores.validade || this.dataValidadePadrao();
+        const vinculos = this.normalizarVinculos(dadosAnteriores, cliente);
 
         return {
             id: dadosAnteriores.id || OrcamentoCalculos.criarId("orc"),
             numero,
+            vinculos,
+            solicitacaoId: vinculos.solicitacaoId,
+            origemSolicitacaoId: vinculos.solicitacaoId,
+            clienteId: vinculos.clienteId,
+            projetoId: vinculos.projetoId,
             cliente,
             obra,
             vendedor,
@@ -69,6 +79,7 @@ const OrcamentoModel = {
 
     normalizar(dados = {}) {
         const cliente = {
+            id: dados.cliente?.id || dados.clienteId || dados.vinculos?.clienteId || "",
             nome: dados.cliente?.nome || dados.nome || "",
             telefone: dados.cliente?.telefone || dados.telefone || "",
             email: dados.cliente?.email || dados.email || "",
@@ -85,10 +96,16 @@ const OrcamentoModel = {
             validade: this.dataParaCampo(dados.datas?.validade) || this.dataValidadePadrao(),
             atualizacao: dados.datas?.atualizacao || dados.atualizadoEmISO || ""
         };
+        const vinculos = this.normalizarVinculos(dados, cliente);
 
         return {
             id: dados.id || "atual",
             numero: dados.numero || "",
+            vinculos,
+            solicitacaoId: vinculos.solicitacaoId,
+            origemSolicitacaoId: vinculos.solicitacaoId,
+            clienteId: vinculos.clienteId,
+            projetoId: vinculos.projetoId,
             cliente,
             obra,
             vendedor: dados.vendedor || "",
@@ -113,6 +130,15 @@ const OrcamentoModel = {
                 tipo: "valor",
                 valor: 0
             }
+        };
+    },
+
+    normalizarVinculos(dados = {}, cliente = {}) {
+        const vinculos = dados.vinculos && typeof dados.vinculos === "object" ? dados.vinculos : {};
+        return {
+            solicitacaoId: String(vinculos.solicitacaoId || dados.solicitacaoId || dados.origemSolicitacaoId || "").trim(),
+            clienteId: String(vinculos.clienteId || dados.clienteId || cliente.id || cliente.cliente_id || "").trim(),
+            projetoId: String(vinculos.projetoId || dados.projetoId || dados.projeto?.id || "").trim()
         };
     },
 

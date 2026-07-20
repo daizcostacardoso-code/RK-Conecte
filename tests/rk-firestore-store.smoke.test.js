@@ -89,7 +89,10 @@ async function executar() {
     resposta = await RKFirestoreStore.fetch("/orcamentos/ORC-TESTE/definitivo", { method: "DELETE" });
     assert.equal(resposta.ok, true);
     resposta = await RKFirestoreStore.fetch("/orcamentos");
-    assert.equal((await resposta.json()).dados.length, 0);
+    const orcamentos = (await resposta.json()).dados;
+    assert.equal(orcamentos.length, 1);
+    assert.equal(orcamentos[0].status, "cancelado");
+    assert.equal(orcamentos[0].historicoStatus.at(-1).acao, "orcamento_cancelado");
 
     const nota = { id: "nota-teste", numeroNota: "NS-TESTE", clienteNome: "Cliente Nota", servicos: [] };
     resposta = await RKFirestoreStore.fetch("/notas", { method: "POST", body: JSON.stringify(nota) });

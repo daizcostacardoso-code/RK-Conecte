@@ -91,8 +91,12 @@ const DashboardComercialController = {
         const unicos = new Map();
         orcamentosEmitidos.forEach(item => {
             const orcamento = this.normalizarOrcamento(item.registro || item.dados || item, "Firestore");
-            const chave = orcamento.id || orcamento.numero;
-            if (chave) unicos.set(chave, orcamento);
+            const chave = orcamento.numero || orcamento.id;
+            if (chave) {
+                const anterior = unicos.get(chave);
+                const maisRecente = !anterior || String(orcamento.atualizadoEm || "") >= String(anterior.atualizadoEm || "");
+                if (maisRecente) unicos.set(chave, orcamento);
+            }
         });
         return [...unicos.values()];
     },
@@ -114,6 +118,10 @@ const DashboardComercialController = {
             numero: String(registro.numero || registro.numero_orcamento || projeto.numero || projeto.id || registro.id || "").trim(),
             cliente: cliente.nome || registro.clienteNome || registro.nomeCliente || "",
             total,
+            vinculos: registro.vinculos || {},
+            solicitacaoId: registro.solicitacaoId || registro.vinculos?.solicitacaoId || "",
+            clienteId: registro.clienteId || registro.vinculos?.clienteId || cliente.id || "",
+            projetoId: registro.projetoId || registro.vinculos?.projetoId || projeto.id || "",
             atualizadoEm: registro.atualizadoEmISO || registro.atualizadoEm || registro.criadoEmISO || registro.dataEmissao || "",
             origem
         };
