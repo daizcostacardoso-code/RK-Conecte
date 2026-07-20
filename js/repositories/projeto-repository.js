@@ -8,12 +8,15 @@ const ProjetoRepository = {
     },
 
     obterAdapter() {
-        const adapter = this.adapter || (typeof MemoryAdapter !== "undefined" ? MemoryAdapter : null);
+        const adapter = this.adapter
+            || (typeof criarFirestoreAdapter === "function" ? criarFirestoreAdapter() : null)
+            || (typeof FirestoreAdapter !== "undefined" ? FirestoreAdapter : null);
 
         if (!StorageAdapterContract.validar(adapter)) {
-            throw new Error("ProjetoRepository precisa de um adapter valido.");
+            throw new Error("ProjetoRepository precisa do FirestoreAdapter.");
         }
 
+        this.adapter = adapter;
         return adapter;
     },
 
@@ -58,4 +61,3 @@ const ProjetoRepository = {
 function criarProjetoRepository(adapter) {
     return Object.create(ProjetoRepository).configurar(adapter);
 }
-

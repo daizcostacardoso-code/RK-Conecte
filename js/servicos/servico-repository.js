@@ -8,12 +8,15 @@ const ServicoRepository = {
     },
 
     obterAdapter() {
-        const adapter = this.adapter || (typeof MemoryAdapter !== "undefined" ? MemoryAdapter : null);
+        const adapter = this.adapter
+            || (typeof criarFirestoreAdapter === "function" ? criarFirestoreAdapter() : null)
+            || (typeof FirestoreAdapter !== "undefined" ? FirestoreAdapter : null);
 
         if (typeof StorageAdapterContract === "undefined" || !StorageAdapterContract.validar(adapter)) {
-            throw new Error("ServicoRepository precisa de um adapter valido.");
+            throw new Error("ServicoRepository precisa do FirestoreAdapter.");
         }
 
+        this.adapter = adapter;
         return adapter;
     },
 

@@ -15,8 +15,7 @@ const ServicoController = {
 
         this.produtosDisponiveis = await this.listarProdutosAtivos();
         ServicoUI.definirProdutosDisponiveis(this.produtosDisponiveis);
-        await this.garantirServicosBase();
-        this.listarServicos();
+        await this.listarServicos();
     },
 
     async recarregarProdutosDisponiveis() {
@@ -31,10 +30,10 @@ const ServicoController = {
 
     configurarServicoService() {
         if (typeof ServicoRepository !== "undefined" && !ServicoRepository.adapter) {
-            const adapter = typeof criarLocalStorageAdapter === "function"
-                ? criarLocalStorageAdapter()
-                : typeof criarMemoryAdapter === "function"
-                    ? criarMemoryAdapter()
+            const adapter = typeof criarFirestoreAdapter === "function"
+                ? criarFirestoreAdapter()
+                : typeof FirestoreAdapter !== "undefined"
+                    ? FirestoreAdapter
                     : null;
 
             if (adapter) {
@@ -102,6 +101,8 @@ const ServicoController = {
     },
 
     async listarServicos(filtros = {}) {
+        ServicoUI.renderizarCarregamentoLista("Carregando itens do Firestore...");
+        ServicoUI.mostrarAviso("Carregando itens...", "info");
         const resultado = await this.executarListagem(filtros);
 
         if (!resultado.sucesso) {
@@ -111,6 +112,7 @@ const ServicoController = {
         }
 
         ServicoUI.renderizarLista(resultado.servicos || []);
+        ServicoUI.mostrarAviso("");
         return resultado;
     },
 

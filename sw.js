@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.4.3';
+const RK_CACHE = 'rk-conecte-v0.5.0';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -19,6 +19,8 @@ const APP_SHELL = [
   '/js/conecte-signature.js',
   '/js/shared/rk-navigation.js',
   '/js/shared/rk-firestore-store.js',
+  '/js/shared/rk-draft-state.js',
+  '/js/storage/firestore-adapter.js',
   '/js/medicoes/medicao-model.js',
   '/js/medicoes/medicao-ui.js',
   '/js/medicoes/medicao-controller.js',

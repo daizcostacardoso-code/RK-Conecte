@@ -21,10 +21,10 @@ const ProjetoVisualController = {
 
     configurarProjetoService() {
         if (typeof ProjetoRepository !== "undefined" && !ProjetoRepository.adapter) {
-            const adapter = typeof criarLocalStorageAdapter === "function"
-                ? criarLocalStorageAdapter()
-                : typeof criarMemoryAdapter === "function"
-                    ? criarMemoryAdapter()
+            const adapter = typeof criarFirestoreAdapter === "function"
+                ? criarFirestoreAdapter()
+                : typeof FirestoreAdapter !== "undefined"
+                    ? FirestoreAdapter
                     : null;
 
             if (adapter) {
@@ -65,6 +65,8 @@ const ProjetoVisualController = {
     },
 
     async listarProjetos(filtros = {}) {
+        ProjetoVisualUI.renderizarCarregamentoLista("Carregando projetos do Firestore...");
+        ProjetoVisualUI.mostrarAviso("Carregando projetos...", "info");
         const resultado = await this.executarListagem(filtros);
 
         if (!resultado.sucesso) {
@@ -76,6 +78,7 @@ const ProjetoVisualController = {
 
         this.estado.projetos = resultado.projetos || [];
         ProjetoVisualUI.renderizarLista(this.estado.projetos);
+        ProjetoVisualUI.mostrarAviso("");
         return resultado;
     },
 
@@ -116,75 +119,6 @@ const ProjetoVisualController = {
         return resultado;
     },
 
-    async garantirProjetosBase() {
-        const resultado = await this.executarListagem({});
-        const existentes = resultado.sucesso ? resultado.projetos || [] : [];
-        const idsExistentes = new Set(existentes.map(projeto => projeto.id));
-        const bases = this.projetosBase().filter(projeto => !idsExistentes.has(projeto.id));
-
-        if (!bases.length) {
-            return false;
-        }
-
-        await Promise.all(bases.map(projeto => this.executarCriacao(projeto)));
-        return true;
-    },
-
-    async selecionarProjetoPadrao() {
-        const padrao = this.estado.projetos.find(projeto => projeto.id === "prj_generico_projeto_padrao" || projeto.padrao);
-
-        if (!padrao) {
-            return false;
-        }
-
-        await this.selecionarProjeto(padrao.id);
-        return true;
-    },
-
-    projetosBase() {
-        return [
-            this.projetoGenerico("prj_generico_projeto_padrao", "Projeto padrao", true),
-            this.projetoGenerico("prj_generico_banheiro", "Banheiro"),
-            this.projetoGenerico("prj_generico_cozinha", "Cozinha"),
-            this.projetoGenerico("prj_generico_area_externa", "Area externa"),
-            this.projetoGenerico("prj_generico_sala", "Sala"),
-            this.projetoGenerico("prj_generico_quarto", "Quarto"),
-            this.projetoGenerico("prj_generico_fachada", "Fachada"),
-            this.projetoGenerico("prj_generico_sacada", "Sacada"),
-            this.projetoGenerico("prj_generico_area_gourmet", "Area gourmet"),
-            this.projetoGenerico("prj_generico_loja_comercial", "Loja/comercial"),
-            this.projetoGenerico("prj_generico_obra_completa", "Obra completa"),
-            this.projetoGenerico("prj_generico_manutencao_geral", "Manutencao geral")
-        ];
-    },
-
-    projetoGenerico(id, nome, padrao = false) {
-        return {
-            id,
-            numero: id.replace("prj_generico_", "PRJ-GEN-").toUpperCase(),
-            codigo: id.replace("prj_generico_", "PRJ-GEN-").toUpperCase(),
-            nome,
-            titulo: nome,
-            clienteId: "cliente_rapido",
-            clienteNome: "Cliente rapido",
-            cliente: {
-                id: "cliente_rapido",
-                nome: "Cliente rapido"
-            },
-            descricao: padrao
-                ? "Use Projeto padrao para orcamentos rapidos sem obra ou ambiente especifico."
-                : `Projeto generico para organizar demandas de ${nome}.`,
-            enderecoObra: "",
-            cidade: "Porto Seguro",
-            status: "rascunho",
-            tipoProjeto: nome,
-            observacoes: "Projeto base cadastrado para cadastros guiados.",
-            padrao,
-            generico: true,
-            ativo: true
-        };
-    },
-
     async usarProjeto(id) {
         const resultado = await this.selecionarProjeto(id);
 
@@ -213,8 +147,8 @@ const ProjetoVisualController = {
             ProjetoStorage.salvarAtual(projeto);
         }
 
-        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.salvarFluxo === "function") {
-            RKE2EDemoState.salvarFluxo({
+        if (typeof RKDraftState !== "undefined" && typeof RKDraftState.salvarFluxo === "function") {
+            RKDraftState.salvarFluxo({
                 projetoSelecionado: projeto,
                 projetoAtual: projeto,
                 clienteSelecionado: projeto.cliente || null

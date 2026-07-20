@@ -74,16 +74,16 @@ const ComercialController = {
             exportacao: resultado.exportacao
         };
 
-        this.salvarFluxoDemo(resultado);
+        this.salvarFluxoRascunho(resultado);
         return this.registrarMensagem(resultado.ultimaAcaoComercial, "sucesso");
     },
 
-    salvarFluxoDemo(resultado = {}) {
-        if (typeof RKE2EDemoState === "undefined" || typeof RKE2EDemoState.salvarFluxo !== "function") {
+    salvarFluxoRascunho(resultado = {}) {
+        if (typeof RKDraftState === "undefined" || typeof RKDraftState.salvarFluxo !== "function") {
             return false;
         }
 
-        return RKE2EDemoState.salvarFluxo({
+        return RKDraftState.salvarFluxo({
             documentoAtual: resultado.documento,
             statusComercial: resultado.statusComercial,
             configuracoes: {

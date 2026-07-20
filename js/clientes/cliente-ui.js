@@ -124,6 +124,16 @@ const ClienteUI = {
         `).join("");
     },
 
+    renderizarCarregamentoLista(mensagem = "Carregando...") {
+        const tabelaCorpo = this.elementos.tabelaCorpo;
+        if (!tabelaCorpo) return;
+        tabelaCorpo.innerHTML = `
+            <tr aria-busy="true">
+                <td colspan="7" class="clientes-estado-vazio">${this.escapar(mensagem)}</td>
+            </tr>
+        `;
+    },
+
     renderizarDetalhe(cliente) {
         this.clienteSelecionado = cliente || null;
         this.atualizarAbas();

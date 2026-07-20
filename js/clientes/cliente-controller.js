@@ -49,6 +49,8 @@ const ClienteController = {
     },
 
     async listarClientes(filtros = {}) {
+        ClienteUI.renderizarCarregamentoLista("Carregando clientes do Firestore...");
+        ClienteUI.mostrarAviso("Carregando clientes...", "info");
         const resultado = await this.executarListagem(filtros);
 
         if (!resultado.sucesso) {
@@ -58,6 +60,7 @@ const ClienteController = {
         }
 
         ClienteUI.renderizarLista(resultado.clientes || []);
+        ClienteUI.mostrarAviso("");
     },
 
     async selecionarCliente(id) {
@@ -112,29 +115,6 @@ const ClienteController = {
         return this.respostaCamadaIndisponivel("buscar");
     },
 
-    criarClientesDemo() {
-        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.obterOuCriar === "function") {
-            const estado = RKE2EDemoState.obterOuCriar();
-            return estado.clienteSelecionado ? [estado.clienteSelecionado] : [];
-        }
-
-        return [];
-    },
-
-    buscarClienteDemo(id, resultadoOriginal = null) {
-        const cliente = this.criarClientesDemo().find(item => item.id === id);
-
-        if (cliente) {
-            return {
-                sucesso: true,
-                cliente,
-                erros: []
-            };
-        }
-
-        return resultadoOriginal || this.respostaCamadaIndisponivel("buscar");
-    },
-
     salvarClienteAtual(cliente = {}) {
         const appState = typeof AppStateService !== "undefined" ? AppStateService : null;
 
@@ -142,8 +122,8 @@ const ClienteController = {
             appState.setState("clienteSelecionado", cliente);
         }
 
-        if (typeof RKE2EDemoState !== "undefined" && typeof RKE2EDemoState.salvarFluxo === "function") {
-            RKE2EDemoState.salvarFluxo({
+        if (typeof RKDraftState !== "undefined" && typeof RKDraftState.salvarFluxo === "function") {
+            RKDraftState.salvarFluxo({
                 clienteSelecionado: cliente
             });
         }

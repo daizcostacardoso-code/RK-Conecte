@@ -169,6 +169,12 @@ const ProdutoUI = {
         `).join('');
     },
 
+    renderizarCarregamentoLista(mensagem = 'Carregando...') {
+        const corpo = this.elementos.tabelaCorpo;
+        if (!corpo) return;
+        corpo.innerHTML = `<tr aria-busy="true"><td class="cadastro-estado-vazio" colspan="7">${this.escapar(mensagem)}</td></tr>`;
+    },
+
     renderizarDetalhe() {},
 
     definirCarregando(carregando) {

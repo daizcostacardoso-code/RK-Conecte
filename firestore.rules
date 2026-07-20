@@ -119,6 +119,10 @@ service cloud.firestore {
       allow read, write: if autorizado();
     }
 
+    match /servicos/{documento} {
+      allow read, write: if autorizado();
+    }
+
     match /caixa_empresa/{documento} {
       allow read, write: if autorizado();
     }

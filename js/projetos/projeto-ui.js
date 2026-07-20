@@ -191,6 +191,16 @@ const ProjetoVisualUI = {
         `).join("");
     },
 
+    renderizarCarregamentoLista(mensagem = "Carregando...") {
+        const tabelaCorpo = this.elementos.tabelaCorpo;
+        if (!tabelaCorpo) return;
+        tabelaCorpo.innerHTML = `
+            <tr aria-busy="true">
+                <td colspan="3" class="cadastro-estado-vazio">${this.escapar(mensagem)}</td>
+            </tr>
+        `;
+    },
+
     renderizarDetalhe(projeto) {
         const { detalheResumo, detalheConteudo } = this.elementos;
 

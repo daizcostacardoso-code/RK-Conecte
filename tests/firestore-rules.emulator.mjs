@@ -140,6 +140,7 @@ test("usuário autorizado opera todas as coleções internas mapeadas", async ()
         "orcamentos_emitidos/000001",
         "solicitacoes_site/solicitacao-1",
         "projetos/projeto-1",
+        "servicos/servico-1",
         "caixa_empresa/lancamento-1",
         "clientes/cliente-1",
         "produtos/produto-1",
