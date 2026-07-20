@@ -4,9 +4,10 @@
 
 - Exposto o controle de acessos no menu superior das telas internas para administradores.
 - Feita a renderização do dashboard aguardar o perfil carregado antes de decidir os atalhos administrativos.
-- Restauradas larguras uniformes para os atalhos em telas grandes, médias e móveis.
+- Restauradas dimensões uniformes para os atalhos em telas grandes, médias e móveis.
 - Convertida a tabela de usuários em cartões responsivos, sem rolagem lateral no celular.
-- Evitado o registro de último acesso nos canais temporários que ainda usam as regras publicadas da versão anterior.
+- Retirada a escrita automática de último acesso pelo navegador para eliminar falhas de permissão na abertura das telas.
+- Corrigida a exibição indevida do painel vazio de senha temporária antes da criação de um acesso.
 - Removido o uso da persistência local obsoleta do SDK e atualizada a metatag de aplicativo no dashboard.
 - Aberto um financeiro determinístico para cada projeto originado de orçamento aprovado.
 - Vinculados valores contratado, recebido e saldo ao projeto operacional.
@@ -16,7 +17,7 @@
 - Criada tela administrativa para cadastrar, ativar e desativar acessos e alterar perfis.
 - Incluídos geração de senha temporária e envio de recuperação sem armazenar senhas.
 - Bloqueadas a autodesativação e a remoção do próprio perfil administrativo.
-- Exigido perfil ativo antes de liberar qualquer tela interna e registrado o último acesso.
+- Exigido perfil ativo antes de liberar qualquer tela interna.
 - Removidas da interface as referências visíveis à infraestrutura técnica interna.
 - Reforçadas as regras e adicionados testes de financeiro, acessos, interface e permissões.
 

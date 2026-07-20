@@ -77,6 +77,8 @@
     background: #edf8f2;
 }
 
+.acesso-page [hidden] { display: none !important; }
+
 .acesso-credencial div { min-width: 0; flex: 1; }
 .acesso-credencial p { margin: .25rem 0 0; color: #4e6d5b; }
 .acesso-credencial code { max-width: 100%; overflow-wrap: anywhere; border-radius: 8px; background: #fff; font-size: 1rem; font-weight: 900; padding: .65rem; }

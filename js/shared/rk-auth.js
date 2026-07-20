@@ -110,7 +110,6 @@ const RKAuth = {
                     return null;
                 }
                 this.perfilAtual = perfil;
-                void this.registrarUltimoAcesso(usuario, perfil);
             } catch (erro) {
                 this.usuarioAtual = null;
                 this.limparPerfilAtual();
@@ -230,34 +229,6 @@ const RKAuth = {
             return null;
         };
         return Object.fromEntries(Object.entries(campos).map(([chave, valor]) => [chave, converter(valor)]));
-    },
-
-    async registrarUltimoAcesso(usuario, perfil = {}) {
-        // Canais temporários de visualização publicam apenas o Hosting. Neles,
-        // as regras novas ainda não existem e esta auditoria geraria um 403.
-        if (this.ambientePreview()) return;
-        const anterior = new Date(perfil.ultimoAcessoEm || 0).getTime();
-        if (Number.isFinite(anterior) && Date.now() - anterior < 15 * 60 * 1000) return;
-        try {
-            const token = await usuario.getIdToken();
-            const configuracao = window.RK_FIREBASE_CONFIG || window.RKFirebase?.config || {};
-            const uid = String(usuario.uid || "");
-            const agora = new Date().toISOString();
-            const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(configuracao.projectId)}/databases/(default)/documents/usuarios_autorizados/${encodeURIComponent(uid)}?updateMask.fieldPaths=ultimoAcessoEm&updateMask.fieldPaths=atualizadoEmISO`;
-            const resposta = await fetch(url, {
-                method: "PATCH",
-                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ fields: { ultimoAcessoEm: { stringValue: agora }, atualizadoEmISO: { stringValue: agora } } })
-            });
-            if (resposta.ok && this.perfilAtual) this.perfilAtual.ultimoAcessoEm = agora;
-        } catch (erro) {
-            console.warn("Não foi possível registrar o último acesso:", erro);
-        }
-    },
-
-    ambientePreview(hostname) {
-        const host = String(hostname || (typeof window !== "undefined" ? window.location?.hostname : "") || "").toLowerCase();
-        return host.endsWith(".web.app") && host.includes("--");
     },
 
     async recusarAcesso() {

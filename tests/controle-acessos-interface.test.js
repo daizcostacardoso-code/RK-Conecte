@@ -27,6 +27,8 @@ test("controle de acessos aparece somente no cabeçalho do administrador", () =>
     assert.match(navegacao, /rotulo: "Acessos", pagina: "acessos\.html"/);
     assert.match(controller, /this\.sessao = await this\.aguardarSessao\(\)/);
     assert.match(estilos, /dashboard-comercial-shortcuts[\s\S]*repeat\(5/);
+    assert.match(estilos, /grid-auto-rows:\s*104px/);
+    assert.match(estilos, /dashboard-comercial-shortcut\s*\{[\s\S]*height:\s*100%/);
     assert.doesNotMatch(estilos, /grid-template-columns:\s*repeat\(auto-fit/);
 });
 
@@ -36,6 +38,7 @@ test("controle de acessos transforma a tabela em cartões no celular", () => {
     assert.match(estilos, /@media\s*\(max-width:\s*720px\)/);
     assert.match(estilos, /\.acesso-tabela thead\s*\{\s*display:\s*none/);
     assert.match(estilos, /content:\s*attr\(data-label\)/);
+    assert.match(estilos, /\.acesso-page \[hidden\]\s*\{\s*display:\s*none !important/);
     assert.match(controller, /data-label="Usuário"/);
     assert.match(controller, /data-label="Ações"/);
 });

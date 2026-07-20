@@ -1,5 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const { readFileSync } = require("node:fs");
+const { resolve } = require("node:path");
 const { RKAuth } = require("../js/shared/rk-auth.js");
 
 function criarStorage(valores = {}) {
@@ -87,17 +89,10 @@ test("Guard interpreta o perfil ativo retornado pelo serviço de dados", () => {
     assert.equal(perfil.historicoAcesso[0].tipo, "acesso_criado");
 });
 
-test("Auditoria de último acesso não envia escrita no canal temporário", async () => {
-    assert.equal(RKAuth.ambientePreview("rk-vidracaria--v0-9-0-exemplo.web.app"), true);
-    assert.equal(RKAuth.ambientePreview("rk-vidracaria.web.app"), false);
-    assert.equal(RKAuth.ambientePreview("localhost"), false);
-    let requisicaoEnviada = false;
-    global.window = { location: { hostname: "rk-vidracaria--v0-9-0-exemplo.web.app" } };
-    global.fetch = async () => { requisicaoEnviada = true; return { ok: true }; };
-    await RKAuth.registrarUltimoAcesso({ getIdToken: async () => "token", uid: "uid-admin" }, {});
-    assert.equal(requisicaoEnviada, false);
-    delete global.fetch;
-    delete global.window;
+test("Abertura de tela autenticada não altera o perfil de acesso", () => {
+    const fonte = readFileSync(resolve(__dirname, "../js/shared/rk-auth.js"), "utf8");
+    assert.doesNotMatch(fonte, /registrarUltimoAcesso|updateMask\.fieldPaths=ultimoAcessoEm/);
+    assert.doesNotMatch(fonte, /method:\s*["']PATCH["']/);
 });
 
 test("Telas comerciais sensíveis permanecem classificadas como protegidas", () => {
