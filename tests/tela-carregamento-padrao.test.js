@@ -42,8 +42,7 @@ test("todas as páginas carregam a proteção visual antes dos estilos", () => {
 
 test("tela padrão informa progresso e permanece disponível no aparelho", () => {
     const fonte = readFileSync(resolve(raiz, "js/shared/rk-loading-screen.js"), "utf8");
-    assert.match(fonte, /rk_tela_carregamento_v1/);
-    assert.match(fonte, /localStorage/);
+    assert.doesNotMatch(fonte, /localStorage|sessionStorage|storageKey/);
     assert.match(fonte, /role=\"progressbar\"/);
     assert.match(fonte, /\/imagens\/logo\.jpeg/);
     assert.match(fonte, /\/assets\/conecte-logo\.png/);

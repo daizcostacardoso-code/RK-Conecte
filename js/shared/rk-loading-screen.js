@@ -4,19 +4,10 @@
     if (!global?.document || global.RKLoading) return;
 
     const documento = global.document;
-    const CHAVE_LOCAL = "rk_tela_carregamento_v1";
     const TOKEN_INICIAL = "pagina-inicial";
     const TEMPO_MINIMO = 420;
     const TEMPO_ESTABILIZACAO_INICIAL = 320;
     const TEMPO_LIMITE_INICIAL = 25000;
-    const CHAVE_TRANSICAO = "conecte_loading_transition_v1";
-    const SUPRIMIR_CARGA_INICIAL = (() => {
-        try {
-            const valor = global.sessionStorage?.getItem(CHAVE_TRANSICAO);
-            if (valor) global.sessionStorage.removeItem(CHAVE_TRANSICAO);
-            return valor === "dashboard";
-        } catch (_) { return false; }
-    })();
     const DICAS_PADRAO = [
         "Confira medidas, endereço e observações antes de liberar uma ordem de serviço.",
         "Orçamentos aprovados seguem para o fluxo operacional sem criar projetos duplicados.",
@@ -25,7 +16,7 @@
     ];
 
     const estado = {
-        ativos: new Set(SUPRIMIR_CARGA_INICIAL ? [] : [TOKEN_INICIAL]),
+        ativos: new Set([TOKEN_INICIAL]),
         sequencia: 0,
         progresso: 7,
         exibidoEm: Date.now(),
@@ -38,35 +29,6 @@
         falhou: false,
         recursosEssenciaisComFalha: []
     };
-
-    function lerLocal() {
-        try {
-            const salvo = JSON.parse(global.localStorage?.getItem(CHAVE_LOCAL) || "null");
-            return salvo && salvo.versao === 1 ? salvo : {};
-        } catch (_) {
-            return {};
-        }
-    }
-
-    function salvarLocal(dados = {}) {
-        try {
-            const anterior = lerLocal();
-            global.localStorage?.setItem(CHAVE_LOCAL, JSON.stringify({
-                ...anterior,
-                ...dados,
-                versao: 1,
-                salvoEm: new Date().toISOString()
-            }));
-        } catch (_) {}
-    }
-
-    function configuracaoEmpresa() {
-        try {
-            return JSON.parse(global.localStorage?.getItem("vidracaria_configuracoes_sistema") || "{}");
-        } catch (_) {
-            return {};
-        }
-    }
 
     function criarEstilos() {
         if (documento.getElementById("rkLoadingCriticalStyles")) return;
@@ -135,6 +97,7 @@
             }
             .rk-loading-company { display: grid; justify-items: center; gap: 12px; }
             .rk-loading-rk-logo {
+                display: none;
                 width: 70px;
                 height: 70px;
                 object-fit: cover;
@@ -201,11 +164,7 @@
     }
 
     function dicaAtual() {
-        const salvo = lerLocal();
-        const dicas = Array.isArray(salvo.dicas) && salvo.dicas.length ? salvo.dicas : DICAS_PADRAO;
-        const indice = Number.isInteger(salvo.proximaDica) ? salvo.proximaDica % dicas.length : 0;
-        salvarLocal({ dicas: DICAS_PADRAO, proximaDica: (indice + 1) % dicas.length });
-        return dicas[indice];
+        return DICAS_PADRAO[Math.floor(Math.random() * DICAS_PADRAO.length)];
     }
 
     function atualizarRelogio() {
@@ -223,7 +182,6 @@
     function montar() {
         if (estado.montado || !documento.body) return documento.getElementById("rkLoadingScreen");
         estado.montado = true;
-        const config = configuracaoEmpresa();
         const tela = documento.createElement("div");
         tela.id = "rkLoadingScreen";
         tela.setAttribute("role", "status");
@@ -253,7 +211,8 @@
                 </footer>
             </section>`;
         documento.body.prepend(tela);
-        texto("rkLoadingEmpresa", `${config.nomeEmpresa || "RK Vidraçaria"} · Gestão integrada`);
+        atualizarUsuario();
+        texto("rkLoadingEmpresa", "RK Vidraçaria · Gestão integrada");
         texto("rkLoadingMensagem", estado.mensagem);
         texto("rkLoadingDica", dicaAtual());
         documento.getElementById("rkLoadingRecarregar")?.addEventListener("click", () => global.location.reload());
@@ -268,7 +227,6 @@
     function atualizarMensagem(mensagem) {
         if (mensagem) estado.mensagem = String(mensagem);
         texto("rkLoadingMensagem", estado.mensagem);
-        salvarLocal({ ultimaMensagem: estado.mensagem });
     }
 
     function atualizarProgresso(valor, mensagem) {
@@ -349,6 +307,22 @@
         texto("rkLoadingPercentual", "Atenção");
     }
 
+    function atualizarUsuario(sessao = global.RKAuth?.obterSessao?.()) {
+        const nome = String(sessao?.nome || sessao?.usuario?.displayName || sessao?.email || sessao?.usuario?.email || "").trim();
+        const meta = documento.querySelector(".rk-loading-meta");
+        if (!meta) return;
+        let item = documento.getElementById("rkLoadingUsuarioItem");
+        if (!nome) { if (item) item.hidden = true; return; }
+        if (!item) {
+            item = documento.createElement("div");
+            item.id = "rkLoadingUsuarioItem";
+            item.innerHTML = '<span>Usuário</span><strong id="rkLoadingUsuario"></strong>';
+            meta.appendChild(item);
+        }
+        item.hidden = false;
+        texto("rkLoadingUsuario", nome);
+    }
+
     function iniciarLimiteInicial() {
         global.clearTimeout(estado.temporizadorLimiteInicial);
         estado.temporizadorLimiteInicial = global.setTimeout(() => {
@@ -390,7 +364,6 @@
         documento.documentElement.classList.add("rk-loading-active");
         iniciarLimiteInicial();
     }
-    salvarLocal({ dicas: DICAS_PADRAO, disponivelOffline: true });
     if (!SUPRIMIR_CARGA_INICIAL) {
         if (documento.body) montar();
         else documento.addEventListener("DOMContentLoaded", montar, { once: true });
@@ -398,6 +371,7 @@
 
     global.addEventListener("online", atualizarConexao);
     global.addEventListener("offline", atualizarConexao);
+    global.addEventListener("rk:auth-state-changed", evento => atualizarUsuario(evento.detail?.sessao));
     global.addEventListener("error", registrarFalhaDeRecurso, true);
     global.addEventListener("load", () => void concluirCargaInicial(), { once: true });
 
@@ -408,7 +382,6 @@
         run: executar,
         initial: executar,
         isBooting: () => estado.ativos.has(TOKEN_INICIAL),
-        fail: informarFalha,
-        storageKey: CHAVE_LOCAL
+        fail: informarFalha
     };
 })(typeof window !== "undefined" ? window : globalThis);

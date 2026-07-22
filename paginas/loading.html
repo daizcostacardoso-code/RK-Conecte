@@ -33,7 +33,6 @@
             }
             window.RKLoading?.update(78, "Acesso confirmado. Abrindo sua área de trabalho...");
             setTimeout(() => {
-                try { sessionStorage.setItem("conecte_loading_transition_v1", "dashboard"); } catch (_) {}
                 window.location.replace("dashboard-comercial.html");
             }, 650);
         })();

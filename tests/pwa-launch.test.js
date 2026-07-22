@@ -15,6 +15,7 @@ test("instalacoes antigas que abrem o index sao enviadas ao carregamento", () =>
     const instalacao = readFileSync(resolve(raiz, "js/app-install.js"), "utf8");
     assert.match(instalacao, /redirectLegacyPwaLaunch/);
     assert.match(instalacao, /location\.replace\('\/paginas\/loading\.html\?app=1&origem=pwa'\)/);
+    assert.doesNotMatch(instalacao, /if \(!isLegacyEntry \|\| !isPwaLaunch\)/);
 });
 
 test("sessao autenticada abre primeiro o dashboard", () => {

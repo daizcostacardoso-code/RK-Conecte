@@ -8,8 +8,7 @@
     if (!isStandalone) return false;
     const path = (location.pathname || '/').toLowerCase();
     const isLegacyEntry = path === '/' || path.endsWith('/index.html');
-    const isPwaLaunch = new URLSearchParams(location.search).get('app') === '1';
-    if (!isLegacyEntry || !isPwaLaunch) return false;
+    if (!isLegacyEntry) return false;
     location.replace('/paginas/loading.html?app=1&origem=pwa');
     return true;
   }
