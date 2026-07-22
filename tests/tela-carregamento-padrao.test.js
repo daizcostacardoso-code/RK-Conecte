@@ -33,7 +33,7 @@ const paginas = [
 test("todas as páginas carregam a proteção visual antes dos estilos", () => {
     paginas.forEach(caminho => {
         const html = readFileSync(resolve(raiz, caminho), "utf8");
-        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.1');
+        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.3');
         const primeiroEstilo = html.indexOf('<link rel="stylesheet"');
         assert.ok(carregamento >= 0, caminho);
         assert.ok(primeiroEstilo < 0 || carregamento < primeiroEstilo, caminho);
@@ -53,11 +53,17 @@ test("tela padrão informa progresso e permanece disponível no aparelho", () =>
     assert.match(fonte, /run:\s*executar/);
     assert.match(fonte, /registrarFalhaDeRecurso/);
     assert.match(fonte, /recursosEssenciaisComFalha/);
+    assert.match(fonte, /TEMPO_ESTABILIZACAO_INICIAL/);
+    assert.match(fonte, /TEMPO_LIMITE_INICIAL\s*=\s*25000/);
+    assert.match(fonte, /iniciarLimiteInicial/);
+    assert.match(fonte, /rk-loading-falha/);
+    assert.match(fonte, /initial:\s*executar/);
+    assert.match(fonte, /isBooting/);
 });
 
 test("service worker armazena a tela e antecipa páginas em conexão lenta", () => {
     const fonte = readFileSync(resolve(raiz, "sw.js"), "utf8");
-    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v1/);
+    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v4/);
     assert.match(fonte, /\/js\/shared\/rk-loading-screen\.js/);
     assert.match(fonte, /\/paginas\/dashboard-comercial\.html/);
     assert.match(fonte, /Promise\.allSettled/);
@@ -72,6 +78,9 @@ test("consultas centrais mantêm a tela ativa até os dados terminarem", () => {
     const entrada = readFileSync(resolve(raiz, "paginas/loading.html"), "utf8");
     const arquivos = readFileSync(resolve(raiz, "js/documentos/document-archive-controller.js"), "utf8");
     const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
+    const firestore = readFileSync(resolve(raiz, "js/shared/rk-firestore-store.js"), "utf8");
+    const servicos = readFileSync(resolve(raiz, "js/servicos/servico-controller.js"), "utf8");
+    const orcamentoPublico = readFileSync(resolve(raiz, "js/orcamento-cliente.js"), "utf8");
     assert.match(dashboard, /RKLoading\?\.start\("Reunindo orçamentos, obras e movimentações/);
     assert.match(dashboard, /RKLoading\?\.finish\(token\)/);
     assert.match(acessos, /RKLoading\?\.start\("Carregando os acessos da equipe/);
@@ -79,5 +88,9 @@ test("consultas centrais mantêm a tela ativa até os dados terminarem", () => {
     assert.match(arquivos, /RKLoading\?\.start\("Carregando os arquivos e dados do Firestore/);
     assert.match(arquivos, /RKLoading\?\.finish\(tokenCarregamento\)/);
     assert.match(navegacao, /RKLoading\?\.start\("Preparando o menu e seu acesso/);
+    assert.match(firestore, /RKLoading\?\.isBooting/);
+    assert.match(firestore, /RKLoading\?\.finish\(tokenCarregamento\)/);
+    assert.match(servicos, /RKLoading\.initial\(\(\) => ServicoController\.iniciar\(\)/);
+    assert.match(orcamentoPublico, /RKLoading\.initial\(\(\) => OrcamentoCliente\.iniciar\(\)/);
     assert.doesNotMatch(entrada, /v0\.4\.2/);
 });

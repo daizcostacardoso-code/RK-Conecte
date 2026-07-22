@@ -98,7 +98,9 @@ const CadastroItemController = {
 
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("formItem")) {
-        CadastroItemController.iniciar();
+        void (window.RKLoading?.initial
+            ? RKLoading.initial(() => CadastroItemController.iniciar(), "Carregando itens...")
+            : CadastroItemController.iniciar());
     }
 });
 

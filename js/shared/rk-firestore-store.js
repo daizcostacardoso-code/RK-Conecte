@@ -313,6 +313,9 @@
     }
 
     async function fetchFirestore(caminho, opcoes = {}) {
+        const tokenCarregamento = window.RKLoading?.isBooting?.()
+            ? window.RKLoading.start("Sincronizando dados do Firestore...")
+            : null;
         try {
             const rota = analisar(caminho);
             const metodo = String(opcoes.method || "GET").toUpperCase();
@@ -323,6 +326,8 @@
             return resposta({ ok: false, mensagem: "Operacao nao suportada." }, 405);
         } catch (erro) {
             return resposta({ ok: false, mensagem: erro.message || "Erro ao acessar os dados." }, 503);
+        } finally {
+            if (tokenCarregamento) window.RKLoading?.finish(tokenCarregamento);
         }
     }
 

@@ -98,7 +98,9 @@ const TamanhoPadraoController = {
 
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("formTamanho")) {
-        TamanhoPadraoController.iniciar();
+        void (window.RKLoading?.initial
+            ? RKLoading.initial(() => TamanhoPadraoController.iniciar(), "Carregando tamanhos...")
+            : TamanhoPadraoController.iniciar());
     }
 });
 

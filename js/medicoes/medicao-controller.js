@@ -245,7 +245,10 @@ const MedicaoController = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    void MedicaoController.iniciar().catch(erro => {
+    const inicializacao = window.RKLoading?.initial
+        ? RKLoading.initial(() => MedicaoController.iniciar(), "Carregando medicao e projeto...")
+        : MedicaoController.iniciar();
+    void inicializacao.catch(erro => {
         console.error(erro);
         MedicaoUI.mensagem("Não foi possível iniciar a medição.");
     });

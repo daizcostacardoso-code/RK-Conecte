@@ -5,9 +5,12 @@
   "description": "Vidra\u00e7aria em Porto Seguro com or\u00e7amento p\u00fablico, cat\u00e1logo de produtos, servi\u00e7os e atendimento por WhatsApp.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "/index.html?app=1",
+  "start_url": "/paginas/loading.html?app=1&origem=pwa",
   "scope": "/",
   "display": "standalone",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "orientation": "portrait-primary",
   "background_color": "#f5f8fb",
   "theme_color": "#083d67",

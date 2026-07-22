@@ -380,6 +380,8 @@ const ServicoController = {
 
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("formServico")) {
-        ServicoController.iniciar();
+        void (window.RKLoading?.initial
+            ? RKLoading.initial(() => ServicoController.iniciar(), "Carregando servicos e produtos...")
+            : ServicoController.iniciar());
     }
 });

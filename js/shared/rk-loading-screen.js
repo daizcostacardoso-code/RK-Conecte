@@ -7,6 +7,8 @@
     const CHAVE_LOCAL = "rk_tela_carregamento_v1";
     const TOKEN_INICIAL = "pagina-inicial";
     const TEMPO_MINIMO = 420;
+    const TEMPO_ESTABILIZACAO_INICIAL = 320;
+    const TEMPO_LIMITE_INICIAL = 25000;
     const DICAS_PADRAO = [
         "Confira medidas, endereço e observações antes de liberar uma ordem de serviço.",
         "Orçamentos aprovados seguem para o fluxo operacional sem criar projetos duplicados.",
@@ -23,7 +25,9 @@
         temporizador: null,
         temporizadorOcultar: null,
         temporizadorRelogio: null,
+        temporizadorLimiteInicial: null,
         montado: false,
+        falhou: false,
         recursosEssenciaisComFalha: []
     };
 
@@ -103,6 +107,8 @@
             #rkLoadingScreen::before { width: 42vw; height: 72vh; top: -34vh; right: -8vw; border-radius: 44px; }
             #rkLoadingScreen::after { width: 36vw; height: 56vh; bottom: -32vh; left: -9vw; border-radius: 50%; }
             #rkLoadingScreen.rk-loading-saindo { opacity: 0; visibility: hidden; }
+            #rkLoadingScreen.rk-loading-falha .rk-loading-progress > span { background: #ffc857; box-shadow: none; }
+            #rkLoadingScreen.rk-loading-falha .rk-loading-message { color: #ffe4a3; }
             .rk-loading-card {
                 position: relative;
                 z-index: 1;
@@ -270,7 +276,7 @@
     }
 
     function iniciarProgressoAutomatico() {
-        if (estado.temporizador) return;
+        if (estado.temporizador || estado.falhou) return;
         estado.temporizador = global.setInterval(() => {
             if (!estado.ativos.size || estado.progresso >= 91) return;
             const incremento = estado.progresso < 45 ? 4 : estado.progresso < 72 ? 2 : .6;
@@ -298,6 +304,8 @@
     function ocultar(token = TOKEN_INICIAL) {
         estado.ativos.delete(token);
         if (estado.ativos.size) return false;
+        estado.falhou = false;
+        global.clearTimeout(estado.temporizadorLimiteInicial);
         atualizarProgresso(100, "Tudo pronto.");
         const espera = Math.max(140, TEMPO_MINIMO - (Date.now() - estado.exibidoEm));
         estado.temporizadorOcultar = global.setTimeout(() => {
@@ -319,11 +327,29 @@
     }
 
     function informarFalha(mensagem = "Não foi possível concluir o carregamento.") {
-        montar();
+        estado.falhou = true;
+        global.clearInterval(estado.temporizador);
+        estado.temporizador = null;
+        global.clearTimeout(estado.temporizadorLimiteInicial);
+        const tela = montar();
+        tela?.classList.add("rk-loading-falha");
+        tela?.setAttribute("role", "alert");
         atualizarMensagem(mensagem);
         const botao = documento.getElementById("rkLoadingRecarregar");
         if (botao) botao.hidden = false;
         atualizarProgresso(Math.min(estado.progresso, 92));
+        texto("rkLoadingPercentual", "Atenção");
+    }
+
+    function iniciarLimiteInicial() {
+        global.clearTimeout(estado.temporizadorLimiteInicial);
+        estado.temporizadorLimiteInicial = global.setTimeout(() => {
+            if (!estado.ativos.size) return;
+            const offline = global.navigator?.onLine === false;
+            informarFalha(offline
+                ? "Sem conexao. O carregamento foi interrompido para evitar uma espera infinita."
+                : "O carregamento demorou mais que o esperado e foi interrompido. Tente novamente.");
+        }, TEMPO_LIMITE_INICIAL);
     }
 
     function registrarFalhaDeRecurso(evento) {
@@ -341,6 +367,8 @@
         try {
             if (documento.fonts?.ready) await documento.fonts.ready;
             if (global.RKAuth?.aguardarAutenticacao) await global.RKAuth.aguardarAutenticacao();
+            await new Promise(resolve => global.requestAnimationFrame(() => global.requestAnimationFrame(resolve)));
+            await new Promise(resolve => global.setTimeout(resolve, TEMPO_ESTABILIZACAO_INICIAL));
         } catch (_) {}
         if (estado.recursosEssenciaisComFalha.length) {
             informarFalha("Nao foi possivel carregar todos os recursos da pagina. Verifique a conexao e tente novamente.");
@@ -351,6 +379,7 @@
 
     criarEstilos();
     documento.documentElement.classList.add("rk-loading-active");
+    iniciarLimiteInicial();
     salvarLocal({ dicas: DICAS_PADRAO, disponivelOffline: true });
     if (documento.body) montar();
     else documento.addEventListener("DOMContentLoaded", montar, { once: true });
@@ -365,6 +394,8 @@
         update: atualizarProgresso,
         finish: ocultar,
         run: executar,
+        initial: executar,
+        isBooting: () => estado.ativos.has(TOKEN_INICIAL),
         fail: informarFalha,
         storageKey: CHAVE_LOCAL
     };

@@ -4,6 +4,18 @@
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   let deferredPrompt = null;
 
+  function redirectLegacyPwaLaunch(){
+    if (!isStandalone) return false;
+    const path = (location.pathname || '/').toLowerCase();
+    const isLegacyEntry = path === '/' || path.endsWith('/index.html');
+    const isPwaLaunch = new URLSearchParams(location.search).get('app') === '1';
+    if (!isLegacyEntry || !isPwaLaunch) return false;
+    location.replace('/paginas/loading.html?app=1&origem=pwa');
+    return true;
+  }
+
+  if (redirectLegacyPwaLaunch()) return;
+
   function registerSW(){
     if (!('serviceWorker' in navigator)) return;
     window.addEventListener('load', () => {

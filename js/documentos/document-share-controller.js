@@ -643,7 +643,10 @@ const DocumentShareController = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    void DocumentShareController.iniciar().catch(erro => {
+    const inicializacao = window.RKLoading?.initial
+        ? RKLoading.initial(() => DocumentShareController.iniciar(), "Carregando documento e dados do Firestore...")
+        : DocumentShareController.iniciar();
+    void inicializacao.catch(erro => {
         console.error("Nao foi possivel abrir o preview do orcamento.", erro);
         DocumentShareController.abrir();
     });

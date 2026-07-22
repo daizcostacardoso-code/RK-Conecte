@@ -200,5 +200,7 @@ const Valores = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    Valores.iniciar();
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => Valores.iniciar(), "Carregando configuracoes...")
+        : Valores.iniciar());
 });

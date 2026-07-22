@@ -103,7 +103,9 @@ const ProdutoController = {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('formProduto')) {
-        ProdutoController.iniciar();
+        void (window.RKLoading?.initial
+            ? RKLoading.initial(() => ProdutoController.iniciar(), "Carregando produtos...")
+            : ProdutoController.iniciar());
     }
 });
 

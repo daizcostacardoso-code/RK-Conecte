@@ -2407,5 +2407,7 @@ const OrcamentoInteligenteController = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    OrcamentoInteligenteController.iniciarTela();
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => OrcamentoInteligenteController.iniciarTela(), "Carregando catalogos e configuracoes...")
+        : OrcamentoInteligenteController.iniciarTela());
 });

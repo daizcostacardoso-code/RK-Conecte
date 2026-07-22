@@ -99,7 +99,9 @@ const ItemDependenciaController = {
 
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("formDependencia")) {
-        ItemDependenciaController.iniciar();
+        void (window.RKLoading?.initial
+            ? RKLoading.initial(() => ItemDependenciaController.iniciar(), "Carregando dependencias...")
+            : ItemDependenciaController.iniciar());
     }
 });
 

@@ -279,5 +279,9 @@ const CaixaBasicoController = {
     escaparAtributo(valor) { return this.escapar(valor); }
 };
 
-document.addEventListener("DOMContentLoaded", () => CaixaBasicoController.iniciar());
+document.addEventListener("DOMContentLoaded", () => {
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => CaixaBasicoController.iniciar(), "Carregando caixa e financeiro...")
+        : CaixaBasicoController.iniciar());
+});
 window.CaixaBasicoController = CaixaBasicoController;

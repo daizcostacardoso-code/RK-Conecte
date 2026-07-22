@@ -1479,5 +1479,7 @@ const Funcionario = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    Funcionario.iniciar();
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => Funcionario.iniciar(), "Carregando painel e solicitacoes...")
+        : Funcionario.iniciar());
 });

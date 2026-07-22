@@ -228,6 +228,8 @@ const ProjetoVisualController = {
 
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("formProjeto")) {
-        ProjetoVisualController.iniciar();
+        void (window.RKLoading?.initial
+            ? RKLoading.initial(() => ProjetoVisualController.iniciar(), "Carregando projetos...")
+            : ProjetoVisualController.iniciar());
     }
 });

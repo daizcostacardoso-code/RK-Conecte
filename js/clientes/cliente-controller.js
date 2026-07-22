@@ -1,7 +1,7 @@
 const ClienteController = {
     buscaTimer: null,
 
-    iniciar() {
+    async iniciar() {
         this.configurarClienteService();
 
         ClienteUI.iniciar({
@@ -11,7 +11,7 @@ const ClienteController = {
             aoSelecionarCliente: id => this.selecionarCliente(id)
         });
 
-        this.listarClientes();
+        await this.listarClientes();
     },
 
     configurarClienteService() {
@@ -215,4 +215,8 @@ const ClienteController = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => ClienteController.iniciar());
+document.addEventListener("DOMContentLoaded", () => {
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => ClienteController.iniciar(), "Carregando clientes...")
+        : ClienteController.iniciar());
+});

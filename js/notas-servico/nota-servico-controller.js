@@ -381,4 +381,8 @@ const NotaServicoController = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => NotaServicoController.iniciar());
+document.addEventListener("DOMContentLoaded", () => {
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => NotaServicoController.iniciar(), "Carregando notas de servico...")
+        : NotaServicoController.iniciar());
+});

@@ -286,5 +286,7 @@ const OrcamentoCliente = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    OrcamentoCliente.iniciar();
+    void (window.RKLoading?.initial
+        ? RKLoading.initial(() => OrcamentoCliente.iniciar(), "Carregando valores do orcamento...")
+        : OrcamentoCliente.iniciar());
 });
