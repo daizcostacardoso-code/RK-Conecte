@@ -5,8 +5,10 @@
 
     const documento = global.document;
     const TOKEN_INICIAL = "pagina-inicial";
+    const MENSAGEM_INICIAL = "Preparando sua área de trabalho...";
     const TEMPO_MINIMO = 420;
     const TEMPO_ESTABILIZACAO_INICIAL = 320;
+    const TEMPO_TRANSICAO = 320;
     const TEMPO_LIMITE_INICIAL = 25000;
     const DICAS_PADRAO = [
         "Confira medidas, endereço e observações antes de liberar uma ordem de serviço.",
@@ -20,9 +22,10 @@
         sequencia: 0,
         progresso: 7,
         exibidoEm: Date.now(),
-        mensagem: "Preparando sua área de trabalho...",
+        mensagem: MENSAGEM_INICIAL,
         temporizador: null,
         temporizadorOcultar: null,
+        temporizadorTransicao: null,
         temporizadorRelogio: null,
         temporizadorLimiteInicial: null,
         montado: false,
@@ -37,7 +40,8 @@
         estilos.textContent = `
             html.rk-loading-active { background: #061c2c; }
             html.rk-loading-active body { overflow: hidden !important; }
-            html.rk-loading-active body > :not(#rkLoadingScreen) { visibility: hidden !important; }
+            html.rk-loading-active body > * { visibility: hidden !important; }
+            html.rk-loading-active body > #rkLoadingScreen { visibility: visible !important; }
             #rkLoadingScreen[hidden] { display: none !important; }
             #rkLoadingScreen {
                 --rk-load-blue: #0d69d5;
@@ -252,17 +256,24 @@
 
     function mostrar(mensagem, token) {
         const id = token || `carga-${++estado.sequencia}`;
+        const cargaInicialEmAndamento = estado.ativos.has(TOKEN_INICIAL);
         estado.ativos.add(id);
         estado.exibidoEm = estado.ativos.size === 1 ? Date.now() : estado.exibidoEm;
         global.clearTimeout(estado.temporizadorOcultar);
+        global.clearTimeout(estado.temporizadorTransicao);
         documento.documentElement.classList.add("rk-loading-active");
         const tela = montar();
         if (tela) {
             tela.hidden = false;
-            tela.classList.remove("rk-loading-saindo");
+            tela.classList.remove("rk-loading-saindo", "rk-loading-falha");
+            tela.setAttribute("role", "status");
         }
+        estado.falhou = false;
         if (estado.progresso >= 100) atualizarProgresso(8);
-        atualizarMensagem(mensagem || "Carregando informações...");
+        const mensagemVisivel = cargaInicialEmAndamento && id !== TOKEN_INICIAL
+            ? (estado.mensagem || MENSAGEM_INICIAL)
+            : (mensagem || "Atualizando informações...");
+        atualizarMensagem(mensagemVisivel);
         iniciarProgressoAutomatico();
         return id;
     }
@@ -277,8 +288,16 @@
         estado.temporizadorOcultar = global.setTimeout(() => {
             const tela = documento.getElementById("rkLoadingScreen");
             tela?.classList.add("rk-loading-saindo");
-            documento.documentElement.classList.remove("rk-loading-active");
-            global.setTimeout(() => { if (tela && !estado.ativos.size) tela.hidden = true; }, 320);
+            estado.temporizadorTransicao = global.setTimeout(() => {
+                if (estado.ativos.size) return;
+                if (tela) {
+                    tela.hidden = true;
+                    tela.classList.remove("rk-loading-saindo");
+                }
+                documento.documentElement.classList.remove("rk-loading-active");
+                global.clearInterval(estado.temporizador);
+                estado.temporizador = null;
+            }, TEMPO_TRANSICAO);
         }, espera);
         return true;
     }
@@ -296,10 +315,17 @@
         estado.falhou = true;
         global.clearInterval(estado.temporizador);
         estado.temporizador = null;
+        global.clearTimeout(estado.temporizadorOcultar);
+        global.clearTimeout(estado.temporizadorTransicao);
         global.clearTimeout(estado.temporizadorLimiteInicial);
+        documento.documentElement.classList.add("rk-loading-active");
         const tela = montar();
-        tela?.classList.add("rk-loading-falha");
-        tela?.setAttribute("role", "alert");
+        if (tela) {
+            tela.hidden = false;
+            tela.classList.remove("rk-loading-saindo");
+            tela.classList.add("rk-loading-falha");
+            tela.setAttribute("role", "alert");
+        }
         atualizarMensagem(mensagem);
         const botao = documento.getElementById("rkLoadingRecarregar");
         if (botao) botao.hidden = false;
@@ -360,14 +386,10 @@
     }
 
     criarEstilos();
-    if (!SUPRIMIR_CARGA_INICIAL) {
-        documento.documentElement.classList.add("rk-loading-active");
-        iniciarLimiteInicial();
-    }
-    if (!SUPRIMIR_CARGA_INICIAL) {
-        if (documento.body) montar();
-        else documento.addEventListener("DOMContentLoaded", montar, { once: true });
-    }
+    documento.documentElement.classList.add("rk-loading-active");
+    iniciarLimiteInicial();
+    if (documento.body) montar();
+    else documento.addEventListener("DOMContentLoaded", montar, { once: true });
 
     global.addEventListener("online", atualizarConexao);
     global.addEventListener("offline", atualizarConexao);

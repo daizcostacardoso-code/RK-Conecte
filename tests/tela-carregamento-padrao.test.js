@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { readFileSync } = require("node:fs");
 const { resolve } = require("node:path");
+const vm = require("node:vm");
 
 const raiz = resolve(__dirname, "..");
 const paginas = [
@@ -30,10 +31,47 @@ const paginas = [
     "paginas/valores.html"
 ];
 
+test("carregador inicializa antes do body sem interromper a proteção visual", () => {
+    const fonte = readFileSync(resolve(raiz, "js/shared/rk-loading-screen.js"), "utf8");
+    const classes = new Set();
+    const ouvintes = {};
+    const documento = {
+        body: null,
+        head: { appendChild() {} },
+        documentElement: {
+            appendChild() {},
+            classList: {
+                add: (...nomes) => nomes.forEach(nome => classes.add(nome)),
+                remove: (...nomes) => nomes.forEach(nome => classes.delete(nome))
+            }
+        },
+        fonts: null,
+        getElementById: () => null,
+        createElement: () => ({ id: "", textContent: "" }),
+        addEventListener: (tipo, callback) => { ouvintes[tipo] = callback; }
+    };
+    const janela = {
+        document: documento,
+        navigator: { onLine: true },
+        location: { reload() {} },
+        addEventListener: (tipo, callback) => { ouvintes[tipo] = callback; },
+        setTimeout: () => 1,
+        clearTimeout() {},
+        setInterval: () => 1,
+        clearInterval() {},
+        requestAnimationFrame: callback => callback()
+    };
+
+    assert.doesNotThrow(() => vm.runInNewContext(fonte, { window: janela, globalThis: janela, console, Date, Math, Set, Promise }));
+    assert.equal(typeof janela.RKLoading?.start, "function");
+    assert.equal(typeof janela.RKLoading?.finish, "function");
+    assert.ok(classes.has("rk-loading-active"));
+});
+
 test("todas as páginas carregam a proteção visual antes dos estilos", () => {
     paginas.forEach(caminho => {
         const html = readFileSync(resolve(raiz, caminho), "utf8");
-        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.3');
+        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.4');
         const primeiroEstilo = html.indexOf('<link rel="stylesheet"');
         assert.ok(carregamento >= 0, caminho);
         assert.ok(primeiroEstilo < 0 || carregamento < primeiroEstilo, caminho);
@@ -58,11 +96,19 @@ test("tela padrão informa progresso e permanece disponível no aparelho", () =>
     assert.match(fonte, /rk-loading-falha/);
     assert.match(fonte, /initial:\s*executar/);
     assert.match(fonte, /isBooting/);
+    assert.doesNotMatch(fonte, /SUPRIMIR_CARGA_INICIAL/);
+    assert.match(fonte, /temporizadorTransicao/);
+    assert.match(fonte, /body > \*/);
+    assert.match(fonte, /body > #rkLoadingScreen/);
+    assert.match(fonte, /cargaInicialEmAndamento[\s\S]*MENSAGEM_INICIAL/);
+    const esconderTela = fonte.indexOf("tela.hidden = true");
+    const liberarConteudo = fonte.indexOf('classList.remove("rk-loading-active")');
+    assert.ok(esconderTela >= 0 && liberarConteudo > esconderTela, "o conteúdo só pode aparecer após o overlay ser ocultado");
 });
 
 test("service worker armazena a tela e antecipa páginas em conexão lenta", () => {
     const fonte = readFileSync(resolve(raiz, "sw.js"), "utf8");
-    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v5/);
+    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v7/);
     assert.match(fonte, /\/js\/shared\/rk-loading-screen\.js/);
     assert.match(fonte, /\/paginas\/dashboard-comercial\.html/);
     assert.match(fonte, /Promise\.allSettled/);
