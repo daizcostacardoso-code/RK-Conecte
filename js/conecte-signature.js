@@ -29,9 +29,12 @@
     style.textContent = `
       .conecte-signature,.conecte-signature *{box-sizing:border-box}
       .conecte-signature{width:100%;flex:0 0 auto;border-top:1px solid rgba(255,255,255,.09);background:#181c20;color:#edf4f7;font:600 12px/1.25 Inter,Arial,sans-serif;padding:0;position:relative;z-index:20}
-      .conecte-signature__bar{min-height:42px;max-width:1180px;margin:auto;padding:7px max(12px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:center;gap:clamp(10px,2.5vw,28px)}
-      .conecte-signature__brand{appearance:none;border:0;background:transparent;color:inherit;padding:0;display:inline-flex;align-items:center;gap:7px;cursor:pointer;flex:0 0 auto}
-      .conecte-signature__brand:focus-visible{outline:2px solid #71f39b;outline-offset:4px;border-radius:4px}
+      .conecte-signature__trigger{appearance:none;width:100%;min-height:44px;border:0;background:transparent;color:inherit;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;margin:0;padding:7px max(14px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));font:inherit;text-align:left}
+      .conecte-signature__trigger:hover{background:rgba(255,255,255,.045)}
+      .conecte-signature__trigger:focus-visible{outline:2px solid #71f39b;outline-offset:-3px}
+      .conecte-signature__side{min-width:0;display:flex;align-items:center;gap:clamp(10px,2vw,24px)}
+      .conecte-signature__side--left{justify-content:flex-end}.conecte-signature__side--right{justify-content:flex-start}
+      .conecte-signature__brand{grid-column:2;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:118px}
       .conecte-signature__brand img{display:block;width:auto;height:20px;max-width:112px;object-fit:contain}
       .conecte-signature__item{display:inline-flex;align-items:center;gap:6px;min-width:0;color:#c4d0d6;white-space:nowrap}
       .conecte-signature__item svg{width:15px;height:15px;flex:0 0 auto;color:#71f39b}
@@ -46,8 +49,8 @@
       .conecte-about__dialog img{width:auto;height:30px;max-width:145px}.conecte-about__dialog h2{margin:24px 0 8px;font-size:25px}.conecte-about__dialog p{margin:0;color:#aebdc5;line-height:1.55}.conecte-about__license{margin-top:18px;padding:15px;border:1px solid rgba(113,243,155,.16);border-radius:14px;background:rgba(113,243,155,.06)}
       .conecte-about__license span{display:block;color:#91a3ad;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.conecte-about__license strong{display:block;margin-top:5px;color:#fff;font-size:17px}
       body.conecte-modal-open{overflow:hidden}
-      @media(max-width:680px){.conecte-signature__bar{justify-content:space-between;gap:8px}.conecte-signature__connection span,.conecte-signature__clock span{display:none}.conecte-signature__item strong{max-width:105px}.conecte-signature__brand img{max-width:90px;height:18px}}
-      @media(max-width:430px){.conecte-signature__user{display:none!important}.conecte-signature__bar{justify-content:space-around}.conecte-signature__brand img{max-width:82px}}
+      @media(max-width:760px){.conecte-signature__trigger{grid-template-columns:1fr auto 1fr;gap:8px}.conecte-signature__connection,.conecte-signature__clock,.conecte-signature__user{display:none!important}.conecte-signature__side--left{justify-content:flex-end}.conecte-signature__side--right{justify-content:flex-start}.conecte-signature__item strong{max-width:72px}.conecte-signature__brand img{max-width:96px;height:19px}}
+      @media(max-width:430px){.conecte-signature__trigger{padding-inline:10px}.conecte-signature__brand{min-width:96px}.conecte-signature__brand img{max-width:88px}}
       @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
     `;
     document.head.appendChild(style);
@@ -61,15 +64,20 @@
     document.querySelectorAll(".conecte-signature").forEach((node, index) => { if (index) node.remove(); });
     let bar = document.querySelector(".conecte-signature");
     if (!bar) { bar = document.createElement("div"); bar.className = "conecte-signature"; }
+    bar.className = "conecte-signature";
     bar.setAttribute("role", "contentinfo");
-    bar.setAttribute("aria-label", "Barra de status Conecte");
-    bar.innerHTML = `<div class="conecte-signature__bar">
-      <button class="conecte-signature__brand" type="button" aria-label="Sobre a Conecte"><img src="${logoUrl()}" alt="Conecte" decoding="async"><span class="conecte-signature__dot" aria-hidden="true"></span></button>
-      <span class="conecte-signature__item conecte-signature__connection"><span data-connection>Online</span></span>
-      <span class="conecte-signature__item conecte-signature__weather" title="Temperatura atual em Porto Seguro">${icon("M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8") }<strong data-temperature>--°C</strong></span>
-      <span class="conecte-signature__item conecte-signature__user" hidden>${icon("M20 21a8 8 0 0 0-16 0m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8") }<strong data-user></strong></span>
-      <time class="conecte-signature__item conecte-signature__clock">${icon("M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20m0-14v5l3 2") }<span data-clock>--:--</span></time>
-    </div>`;
+    bar.setAttribute("aria-label", "Conecte");
+    bar.innerHTML = `<button class="conecte-signature__trigger" type="button" aria-label="Abrir informações da Conecte">
+      <span class="conecte-signature__side conecte-signature__side--left">
+        <span class="conecte-signature__item conecte-signature__connection"><span data-connection>Online</span></span>
+        <span class="conecte-signature__item conecte-signature__weather" title="Temperatura atual em Porto Seguro">${icon("M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8") }<strong data-temperature>--°C</strong></span>
+      </span>
+      <span class="conecte-signature__brand"><img src="${logoUrl()}" alt="Conecte" decoding="async"><span class="conecte-signature__dot" aria-hidden="true"></span></span>
+      <span class="conecte-signature__side conecte-signature__side--right">
+        <span class="conecte-signature__item conecte-signature__user" hidden>${icon("M20 21a8 8 0 0 0-16 0m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8") }<strong data-user></strong></span>
+        <time class="conecte-signature__item conecte-signature__clock">${icon("M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20m0-14v5l3 2") }<span data-clock>--:--</span></time>
+      </span>
+    </button>`;
     const footer = document.querySelector("body > footer:last-of-type");
     if (footer) footer.insertAdjacentElement("afterend", bar); else document.body.appendChild(bar);
     return bar;
@@ -131,7 +139,7 @@
     node.innerHTML = `<div class="conecte-about__backdrop" data-close></div><section class="conecte-about__dialog" role="dialog" aria-modal="true" aria-labelledby="conecte-about-title"><button class="conecte-about__close" type="button" aria-label="Fechar" data-close>×</button><img src="${logoUrl()}" alt="Conecte"><h2 id="conecte-about-title">Conecte Desenvolvimentos</h2><p>Solução digital desenvolvida, mantida e evoluída pela Conecte.</p><div class="conecte-about__license"><span>Licenciado para</span><strong>${project().company}</strong></div></section>`;
     document.body.appendChild(node);
     const close = () => { node.setAttribute("aria-hidden", "true"); document.body.classList.remove("conecte-modal-open"); };
-    bar.querySelector(".conecte-signature__brand").addEventListener("click", () => { node.setAttribute("aria-hidden", "false"); document.body.classList.add("conecte-modal-open"); node.querySelector("button").focus(); });
+    bar.querySelector(".conecte-signature__trigger").addEventListener("click", () => { node.setAttribute("aria-hidden", "false"); document.body.classList.add("conecte-modal-open"); node.querySelector("button").focus(); });
     node.querySelectorAll("[data-close]").forEach(el => el.addEventListener("click", close));
     document.addEventListener("keydown", event => { if (event.key === "Escape") close(); });
   }
@@ -150,4 +158,3 @@
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true }); else init();
 })(window, document);
-

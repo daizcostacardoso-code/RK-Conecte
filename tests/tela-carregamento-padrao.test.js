@@ -62,7 +62,7 @@ test("tela padrão informa progresso e permanece disponível no aparelho", () =>
 
 test("service worker armazena a tela e antecipa páginas em conexão lenta", () => {
     const fonte = readFileSync(resolve(raiz, "sw.js"), "utf8");
-    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v4/);
+    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v5/);
     assert.match(fonte, /\/js\/shared\/rk-loading-screen\.js/);
     assert.match(fonte, /\/paginas\/dashboard-comercial\.html/);
     assert.match(fonte, /Promise\.allSettled/);
