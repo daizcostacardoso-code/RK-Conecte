@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.9.1-splash-seamless-v9';
+const RK_CACHE = 'rk-conecte-v0.9.1-single-loader-v10';
 const APP_SHELL = [
   '/',
   '/index.html',
