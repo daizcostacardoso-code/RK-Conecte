@@ -1,5 +1,14 @@
 # Histórico de alterações
 
+## v1.0.0 — estabilização para lançamento
+
+- Adicionado carregador global acessível, responsivo e orientado a tarefas reais.
+- Protegido o conteúdo interno antes da autenticação e do perfil autorizado.
+- Adicionado app shell offline e cache `rk-conecte-v1.0.0` com descarte seguro de caches antigos.
+- Centralizada a versão e adicionados testes contra regressões e referências visíveis antigas.
+- Adicionado workflow de validação com Node.js 22, Java 21 e Firebase Emulator isolado.
+- Documentados auditoria de legado, backup, preview, rollback e testes pós-publicação.
+
 ## v0.9.0 — financeiro operacional e controle de acessos
 
 - Exposto o controle de acessos no menu superior das telas internas para administradores.

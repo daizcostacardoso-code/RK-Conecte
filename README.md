@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v0.9.0`
+`v1.0.0`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -44,7 +44,7 @@ Requisitos:
 
 - Node.js 22 ou superior;
 - Java 21 ou superior para o emulador do Firestore;
-- dependências instaladas com `npm install`.
+- dependências instaladas de forma reproduzível com `npm ci`.
 
 Execute antes de aplicar novas alterações ou publicar:
 

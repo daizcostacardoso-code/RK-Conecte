@@ -1,101 +1,52 @@
-const RK_CACHE = 'rk-conecte-v0.9.0';
+const RK_CACHE = 'rk-conecte-v1.0.0';
+const OFFLINE_FALLBACK = '/404.html';
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/paginas/servicos-publico.html',
-  '/paginas/produtos-publico.html',
-  '/paginas/galeria.html',
-  '/paginas/contato.html',
-  '/paginas/orcamento.html',
-  '/paginas/projetos.html',
-  '/paginas/medicao-obra.html',
-  '/paginas/nota-servico.html',
-  '/paginas/caixa.html',
-  '/paginas/acessos.html',
-  '/css/style.css',
-  '/css/medicao-obra.css',
-  '/css/nota-servico.css',
-  '/css/caixa-basico.css',
-  '/css/acessos.css',
-  '/js/public-site.js',
-  '/js/app-install.js',
-  '/js/conecte-signature.js',
-  '/js/shared/rk-navigation.js',
-  '/js/shared/rk-firestore-store.js',
-  '/js/shared/rk-draft-state.js',
-  '/js/projetos/projeto-operacional-model.js',
-  '/js/projetos/projeto-operacional-repository.js',
-  '/js/projetos/projeto-operacional-service.js',
-  '/js/storage/firestore-adapter.js',
-  '/js/medicoes/medicao-model.js',
-  '/js/medicoes/medicao-operacional-model.js',
-  '/js/medicoes/medicao-operacional-repository.js',
-  '/js/medicoes/medicao-ui.js',
-  '/js/medicoes/medicao-controller.js',
-  '/js/medicoes/medicao-pdf.js',
-  '/js/notas-servico/nota-servico-model.js',
-  '/js/notas-servico/ordem-servico-operacional-model.js',
-  '/js/notas-servico/ordem-servico-operacional-repository.js',
-  '/js/notas-servico/nota-servico-ui.js',
-  '/js/notas-servico/nota-servico-controller.js',
-  '/js/notas-servico/nota-servico-pdf.js',
-  '/js/caixa/caixa-model.js',
-  '/js/caixa/caixa-validator.js',
-  '/js/caixa/caixa-repository.js',
-  '/js/caixa/caixa-export.js',
-  '/js/caixa/caixa-service.js',
-  '/js/caixa/caixa-basico-controller.js',
-  '/js/caixa/financeiro-operacional-model.js',
-  '/js/caixa/financeiro-operacional-repository.js',
-  '/js/acessos/acesso-model.js',
-  '/js/acessos/acesso-repository.js',
-  '/js/acessos/acesso-controller.js',
-  '/js/vendor/pdf-lib.min.js',
-  '/imagens/logo.jpeg',
-  '/assets/conecte-logo.png',
-  '/imagens/icons/icon-192.png',
-  '/imagens/icons/icon-512.png',
-  '/manifest.webmanifest',
-  '/robots.txt',
-  '/sitemap.xml'
+  '/', '/index.html', OFFLINE_FALLBACK, '/paginas/login.html', '/paginas/loading.html',
+  '/paginas/dashboard-comercial.html', '/paginas/clientes.html', '/paginas/funcionario.html',
+  '/paginas/orcamento-inteligente.html', '/paginas/novo-orcamento.html', '/paginas/orcamento.html',
+  '/paginas/projetos.html', '/paginas/produtos.html', '/paginas/valores.html', '/paginas/arquivos.html',
+  '/paginas/compartilhar-documento.html', '/paginas/medicao-obra.html', '/paginas/nota-servico.html',
+  '/paginas/caixa.html', '/paginas/acessos.html', '/css/style.css', '/css/rk-loading-critical.css',
+  '/css/medicao-obra.css', '/css/nota-servico.css', '/css/caixa-basico.css', '/css/acessos.css',
+  '/js/app-install.js', '/js/shared/rk-loading.js', '/js/shared/rk-version.js',
+  '/imagens/logo.jpeg', '/assets/conecte-logo.png', '/imagens/icons/icon-192.png',
+  '/imagens/icons/icon-512.png', '/manifest.webmanifest'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
-  event.waitUntil(caches.open(RK_CACHE).then(cache => cache.addAll(APP_SHELL).catch(() => null)));
+  event.waitUntil(caches.open(RK_CACHE).then(cache => cache.addAll(APP_SHELL)));
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== RK_CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil(caches.keys()
+    .then(keys => Promise.all(keys.filter(key => key.startsWith('rk-conecte-') && key !== RK_CACHE).map(key => caches.delete(key))))
+    .then(() => self.clients.claim()));
 });
+
+function cacheable(response) {
+  return Boolean(response && response.ok && (response.type === 'basic' || response.type === 'cors'));
+}
+
+async function navigation(request) {
+  try { return await fetch(request); }
+  catch (_) { return (await caches.match(request, { ignoreSearch: true })) || caches.match(OFFLINE_FALLBACK); }
+}
+
+async function staticAsset(request) {
+  const cached = await caches.match(request, { ignoreSearch: true });
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (cacheable(response)) (await caches.open(RK_CACHE)).put(request, response.clone());
+  return response;
+}
 
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
-
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) {
-    event.respondWith(fetch(request));
-    return;
-  }
-
-  event.respondWith(
-    fetch(request).then(response => {
-      if (response && response.ok) {
-        const copy = response.clone();
-        caches.open(RK_CACHE).then(cache => cache.put(request, copy)).catch(() => null);
-      }
-      return response;
-    }).catch(() => {
-      if (request.mode === 'navigate') {
-        return caches.match(request).then(cached => cached || caches.match('/index.html'));
-      }
-
-      return caches.match(request);
-    })
-  );
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.includes('/firestore.googleapis.com/') || url.pathname.includes('/identitytoolkit.googleapis.com/')) return;
+  if (request.mode === 'navigate') { event.respondWith(navigation(request)); return; }
+  if (['style', 'script', 'image', 'font', 'manifest'].includes(request.destination)) event.respondWith(staticAsset(request));
 });
