@@ -10,7 +10,9 @@ const APP_SHELL = [
   '/css/medicao-obra.css', '/css/nota-servico.css', '/css/caixa-basico.css', '/css/acessos.css',
   '/js/app-install.js', '/js/shared/rk-loading.js', '/js/shared/rk-version.js',
   '/imagens/logo.jpeg', '/assets/conecte-logo.png', '/imagens/icons/icon-192.png',
-  '/imagens/icons/icon-512.png', '/manifest.webmanifest'
+  '/imagens/icons/icon-512.png', '/imagens/icons/maskable-192-v1.0.1.png',
+  '/imagens/icons/maskable-512-v1.0.1.png', '/assets/pwa/launch-1170x2532.png',
+  '/assets/pwa/launch-1290x2796.png', '/assets/pwa/launch-2048x2732.png', '/manifest.webmanifest'
 ];
 
 self.addEventListener('install', event => {

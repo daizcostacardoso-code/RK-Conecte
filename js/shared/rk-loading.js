@@ -16,7 +16,8 @@
     root.setAttribute("role", "status");
     root.setAttribute("aria-live", "polite");
     root.setAttribute("aria-busy", "true");
-    root.innerHTML = '<section class="rk-loading-card"><img class="rk-loading-logo" src="../imagens/logo.jpeg" alt="RK Vidraçaria"><p class="rk-loading-kicker">RK VIDRAÇARIA</p><h1 id="rk-loading-title">Preparando o sistema</h1><div class="rk-loading-line" aria-hidden="true"><span></span></div><p id="rk-loading-message">Carregando informações essenciais…</p><button id="rk-loading-retry" type="button" hidden>Tentar novamente</button><footer><span>Desenvolvido por</span><img src="../assets/conecte-logo.png" alt="Conecte"></footer></section>';
+    root.innerHTML = '<section class="rk-loading-card"><img class="rk-loading-logo" src="/imagens/logo.jpeg" alt="RK Vidraçaria"><p class="rk-loading-kicker">RK VIDRAÇARIA</p><h1 id="rk-loading-title">Preparando o sistema</h1><div class="rk-loading-line" aria-hidden="true"><span></span></div><p id="rk-loading-message">Carregando informações essenciais…</p><button id="rk-loading-retry" type="button" hidden>Tentar novamente</button><footer><span>Desenvolvido por</span><img src="/assets/conecte-logo.png" alt="Conecte"></footer></section>';
+    root.hidden = tasks.size === 0 && !error;
     doc.body.prepend(root);
     doc.getElementById("rk-loading-retry").addEventListener("click", function () {
       if (typeof retry === "function") retry();

@@ -15,6 +15,7 @@
       "**/.*",
       "**/node_modules/**",
       "docs/**",
+      "assets/pwa/launch-background.png",
       "patchs/**",
       "scripts/**",
       "tests/**",
