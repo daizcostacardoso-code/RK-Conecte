@@ -23,7 +23,8 @@
         temporizador: null,
         temporizadorOcultar: null,
         temporizadorRelogio: null,
-        montado: false
+        montado: false,
+        recursosEssenciaisComFalha: []
     };
 
     function lerLocal() {
@@ -325,11 +326,26 @@
         atualizarProgresso(Math.min(estado.progresso, 92));
     }
 
+    function registrarFalhaDeRecurso(evento) {
+        const alvo = evento?.target;
+        const tag = String(alvo?.tagName || "").toUpperCase();
+        const folhaDeEstilo = tag === "LINK" && String(alvo?.rel || "").toLowerCase().includes("stylesheet");
+        if (tag !== "SCRIPT" && !folhaDeEstilo) return;
+
+        const origem = alvo?.src || alvo?.href || "recurso essencial";
+        estado.recursosEssenciaisComFalha.push(origem);
+        informarFalha("Nao foi possivel carregar todos os recursos da pagina. Verifique a conexao e tente novamente.");
+    }
+
     async function concluirCargaInicial() {
         try {
             if (documento.fonts?.ready) await documento.fonts.ready;
             if (global.RKAuth?.aguardarAutenticacao) await global.RKAuth.aguardarAutenticacao();
         } catch (_) {}
+        if (estado.recursosEssenciaisComFalha.length) {
+            informarFalha("Nao foi possivel carregar todos os recursos da pagina. Verifique a conexao e tente novamente.");
+            return;
+        }
         ocultar(TOKEN_INICIAL);
     }
 
@@ -341,6 +357,7 @@
 
     global.addEventListener("online", atualizarConexao);
     global.addEventListener("offline", atualizarConexao);
+    global.addEventListener("error", registrarFalhaDeRecurso, true);
     global.addEventListener("load", () => void concluirCargaInicial(), { once: true });
 
     global.RKLoading = {

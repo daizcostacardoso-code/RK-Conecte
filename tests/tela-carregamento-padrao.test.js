@@ -33,7 +33,7 @@ const paginas = [
 test("todas as páginas carregam a proteção visual antes dos estilos", () => {
     paginas.forEach(caminho => {
         const html = readFileSync(resolve(raiz, caminho), "utf8");
-        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.0');
+        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.1');
         const primeiroEstilo = html.indexOf('<link rel="stylesheet"');
         assert.ok(carregamento >= 0, caminho);
         assert.ok(primeiroEstilo < 0 || carregamento < primeiroEstilo, caminho);
@@ -51,6 +51,8 @@ test("tela padrão informa progresso e permanece disponível no aparelho", () =>
     assert.match(fonte, /start:\s*mostrar/);
     assert.match(fonte, /finish:\s*ocultar/);
     assert.match(fonte, /run:\s*executar/);
+    assert.match(fonte, /registrarFalhaDeRecurso/);
+    assert.match(fonte, /recursosEssenciaisComFalha/);
 });
 
 test("service worker armazena a tela e antecipa páginas em conexão lenta", () => {
@@ -68,9 +70,14 @@ test("consultas centrais mantêm a tela ativa até os dados terminarem", () => {
     const dashboard = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-controller.js"), "utf8");
     const acessos = readFileSync(resolve(raiz, "js/acessos/acesso-controller.js"), "utf8");
     const entrada = readFileSync(resolve(raiz, "paginas/loading.html"), "utf8");
+    const arquivos = readFileSync(resolve(raiz, "js/documentos/document-archive-controller.js"), "utf8");
+    const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
     assert.match(dashboard, /RKLoading\?\.start\("Reunindo orçamentos, obras e movimentações/);
     assert.match(dashboard, /RKLoading\?\.finish\(token\)/);
     assert.match(acessos, /RKLoading\?\.start\("Carregando os acessos da equipe/);
     assert.match(entrada, /RKLoading\?\.start\("Validando seu acesso/);
+    assert.match(arquivos, /RKLoading\?\.start\("Carregando os arquivos e dados do Firestore/);
+    assert.match(arquivos, /RKLoading\?\.finish\(tokenCarregamento\)/);
+    assert.match(navegacao, /RKLoading\?\.start\("Preparando o menu e seu acesso/);
     assert.doesNotMatch(entrada, /v0\.4\.2/);
 });

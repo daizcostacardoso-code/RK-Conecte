@@ -561,11 +561,16 @@ const RKNavigation = {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    if (window.RKAuth?.paginaAtualProtegida()) {
-        const sessao = await RKAuth.aguardarAutenticacao();
-        if (!sessao) return;
+    const tokenCarregamento = window.RKLoading?.start("Preparando o menu e seu acesso...");
+    try {
+        if (window.RKAuth?.paginaAtualProtegida()) {
+            const sessao = await RKAuth.aguardarAutenticacao();
+            if (!sessao) return;
+        }
+        RKNavigation.iniciar();
+    } finally {
+        window.RKLoading?.finish(tokenCarregamento);
     }
-    RKNavigation.iniciar();
 });
 
 window.addEventListener("rk:auth-state-changed", () => {

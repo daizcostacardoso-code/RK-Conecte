@@ -7,9 +7,11 @@ const DocumentArchiveController = {
     exclusaoPendente: [],
 
     async iniciar() {
-        document.getElementById("btnBuscarArquivos")?.addEventListener("click", () => this.buscar());
-        document.getElementById("btnLimparArquivos")?.addEventListener("click", () => this.limparFiltros());
-        document.getElementById("btnExcluirArquivosSelecionados")?.addEventListener("click", () => this.solicitarExclusaoSelecionados());
+        const tokenCarregamento = window.RKLoading?.start("Carregando os arquivos e dados do Firestore...");
+        try {
+            document.getElementById("btnBuscarArquivos")?.addEventListener("click", () => this.buscar());
+            document.getElementById("btnLimparArquivos")?.addEventListener("click", () => this.limparFiltros());
+            document.getElementById("btnExcluirArquivosSelecionados")?.addEventListener("click", () => this.solicitarExclusaoSelecionados());
         document.getElementById("arquivosCorpo")?.addEventListener("click", evento => this.tratarAcao(evento));
         document.getElementById("arquivosCorpo")?.addEventListener("change", evento => this.alterarSelecao(evento));
         document.getElementById("arquivosSelecionarTodos")?.addEventListener("change", evento => this.selecionarTodos(evento.currentTarget.checked));
@@ -31,6 +33,9 @@ const DocumentArchiveController = {
             const registroId = String(parametros.get("registro") || "").trim();
             const registro = this.registros.find(item => (registroId && String(item.id || "") === registroId) || (numero && String(item.numero || "") === numero));
             if (registro) await this.gerarPdf(registro, false);
+        }
+        } finally {
+            window.RKLoading?.finish(tokenCarregamento);
         }
     },
 
