@@ -184,7 +184,7 @@ const RKNavigation = {
         }
 
         const script = document.createElement("script");
-        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=0.4.2`;
+        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=1.0.0`;
         script.dataset.rkVersion = "true";
         script.onload = callback;
         script.onerror = callback;
@@ -410,7 +410,7 @@ const RKNavigation = {
     },
 
     obterVersao() {
-        return String(window.RK_VERSION || "v0.4.2");
+        return String(window.RK_VERSION || "v1.0.0");
     },
 
     renderizarLink(link) {

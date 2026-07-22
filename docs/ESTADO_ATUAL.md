@@ -2,7 +2,9 @@
 
 ## Base técnica
 
-- Versão: `v0.9.0`.
+- Versão: `v1.0.0`.
+- Carregamento: shell global local, protegido até autenticação e perfil serem resolvidos.
+- Offline: app shell versionado no Cache Storage; dados privados continuam sob responsabilidade do SDK Firestore.
 - Frontend: HTML, CSS e JavaScript sem framework.
 - Hospedagem: Firebase Hosting.
 - Banco oficial: Cloud Firestore.

@@ -320,13 +320,14 @@ const RKAuth = {
         if (document.getElementById("rkAuthPendingStyle")) return;
         const estilo = document.createElement("style");
         estilo.id = "rkAuthPendingStyle";
-        estilo.textContent = "html.rk-auth-pending body{visibility:hidden!important}html.rk-auth-pending{background:#f4f7fb}";
+        estilo.textContent = "html.rk-auth-pending body>:not(#rk-global-loading){visibility:hidden!important}html.rk-auth-pending{background:#071c2b}";
         document.head.appendChild(estilo);
     },
 
     liberarInterface() {
         if (typeof document === "undefined") return;
         document.documentElement.classList.remove("rk-auth-pending");
+        window.RKLoading?.concluirInicializacao?.();
     },
 
     notificarEstado(sessao) {

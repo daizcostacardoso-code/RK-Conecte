@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="rk-app-iniciando">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="stylesheet" href="../css/rk-loading-critical.css?v=1.0.0">
+    <script src="../js/shared/rk-loading.js?v=1.0.0"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="../js/firebase-auth-bootstrap.js?v=0.9.0"></script>
-    <script src="../js/shared/rk-auth.js?v=0.9.2" data-rk-auth="protected"></script>
+    <script src="../js/firebase-auth-bootstrap.js?v=1.0.0"></script>
+    <script src="../js/shared/rk-auth.js?v=1.0.0" data-rk-auth="protected"></script>
     <script>document.documentElement.classList.add("orcamento-inteligente-html");</script>
     <title>Or&ccedil;amento Inteligente - RK Vidra&ccedil;aria</title>
 
-    <link rel="stylesheet" href="../css/style.css?v=5.9.5">
-    <link rel="stylesheet" href="../css/orcamento-inteligente-mobile.css?v=1.0.9">
-    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.2"></script>
+    <link rel="stylesheet" href="../css/style.css?v=1.0.0">
+    <link rel="stylesheet" href="../css/orcamento-inteligente-mobile.css?v=1.0.0">
+    <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.0"></script>
 
     <meta name="theme-color" content="#083d67">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -179,70 +181,70 @@
     <p>(73) 9981-9768 | Rua Guimar&atilde;es, 336 - Nilo Fraga, Porto Seguro</p>
 </footer>
 
-<script src="../js/config.js?v=3.9.1"></script>
-<script src="../js/storage.js?v=3.9.1"></script>
-<script src="../js/util.js?v=3.9.1"></script>
-<script src="../js/storage/storage-adapter.js?v=3.9.1"></script>
-<script src="../js/storage/firestore-adapter.js?v=0.5.0"></script>
-<script src="../js/core/event-types.js?v=5.1A"></script>
-<script src="../js/core/event-bus.js?v=5.1A"></script>
-<script src="../js/core/app-state-events.js?v=5.1A"></script>
-<script src="../js/core/app-state.js?v=5.1A"></script>
-<script src="../js/core/app-state-service.js?v=5.1A"></script>
-<script src="../js/workflow/workflow-state.js?v=3.9.1"></script>
-<script src="../js/workflow/workflow-validator.js?v=3.9.1"></script>
-<script src="../js/workflow/workflow-events.js?v=3.9.1"></script>
-<script src="../js/workflow/workflow-engine.js?v=3.9.1"></script>
-<script src="../js/clientes/cliente-model.js?v=3.9.1"></script>
+<script src="../js/config.js?v=1.0.0"></script>
+<script src="../js/storage.js?v=1.0.0"></script>
+<script src="../js/util.js?v=1.0.0"></script>
+<script src="../js/storage/storage-adapter.js?v=1.0.0"></script>
+<script src="../js/storage/firestore-adapter.js?v=1.0.0"></script>
+<script src="../js/core/event-types.js?v=1.0.0"></script>
+<script src="../js/core/event-bus.js?v=1.0.0"></script>
+<script src="../js/core/app-state-events.js?v=1.0.0"></script>
+<script src="../js/core/app-state.js?v=1.0.0"></script>
+<script src="../js/core/app-state-service.js?v=1.0.0"></script>
+<script src="../js/workflow/workflow-state.js?v=1.0.0"></script>
+<script src="../js/workflow/workflow-validator.js?v=1.0.0"></script>
+<script src="../js/workflow/workflow-events.js?v=1.0.0"></script>
+<script src="../js/workflow/workflow-engine.js?v=1.0.0"></script>
+<script src="../js/clientes/cliente-model.js?v=1.0.0"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="../js/firebase-config.js?v=3.0.1"></script>
-<script src="../js/shared/rk-firestore-store.js?v=0.9.0"></script>
-<script src="../js/clientes/cliente-factory.js?v=3.9.1"></script>
-<script src="../js/clientes/cliente-validator.js?v=3.9.1"></script>
-<script src="../js/clientes/cliente-repository.js?v=6.1.1"></script>
-<script src="../js/clientes/cliente-service.js?v=3.9.1"></script>
-<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=5.2.1"></script>
-<script src="../js/projetos/projeto-status.js?v=0.9.0"></script>
-<script src="../js/projetos/projeto-historico.js?v=0.9.0"></script>
-<script src="../js/projetos/projeto-model.js?v=0.9.0"></script>
-<script src="../js/projetos/projeto-storage.js?v=0.9.0"></script>
-<script src="../js/projetos/projeto-service.js?v=0.9.0"></script>
-<script src="../js/servicos/servico-model.js?v=5.6.7"></script>
-<script src="../js/servicos/servico-factory.js?v=3.9.1"></script>
-<script src="../js/servicos/servico-validator.js?v=3.9.1"></script>
-<script src="../js/servicos/servico-repository.js?v=0.5.0"></script>
-<script src="../js/servicos/servico-service.js?v=3.9.1"></script>
-<script src="../js/produtos/produto-model.js?v=3.9.1"></script>
-<script src="../js/produtos/produto-factory.js?v=3.9.1"></script>
-<script src="../js/produtos/produto-validator.js?v=3.9.1"></script>
-<script src="../js/produtos/produto-repository.js?v=6.1.0"></script>
-<script src="../js/produtos/produto-service.js?v=3.9.1"></script>
-<script src="../js/calculos/calculo-model.js?v=3.9.1"></script>
-<script src="../js/calculos/calculo-validator.js?v=3.9.1"></script>
-<script src="../js/calculos/calculo-engine.js?v=7.2.1"></script>
-<script src="../js/calculos/calculo-service.js?v=7.2.1"></script>
-<script src="../js/orcamentos/orcamento-state.js?v=3.9.1"></script>
-<script src="../js/orcamentos/orcamento-context.js?v=5.3.0"></script>
-<script src="../js/orcamentos/orcamento-factory.js?v=3.9.1"></script>
-<script src="../js/orcamentos/orcamento-item-config.js?v=5.6.7"></script>
-<script src="../js/orcamentos/orcamento-orchestrator.js?v=7.2.1"></script>
-<script src="../js/usecases/orcamentos/criar-orcamento-usecase.js?v=3.9.1"></script>
-<script src="../js/usecases/orcamentos/calcular-orcamento-usecase.js?v=3.9.1"></script>
-<script src="../js/usecases/orcamentos/validar-orcamento-usecase.js?v=3.9.1"></script>
-<script src="../js/documentos/document-model.js?v=7.2.1"></script>
-<script src="../js/documentos/document-builder.js?v=7.2.1"></script>
-<script src="../js/documentos/document-validator.js?v=5.1A"></script>
-<script src="../js/documentos/document-service.js?v=5.8.5"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-model.js?v=0.9.0"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-validator.js?v=0.9.0"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-repository.js?v=0.9.0"></script>
-<script src="../js/orcamentos/orcamento-aprovacao-service.js?v=0.9.0"></script>
-<script src="../js/documentos/document-pdf-repository.js?v=0.6.0"></script>
-<script src="../js/shared/rk-draft-state.js?v=0.5.0"></script>
-<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=7.2.1"></script>
-<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=0.5.0"></script>
-<script src="../js/shared/rk-navigation.js?v=0.9.1"></script>
-<script src="../js/app-install.js?v=3.2.0"></script>
-  <script src="../js/conecte-signature.js?v=20260718"></script>
+<script src="../js/firebase-config.js?v=1.0.0"></script>
+<script src="../js/shared/rk-firestore-store.js?v=1.0.0"></script>
+<script src="../js/clientes/cliente-factory.js?v=1.0.0"></script>
+<script src="../js/clientes/cliente-validator.js?v=1.0.0"></script>
+<script src="../js/clientes/cliente-repository.js?v=1.0.0"></script>
+<script src="../js/clientes/cliente-service.js?v=1.0.0"></script>
+<script src="../js/usecases/clientes/criar-cliente-usecase.js?v=1.0.0"></script>
+<script src="../js/projetos/projeto-status.js?v=1.0.0"></script>
+<script src="../js/projetos/projeto-historico.js?v=1.0.0"></script>
+<script src="../js/projetos/projeto-model.js?v=1.0.0"></script>
+<script src="../js/projetos/projeto-storage.js?v=1.0.0"></script>
+<script src="../js/projetos/projeto-service.js?v=1.0.0"></script>
+<script src="../js/servicos/servico-model.js?v=1.0.0"></script>
+<script src="../js/servicos/servico-factory.js?v=1.0.0"></script>
+<script src="../js/servicos/servico-validator.js?v=1.0.0"></script>
+<script src="../js/servicos/servico-repository.js?v=1.0.0"></script>
+<script src="../js/servicos/servico-service.js?v=1.0.0"></script>
+<script src="../js/produtos/produto-model.js?v=1.0.0"></script>
+<script src="../js/produtos/produto-factory.js?v=1.0.0"></script>
+<script src="../js/produtos/produto-validator.js?v=1.0.0"></script>
+<script src="../js/produtos/produto-repository.js?v=1.0.0"></script>
+<script src="../js/produtos/produto-service.js?v=1.0.0"></script>
+<script src="../js/calculos/calculo-model.js?v=1.0.0"></script>
+<script src="../js/calculos/calculo-validator.js?v=1.0.0"></script>
+<script src="../js/calculos/calculo-engine.js?v=1.0.0"></script>
+<script src="../js/calculos/calculo-service.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-state.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-context.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-factory.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-item-config.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-orchestrator.js?v=1.0.0"></script>
+<script src="../js/usecases/orcamentos/criar-orcamento-usecase.js?v=1.0.0"></script>
+<script src="../js/usecases/orcamentos/calcular-orcamento-usecase.js?v=1.0.0"></script>
+<script src="../js/usecases/orcamentos/validar-orcamento-usecase.js?v=1.0.0"></script>
+<script src="../js/documentos/document-model.js?v=1.0.0"></script>
+<script src="../js/documentos/document-builder.js?v=1.0.0"></script>
+<script src="../js/documentos/document-validator.js?v=1.0.0"></script>
+<script src="../js/documentos/document-service.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-model.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-validator.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-repository.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-aprovacao-service.js?v=1.0.0"></script>
+<script src="../js/documentos/document-pdf-repository.js?v=1.0.0"></script>
+<script src="../js/shared/rk-draft-state.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-inteligente-ui.js?v=1.0.0"></script>
+<script src="../js/orcamentos/orcamento-inteligente-controller.js?v=1.0.0"></script>
+<script src="../js/shared/rk-navigation.js?v=1.0.0"></script>
+<script src="../js/app-install.js?v=1.0.0"></script>
+  <script src="../js/conecte-signature.js?v=1.0.0"></script>
 </body>
 </html>

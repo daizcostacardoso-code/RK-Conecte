@@ -1,98 +1,35 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="rk-app-iniciando">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="stylesheet" href="../css/rk-loading-critical.css?v=1.0.0">
+    <script src="../js/shared/rk-loading.js?v=1.0.0"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="../js/firebase-auth-bootstrap.js?v=0.9.0"></script>
-    <script src="../js/shared/rk-auth.js?v=0.9.2" data-rk-auth="protected"></script>
-    <title>Carregando - RK Vidraçaria</title>
-    <link rel="stylesheet" href="../css/style.css?v=5.8.0">
-
-    <meta name="theme-color" content="#083d67">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
+    <script src="../js/firebase-auth-bootstrap.js?v=1.0.0"></script>
+    <script src="../js/shared/rk-auth.js?v=1.0.0" data-rk-auth="protected"></script>
+    <script src="../js/shared/rk-version.js?v=1.0.0"></script>
+    <title>Preparando o sistema - RK Vidraçaria</title>
+    <meta name="theme-color" content="#071c2b">
     <link rel="manifest" href="../manifest.webmanifest">
-    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
 </head>
-<body class="splash-body">
-    <main class="splash-page">
-        <section class="splash-card">
-            <div class="splash-logo-wrap">
-                <img src="../imagens/logo.jpeg" alt="Logo RK Vidraçaria" class="splash-logo">
-            </div>
-
-            <span class="splash-kicker">Acesso autorizado</span>
-            <h1 id="splashEmpresa">RK Vidraçaria</h1>
-            <p id="splashSubtitulo">Preparando ambiente do funcionário...</p>
-
-            <div class="splash-user">
-                <div class="splash-avatar" id="splashAvatar">RK</div>
-                <div>
-                    <strong id="splashUsuario">Funcionário RK</strong>
-                    <small id="splashLogin">Validando acesso...</small>
-                </div>
-            </div>
-
-            <div class="splash-info-grid">
-                <div>
-                    <span>Versão</span>
-                    <strong>RK Vidraçaria v0.4.2</strong>
-                </div>
-                <div>
-                    <span>CNPJ</span>
-                    <strong id="splashCnpj">Não informado</strong>
-                </div>
-                <div>
-                    <span>Sistema</span>
-                    <strong>RK Vidra&ccedil;aria</strong>
-                </div>
-            </div>
-
-            <div class="splash-progress" aria-label="Carregando painel">
-                <span></span>
-            </div>
-
-            <p class="splash-footer">Carregando painel. Aguarde alguns segundos...</p>
-        </section>
-    </main>
-
+<body>
+    <main aria-label="Validação de acesso"></main>
     <script>
-        (async function(){
-            const chaveConfig = "vidracaria_configuracoes_sistema";
-            const sessao = await RKAuth.aguardarAutenticacao();
-            const config = JSON.parse(localStorage.getItem(chaveConfig) || "{}");
-
-            if (!sessao || !sessao.logado) return;
-
-            const nomeEmpresa = config.nomeEmpresa || "RK Vidraçaria";
-            const nomeUsuario = sessao.nomeUsuario || config.nomeUsuario || "Funcionário RK";
-            const emailUsuario = sessao.email || sessao.usuario || "";
-            const foto = sessao.fotoUsuario || config.fotoUsuario || "";
-            const cnpj = config.cnpjEmpresa || config.cnpj || "Não informado";
-
-            document.getElementById("splashEmpresa").textContent = nomeEmpresa;
-            document.getElementById("splashUsuario").textContent = nomeUsuario;
-            document.getElementById("splashLogin").textContent = emailUsuario;
-            document.getElementById("splashCnpj").textContent = cnpj;
-
-            const avatar = document.getElementById("splashAvatar");
-            if (foto) {
-                avatar.innerHTML = '<img src="' + foto + '" alt="Foto do usuário">';
-                avatar.classList.add("com-imagem");
-            } else {
-                const partes = nomeUsuario.trim().split(/\s+/).filter(Boolean);
-                avatar.textContent = (partes[0]?.[0] || "R") + (partes[1]?.[0] || "K");
-            }
-
-            setTimeout(() => {
-                window.location.href = "dashboard-comercial.html";
-            }, 2600);
-        })();
+      (async function () {
+        RKLoading.adicionarTarefa("autenticacao", "Validando seu acesso…");
+        try {
+          const sessao = await RKAuth.aguardarAutenticacao();
+          if (sessao && sessao.logado) window.location.replace("dashboard-comercial.html");
+        } catch (erro) {
+          RKLoading.mostrarErro("Não foi possível validar o acesso.");
+        } finally {
+          RKLoading.concluirTarefa("autenticacao");
+          RKLoading.concluirInicializacao();
+        }
+      })();
     </script>
-    <script src="../js/app-install.js?v=3.2.0"></script>
-  <script src="../js/conecte-signature.js?v=20260718"></script>
+    <script src="../js/app-install.js?v=1.0.0"></script>
 </body>
 </html>

@@ -73,9 +73,9 @@
 - remover módulos antigos que permanecerem sem uso após a migração;
 - preparar cenários de ponta a ponta para o lançamento.
 
-## Sprint 3 — lançamento
+## Sprint 3 — estabilização v1.0.0
 
 - testes de ponta a ponta;
 - backup e checklist de deploy;
-- publicação controlada;
-- criação da versão estável `v1.0.0` do produto.
+- publicação controlada (pendente de autorização explícita);
+- versão estável `v1.0.0` preparada, sem deploy automático.
