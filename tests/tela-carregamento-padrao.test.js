@@ -106,9 +106,22 @@ test("tela padrão informa progresso e permanece disponível no aparelho", () =>
     assert.ok(esconderTela >= 0 && liberarConteudo > esconderTela, "o conteúdo só pode aparecer após o overlay ser ocultado");
 });
 
+
+
+test("entrada do PWA possui primeira pintura estática compatível com a tela padrão", () => {
+    const entrada = readFileSync(resolve(raiz, "paginas/loading.html"), "utf8");
+    assert.match(entrada, /id="rkPwaBootStyles"/);
+    assert.match(entrada, /id="rkPwaBootScreen"/);
+    assert.match(entrada, /Preparando tudo para você/);
+    assert.match(entrada, /Validando seu acesso e preparando o dashboard/);
+    assert.match(entrada, /linear-gradient\(145deg, #041522/);
+    assert.match(entrada, /html:not\(\.rk-loading-active\) #rkPwaBootScreen/);
+    assert.match(entrada, /window\.addEventListener\("DOMContentLoaded"/);
+});
+
 test("service worker armazena a tela e antecipa páginas em conexão lenta", () => {
     const fonte = readFileSync(resolve(raiz, "sw.js"), "utf8");
-    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v7/);
+    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v8/);
     assert.match(fonte, /\/js\/shared\/rk-loading-screen\.js/);
     assert.match(fonte, /\/paginas\/dashboard-comercial\.html/);
     assert.match(fonte, /Promise\.allSettled/);

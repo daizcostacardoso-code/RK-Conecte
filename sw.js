@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.9.1-loading-v7';
+const RK_CACHE = 'rk-conecte-v0.9.1-loading-v8';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -68,6 +68,10 @@ const APP_SHELL = [
   '/assets/conecte-logo.png',
   '/imagens/icons/icon-192.png',
   '/imagens/icons/icon-512.png',
+  '/imagens/icons/icon-1024.png',
+  '/imagens/icons/maskable-192.png',
+  '/imagens/icons/maskable-512.png',
+  '/imagens/icons/maskable-1024.png',
   '/manifest.webmanifest',
   '/robots.txt',
   '/sitemap.xml'
