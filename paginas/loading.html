@@ -10,8 +10,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RK Vidraçaria">
-    <link rel="manifest" href="../manifest.webmanifest">
-    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
+    <link rel="manifest" href="../manifest.webmanifest?v=20260722-splash2">
+    <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png?v=20260722-splash2">
+    <link rel="preload" href="/imagens/icons/rk-splash-mark-256.png" as="image" fetchpriority="high">
     <link rel="preload" href="/assets/conecte-logo.png" as="image">
 
     <!--
@@ -78,6 +79,13 @@
             text-align: center;
         }
         .rk-pwa-boot-company { display: grid; justify-items: center; gap: 12px; }
+        .rk-pwa-boot-logo {
+            width: 78px;
+            height: 78px;
+            object-fit: contain;
+            border-radius: 20px;
+            filter: drop-shadow(0 12px 22px rgba(0,0,0,.28));
+        }
         .rk-pwa-boot-kicker { color: #79e8f5; font-size: .72rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
         .rk-pwa-boot-card h1 { max-width: 430px; margin: 0; color: #fff; font-size: clamp(1.65rem, 6vw, 2.35rem); line-height: 1.08; letter-spacing: -.035em; }
         .rk-pwa-boot-message { min-height: 1.5em; margin: 0; color: #c7dce9; font-size: clamp(.9rem, 2.8vw, 1rem); line-height: 1.5; }
@@ -117,6 +125,7 @@
         @media (max-width: 520px) {
             #rkPwaBootScreen { place-items: stretch center; padding-inline: 12px; }
             .rk-pwa-boot-card { align-self: center; gap: 16px; border-radius: 22px; padding: 24px 18px; }
+            .rk-pwa-boot-logo { width: 68px; height: 68px; border-radius: 17px; }
             .rk-pwa-boot-meta { grid-template-columns: 1fr; }
             .rk-pwa-boot-meta > div { grid-template-columns: 84px minmax(0,1fr); align-items: center; }
         }
@@ -125,7 +134,7 @@
         }
     </style>
 
-    <script defer src="/js/shared/rk-loading-screen.js?v=1.0.4"></script>
+    <script defer src="/js/shared/rk-loading-screen.js?v=1.0.5"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script defer src="../js/firebase-auth-bootstrap.js?v=0.9.0"></script>
@@ -137,6 +146,7 @@
     <div id="rkPwaBootScreen" role="status" aria-live="polite" aria-label="Preparando o sistema">
         <section class="rk-pwa-boot-card">
             <div class="rk-pwa-boot-company">
+                <img class="rk-pwa-boot-logo" src="/imagens/icons/rk-splash-mark-256.png" alt="Símbolo RK Vidraçaria" width="256" height="256" fetchpriority="high">
                 <span class="rk-pwa-boot-kicker">RK Vidraçaria · Gestão integrada</span>
                 <h1>Preparando tudo para você</h1>
                 <p class="rk-pwa-boot-message">Validando seu acesso e preparando o dashboard...</p>

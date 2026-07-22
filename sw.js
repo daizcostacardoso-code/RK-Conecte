@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v0.9.1-loading-v8';
+const RK_CACHE = 'rk-conecte-v0.9.1-splash-seamless-v9';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -72,6 +72,7 @@ const APP_SHELL = [
   '/imagens/icons/maskable-192.png',
   '/imagens/icons/maskable-512.png',
   '/imagens/icons/maskable-1024.png',
+  '/imagens/icons/rk-splash-mark-256.png',
   '/manifest.webmanifest',
   '/robots.txt',
   '/sitemap.xml'
@@ -100,13 +101,22 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (url.pathname === '/js/shared/rk-loading-screen.js' || url.pathname === '/imagens/logo.jpeg' || url.pathname === '/assets/conecte-logo.png') {
+  if (url.pathname === '/js/shared/rk-loading-screen.js' || url.pathname === '/imagens/logo.jpeg' || url.pathname === '/assets/conecte-logo.png' || url.pathname === '/imagens/icons/rk-splash-mark-256.png') {
     const atualizacao = fetch(request).then(response => {
       if (response && response.ok) caches.open(RK_CACHE).then(cache => cache.put(request, response.clone())).catch(() => null);
       return response;
     });
     event.waitUntil(atualizacao.catch(() => null));
     event.respondWith(caches.match(request, { ignoreSearch: true }).then(cached => cached || atualizacao));
+    return;
+  }
+
+  if (request.mode === 'navigate' && url.pathname === '/paginas/loading.html') {
+    const atualizacao = fetch(request).then(response => {
+      if (response && response.ok) caches.open(RK_CACHE).then(cache => cache.put(request, response.clone())).catch(() => null);
+      return response;
+    });
+    event.respondWith(atualizacao.catch(() => caches.match('/paginas/loading.html', { ignoreSearch: true }).then(cached => cached || caches.match('/index.html'))));
     return;
   }
 

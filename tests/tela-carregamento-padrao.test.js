@@ -71,7 +71,7 @@ test("carregador inicializa antes do body sem interromper a proteção visual", 
 test("todas as páginas carregam a proteção visual antes dos estilos", () => {
     paginas.forEach(caminho => {
         const html = readFileSync(resolve(raiz, caminho), "utf8");
-        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.4');
+        const carregamento = html.indexOf('/js/shared/rk-loading-screen.js?v=1.0.5');
         const primeiroEstilo = html.indexOf('<link rel="stylesheet"');
         assert.ok(carregamento >= 0, caminho);
         assert.ok(primeiroEstilo < 0 || carregamento < primeiroEstilo, caminho);
@@ -82,7 +82,7 @@ test("tela padrão informa progresso e permanece disponível no aparelho", () =>
     const fonte = readFileSync(resolve(raiz, "js/shared/rk-loading-screen.js"), "utf8");
     assert.doesNotMatch(fonte, /localStorage|sessionStorage|storageKey/);
     assert.match(fonte, /role=\"progressbar\"/);
-    assert.match(fonte, /\/imagens\/logo\.jpeg/);
+    assert.match(fonte, /\/imagens\/icons\/rk-splash-mark-256\.png/);
     assert.match(fonte, /\/assets\/conecte-logo\.png/);
     assert.match(fonte, /addEventListener\(\"offline\"/);
     assert.match(fonte, /start:\s*mostrar/);
@@ -121,7 +121,7 @@ test("entrada do PWA possui primeira pintura estática compatível com a tela pa
 
 test("service worker armazena a tela e antecipa páginas em conexão lenta", () => {
     const fonte = readFileSync(resolve(raiz, "sw.js"), "utf8");
-    assert.match(fonte, /rk-conecte-v0\.9\.1-loading-v8/);
+    assert.match(fonte, /rk-conecte-v0\.9\.1-splash-seamless-v9/);
     assert.match(fonte, /\/js\/shared\/rk-loading-screen\.js/);
     assert.match(fonte, /\/paginas\/dashboard-comercial\.html/);
     assert.match(fonte, /Promise\.allSettled/);

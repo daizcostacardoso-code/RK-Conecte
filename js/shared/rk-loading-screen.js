@@ -101,14 +101,14 @@
             }
             .rk-loading-company { display: grid; justify-items: center; gap: 12px; }
             .rk-loading-rk-logo {
-                display: none;
-                width: 70px;
-                height: 70px;
-                object-fit: cover;
-                border: 4px solid rgba(255,255,255,.9);
-                border-radius: 20px;
-                background: #fff;
-                box-shadow: 0 12px 28px rgba(0,0,0,.24);
+                display: block;
+                width: 76px;
+                height: 76px;
+                object-fit: contain;
+                border: 0;
+                border-radius: 19px;
+                background: transparent;
+                filter: drop-shadow(0 12px 22px rgba(0,0,0,.28));
             }
             .rk-loading-kicker { color: #79e8f5; font-size: .72rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
             .rk-loading-card h1 { max-width: 430px; margin: 0; color: #fff; font-size: clamp(1.65rem, 6vw, 2.35rem); line-height: 1.08; letter-spacing: -.035em; }
@@ -151,7 +151,7 @@
             @media (max-width: 520px) {
                 #rkLoadingScreen { place-items: stretch center; padding-inline: 12px; }
                 .rk-loading-card { align-self: center; gap: 16px; border-radius: 22px; padding: 24px 18px; }
-                .rk-loading-rk-logo { width: 60px; height: 60px; border-radius: 17px; }
+                .rk-loading-rk-logo { width: 66px; height: 66px; border-radius: 16px; }
                 .rk-loading-meta { grid-template-columns: 1fr; }
                 .rk-loading-meta > div { grid-template-columns: 84px minmax(0,1fr); align-items: center; }
             }
@@ -194,7 +194,7 @@
         tela.innerHTML = `
             <section class="rk-loading-card">
                 <div class="rk-loading-company">
-                    <img class="rk-loading-rk-logo" src="/imagens/logo.jpeg" alt="Logo RK Vidraçaria">
+                    <img class="rk-loading-rk-logo" src="/imagens/icons/rk-splash-mark-256.png" alt="Símbolo RK Vidraçaria" width="256" height="256" decoding="async">
                     <span class="rk-loading-kicker" id="rkLoadingEmpresa">RK Vidraçaria · Gestão integrada</span>
                     <h1>Preparando tudo para você</h1>
                     <p class="rk-loading-message" id="rkLoadingMensagem">Preparando sua área de trabalho...</p>
