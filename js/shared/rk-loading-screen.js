@@ -9,6 +9,14 @@
     const TEMPO_MINIMO = 420;
     const TEMPO_ESTABILIZACAO_INICIAL = 320;
     const TEMPO_LIMITE_INICIAL = 25000;
+    const CHAVE_TRANSICAO = "conecte_loading_transition_v1";
+    const SUPRIMIR_CARGA_INICIAL = (() => {
+        try {
+            const valor = global.sessionStorage?.getItem(CHAVE_TRANSICAO);
+            if (valor) global.sessionStorage.removeItem(CHAVE_TRANSICAO);
+            return valor === "dashboard";
+        } catch (_) { return false; }
+    })();
     const DICAS_PADRAO = [
         "Confira medidas, endereço e observações antes de liberar uma ordem de serviço.",
         "Orçamentos aprovados seguem para o fluxo operacional sem criar projetos duplicados.",
@@ -17,7 +25,7 @@
     ];
 
     const estado = {
-        ativos: new Set([TOKEN_INICIAL]),
+        ativos: new Set(SUPRIMIR_CARGA_INICIAL ? [] : [TOKEN_INICIAL]),
         sequencia: 0,
         progresso: 7,
         exibidoEm: Date.now(),
@@ -378,11 +386,15 @@
     }
 
     criarEstilos();
-    documento.documentElement.classList.add("rk-loading-active");
-    iniciarLimiteInicial();
+    if (!SUPRIMIR_CARGA_INICIAL) {
+        documento.documentElement.classList.add("rk-loading-active");
+        iniciarLimiteInicial();
+    }
     salvarLocal({ dicas: DICAS_PADRAO, disponivelOffline: true });
-    if (documento.body) montar();
-    else documento.addEventListener("DOMContentLoaded", montar, { once: true });
+    if (!SUPRIMIR_CARGA_INICIAL) {
+        if (documento.body) montar();
+        else documento.addEventListener("DOMContentLoaded", montar, { once: true });
+    }
 
     global.addEventListener("online", atualizarConexao);
     global.addEventListener("offline", atualizarConexao);

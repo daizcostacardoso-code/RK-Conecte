@@ -32,10 +32,13 @@
                 return;
             }
             window.RKLoading?.update(78, "Acesso confirmado. Abrindo sua área de trabalho...");
-            setTimeout(() => { window.location.replace("dashboard-comercial.html"); }, 650);
+            setTimeout(() => {
+                try { sessionStorage.setItem("conecte_loading_transition_v1", "dashboard"); } catch (_) {}
+                window.location.replace("dashboard-comercial.html");
+            }, 650);
         })();
     </script>
     <script src="../js/app-install.js?v=3.2.1"></script>
-  <script src="../js/conecte-signature.js?v=20260718"></script>
+  <script src="../js/conecte-signature.js?v=20260722"></script>
 </body>
 </html>
