@@ -5,6 +5,7 @@ const { resolve } = require("node:path");
 
 const raiz = resolve(__dirname, "..");
 const paginasComAuth = [
+    "index.html",
     "paginas/acessos.html",
     "paginas/arquivos.html",
     "paginas/caixa.html",
@@ -12,7 +13,6 @@ const paginasComAuth = [
     "paginas/compartilhar-documento.html",
     "paginas/dashboard-comercial.html",
     "paginas/funcionario.html",
-    "paginas/loading.html",
     "paginas/login.html",
     "paginas/medicao-obra.html",
     "paginas/nota-servico.html",

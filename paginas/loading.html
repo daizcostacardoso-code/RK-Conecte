@@ -1,36 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="rk-app-iniciando">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <link rel="stylesheet" href="../css/rk-loading-critical.css?v=1.0.0">
-    <script src="../js/shared/rk-loading.js?v=1.0.0"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-    <script src="../js/firebase-auth-bootstrap.js?v=1.0.0"></script>
-    <script src="../js/shared/rk-auth.js?v=1.0.0" data-rk-auth="protected"></script>
-    <script src="../js/shared/rk-version.js?v=1.0.0"></script>
-    <title>Preparando o sistema - RK Vidraçaria</title>
+    <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#071c2b">
-    <link rel="manifest" href="../manifest.webmanifest">
+    <meta http-equiv="refresh" content="0; url=dashboard-comercial.html?app=1&amp;origem=pwa-legado">
+    <title>Abrindo o sistema - RK Vidraçaria</title>
+    <script>
+        (() => {
+            const destino = new URL("dashboard-comercial.html", window.location.href);
+            destino.searchParams.set("app", "1");
+            destino.searchParams.set("origem", "pwa-legado");
+            window.location.replace(destino.href);
+        })();
+    </script>
 </head>
 <body>
-    <main aria-label="Validação de acesso"></main>
-    <script>
-      (async function () {
-        RKLoading.adicionarTarefa("autenticacao", "Validando seu acesso…");
-        try {
-          const sessao = await RKAuth.aguardarAutenticacao();
-          if (sessao && sessao.logado) window.location.replace("dashboard-comercial.html");
-        } catch (erro) {
-          RKLoading.mostrarErro("Não foi possível validar o acesso.");
-        } finally {
-          RKLoading.concluirTarefa("autenticacao");
-          RKLoading.concluirInicializacao();
-        }
-      })();
-    </script>
-    <script src="../js/app-install.js?v=1.0.0"></script>
-  <script src="../js/conecte-signature.js?v=20260722"></script>
+    <main>
+        <p>Abrindo a área interna da RK Vidraçaria…</p>
+        <noscript><a href="dashboard-comercial.html?app=1&amp;origem=pwa-legado">Continuar para o sistema</a></noscript>
+    </main>
 </body>
 </html>

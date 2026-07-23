@@ -122,7 +122,7 @@ const RKNavigation = {
     prepararTelaInterna(lista) {
         document.body.classList.add("rk-app-interna");
         this.prepararMenuMobile(lista);
-        this.carregarVersao(() => this.renderizarAssinaturaVersao());
+        this.carregarVersao(() => {});
     },
 
     prepararMenuMobile(lista) {
@@ -184,34 +184,11 @@ const RKNavigation = {
         }
 
         const script = document.createElement("script");
-        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=1.0.0`;
+        script.src = `${this.estaEmPaginas() ? "../" : ""}js/shared/rk-version.js?v=1.0.1`;
         script.dataset.rkVersion = "true";
         script.onload = callback;
         script.onerror = callback;
         document.head.appendChild(script);
-    },
-
-    renderizarAssinaturaVersao() {
-        if (document.querySelector(".conecte-signature, .rk-version-signature")) {
-            return;
-        }
-
-        const footer = document.querySelector("body > footer:last-of-type");
-
-        if (!footer) {
-            return;
-        }
-
-        const assinatura = document.createElement("div");
-        assinatura.className = "rk-version-signature conecte-signature";
-        assinatura.setAttribute("role", "contentinfo");
-        assinatura.setAttribute("aria-label", "Conecte");
-
-        const logo = document.createElement("img");
-        logo.src = `${this.estaEmPaginas() ? "../" : ""}assets/conecte-logo.png`;
-        logo.alt = "Conecte";
-        assinatura.appendChild(logo);
-        footer.insertAdjacentElement("afterend", assinatura);
     },
 
     renderizarAtalhosSistema() {
@@ -410,7 +387,7 @@ const RKNavigation = {
     },
 
     obterVersao() {
-        return String(window.RK_VERSION || "v1.0.0");
+        return String(window.RK_VERSION || "v1.0.1");
     },
 
     renderizarLink(link) {

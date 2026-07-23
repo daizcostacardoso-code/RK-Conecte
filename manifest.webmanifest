@@ -1,11 +1,11 @@
 {
   "id": "/",
-  "name": "RK Vidra\u00e7aria",
-  "short_name": "RK Vidra\u00e7aria",
-  "description": "Vidra\u00e7aria em Porto Seguro com or\u00e7amento p\u00fablico, cat\u00e1logo de produtos, servi\u00e7os e atendimento por WhatsApp.",
+  "name": "RK Vidraçaria",
+  "short_name": "RK Vidraçaria",
+  "description": "Vidraçaria em Porto Seguro com orçamento público, catálogo de produtos, serviços e atendimento por WhatsApp.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "/index.html?app=1",
+  "start_url": "/paginas/dashboard-comercial.html?app=1&origem=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -71,10 +71,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Solicitar or\u00e7amento",
-      "short_name": "Or\u00e7amento",
+      "name": "Solicitar orçamento",
+      "short_name": "Orçamento",
       "url": "/paginas/orcamento.html?app=1",
-      "description": "Enviar pedido de or\u00e7amento para a RK Vidra\u00e7aria.",
+      "description": "Enviar pedido de orçamento para a RK Vidraçaria.",
       "icons": [
         {
           "src": "/imagens/icons/icon-192.png",
@@ -84,10 +84,10 @@
       ]
     },
     {
-      "name": "Servi\u00e7os",
-      "short_name": "Servi\u00e7os",
+      "name": "Serviços",
+      "short_name": "Serviços",
       "url": "/paginas/servicos-publico.html?app=1",
-      "description": "Conhecer servi\u00e7os de box, espelhos, fachadas e fechamentos.",
+      "description": "Conhecer serviços de box, espelhos, fachadas e fechamentos.",
       "icons": [
         {
           "src": "/imagens/icons/icon-192.png",
@@ -100,7 +100,7 @@
       "name": "WhatsApp",
       "short_name": "WhatsApp",
       "url": "/paginas/contato.html?app=1",
-      "description": "Abrir os canais de contato da RK Vidra\u00e7aria.",
+      "description": "Abrir os canais de contato da RK Vidraçaria.",
       "icons": [
         {
           "src": "/imagens/icons/icon-192.png",
@@ -109,5 +109,8 @@
         }
       ]
     }
-  ]
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

@@ -1,13 +1,17 @@
 {
   "name": "rk-conecte",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Sistema web da RK Vidraçaria para atendimento, orçamentos e operação interna.",
   "scripts": {
     "test": "node --test",
     "test:rules": "firebase emulators:exec --only firestore --project demo-rk-conecte \"node --test tests/firestore-rules.emulator.mjs\"",
     "check:syntax": "node scripts/check-syntax.js",
-    "check": "npm run check:syntax && npm test && npm run test:rules"
+    "check": "npm run check:syntax && npm test && npm run test:rules",
+    "build:hosting": "node scripts/build-hosting.mjs",
+    "check:hosting": "node scripts/check-hosting-package.mjs",
+    "release:prepare": "npm run check && npm run build:hosting && npm run check:hosting",
+    "deploy": "firebase deploy --only hosting,firestore:rules"
   },
   "dependencies": {
     "pdf-lib": "^1.17.1"

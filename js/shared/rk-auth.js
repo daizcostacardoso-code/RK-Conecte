@@ -24,7 +24,6 @@ const RKAuth = {
         "medicao-obra.html",
         "nota-servico.html",
         "caixa.html",
-        "loading.html",
         "projetos.html",
         "funcionario.html",
         "novo-orcamento.html",
@@ -144,7 +143,13 @@ const RKAuth = {
             return sessao;
         }
 
-        if (["home", "public"].includes(this.modoAtual)) {
+        if (this.modoAtual === "home") {
+            if (sessao) this.redirecionarDashboard();
+            else this.liberarInterface();
+            return sessao;
+        }
+
+        if (this.modoAtual === "public") {
             this.liberarInterface();
             return sessao;
         }

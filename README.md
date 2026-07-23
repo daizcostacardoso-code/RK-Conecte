@@ -5,7 +5,7 @@ orçamentos, arquivos comerciais, medições, notas de serviço e controle de ca
 
 ## Versão atual
 
-`v1.0.0`
+`v1.0.1`
 
 A aplicação utiliza Firebase Hosting e Firestore como fonte oficial de dados.
 Não existe API Node ou sincronização com MySQL nesta base.
@@ -46,7 +46,7 @@ Requisitos:
 - Java 21 ou superior para o emulador do Firestore;
 - dependências instaladas de forma reproduzível com `npm ci`.
 
-Execute antes de aplicar novas alterações ou publicar:
+Execute durante o desenvolvimento:
 
 ```powershell
 npm run check
@@ -56,6 +56,16 @@ O comando valida a sintaxe dos módulos JavaScript, executa os testes unitários
 inicia temporariamente o emulador local para testar as regras do Firestore. Os
 testes de regras usam o projeto isolado `demo-rk-conecte` e não acessam produção.
 
+Antes de publicar, gere e valide o pacote restrito do Hosting:
+
+```powershell
+npm run release:prepare
+```
+
+Esse comando executa toda a validação, recria `dist/` somente com arquivos
+públicos permitidos e bloqueia o deploy caso encontre Git, backups, testes, logs,
+patches, mapas de código-fonte ou referências locais quebradas.
+
 Para executar somente os testes das regras:
 
 ```powershell
@@ -64,12 +74,21 @@ npm run test:rules
 
 ## Publicação
 
-O Firebase Hosting está configurado para não publicar testes, scripts de
-manutenção, documentação, backups temporários ou arquivos de configuração. As
-coleções operacionais exigem Firebase Authentication e um perfil ativo vinculado
-ao UID em `usuarios_autorizados`; visitantes podem apenas ler os valores do
-orçamento público e criar solicitações dentro do contrato validado pelas regras.
+O Firebase Hosting publica exclusivamente a pasta gerada `dist/`, nunca a raiz
+do repositório. Testes, scripts de manutenção, documentação, backups temporários,
+metadados Git e configurações de desenvolvimento ficam fora do pacote público.
+As coleções operacionais exigem Firebase Authentication e um perfil ativo
+vinculado ao UID em `usuarios_autorizados`; visitantes podem apenas ler os
+valores do orçamento público e criar solicitações dentro do contrato validado
+pelas regras.
 
+Para validar novamente e publicar Hosting e regras:
+
+```powershell
+npm run deploy
+```
+
+O Firebase executa `release:prepare` automaticamente antes do deploy do Hosting.
 Antes de publicar, siga [docs/PUBLICACAO_SEGURA.md](docs/PUBLICACAO_SEGURA.md).
 
 ## Estrutura principal

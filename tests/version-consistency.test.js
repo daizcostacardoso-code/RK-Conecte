@@ -4,11 +4,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 
-test("artefatos publicados usam a versão central v1.0.0", () => {
-  assert.equal(require(path.join(root, "package.json")).version, "1.0.0");
-  assert.equal(require(path.join(root, "package-lock.json")).version, "1.0.0");
-  assert.match(fs.readFileSync(path.join(root, "js/shared/rk-version.js"), "utf8"), /"v1\.0\.0"/);
-  assert.match(fs.readFileSync(path.join(root, "sw.js"), "utf8"), /rk-conecte-v1\.0\.0/);
+test("artefatos publicados usam a versão central v1.0.1", () => {
+  assert.equal(require(path.join(root, "package.json")).version, "1.0.1");
+  assert.equal(require(path.join(root, "package-lock.json")).version, "1.0.1");
+  assert.match(fs.readFileSync(path.join(root, "js/shared/rk-version.js"), "utf8"), /"v1\.0\.1"/);
+  assert.match(fs.readFileSync(path.join(root, "sw.js"), "utf8"), /rk-conecte-v1\.0\.1/);
 });
 
 test("arquivos de produção não expõem versões antigas do RK-Conecte", () => {

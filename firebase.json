@@ -1,25 +1,42 @@
 {
   "hosting": {
-    "public": ".",
+    "public": "dist",
     "predeploy": [
-      "npm run check"
+      "npm run release:prepare"
     ],
     "ignore": [
       "firebase.json",
-      "firestore.rules",
-      "package.json",
-      "package-lock.json",
-      "README.md",
-      "CHANGELOG.md",
-      "LIMPEZA_REALIZADA.txt",
       "**/.*",
-      "**/node_modules/**",
-      "docs/**",
-      "assets/pwa/launch-background.png",
-      "patchs/**",
-      "scripts/**",
-      "tests/**",
-      "tmp/**"
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "/sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/manifest.webmanifest",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, must-revalidate"
+          }
+        ]
+      }
     ]
   },
   "firestore": {

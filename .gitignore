@@ -32,3 +32,14 @@ desktop.ini
 
 # Logs
 *.log
+
+# Pacote gerado para o Firebase Hosting
+dist/
+
+# Residuos locais que nunca devem entrar no repositorio
+.backups/
+.vscode/
+playwright-report/
+*.patch
+*.aplicado-*
+package.json.backup-*

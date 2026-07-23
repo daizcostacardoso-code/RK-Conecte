@@ -2,7 +2,19 @@
   'use strict';
 
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const internalStartUrl = '/paginas/dashboard-comercial.html?app=1&origem=pwa-legado';
   let deferredPrompt = null;
+
+  function redirectLegacyPwaLaunch(){
+    if (!isStandalone) return false;
+    const path = (window.location.pathname || '/').toLowerCase();
+    const legacyEntry = path === '/' || path.endsWith('/index.html') || path.endsWith('/paginas/loading.html');
+    if (!legacyEntry) return false;
+    window.location.replace(internalStartUrl);
+    return true;
+  }
+
+  if (redirectLegacyPwaLaunch()) return;
 
   function registerSW(){
     if (!('serviceWorker' in navigator)) return;
