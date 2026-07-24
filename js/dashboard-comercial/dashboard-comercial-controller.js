@@ -239,7 +239,28 @@ const DashboardComercialController = {
         const entradas = confirmados.filter(item => item.tipo === "entrada").reduce((total, item) => total + this.numero(item.valor), 0);
         const saidas = confirmados.filter(item => item.tipo === "saida").reduce((total, item) => total + this.numero(item.valor), 0);
         const pendentes = movimentos.filter(item => String(item.status || "").toLowerCase() === "pendente");
-        return { saldo: entradas - saidas, entradas, saidas, resultadoMes: entradas - saidas, totalConfirmados: confirmados.length, pendentes: pendentes.length, valorPendente: pendentes.reduce((total, item) => total + this.numero(item.valor), 0), movimentos: this.ordenarPorData(confirmados, "data").slice(0, 3), referencia: this.referenciaMes(new Date()) };
+        const referencia = this.referenciaMes(new Date());
+        const serieMensal = this.montarSerieMensal(confirmados, referencia);
+        return { saldo: entradas - saidas, entradas, saidas, resultadoMes: entradas - saidas, resultadoGraficoMes: serieMensal.at(-1) || 0, serieMensal, totalConfirmados: confirmados.length, pendentes: pendentes.length, valorPendente: pendentes.reduce((total, item) => total + this.numero(item.valor), 0), movimentos: this.ordenarPorData(confirmados, "data").slice(0, 3), referencia };
+    },
+
+    montarSerieMensal(movimentos = [], referencia = this.referenciaMes(new Date())) {
+        const porDia = new Map();
+        movimentos.forEach(item => {
+            const data = String(item.data || item.criadoEm || item.atualizadoEm || "");
+            if (!this.pertenceAoMes(data, referencia)) return;
+            const dia = Number(data.slice(8, 10));
+            if (!Number.isInteger(dia) || dia < 1 || dia > 31) return;
+            const valor = this.numero(item.valor) * (item.tipo === "saida" ? -1 : 1);
+            porDia.set(dia, (porDia.get(dia) || 0) + valor);
+        });
+        let acumulado = 0;
+        const serie = [0];
+        [...porDia.keys()].sort((a, b) => a - b).forEach(dia => {
+            acumulado += porDia.get(dia);
+            serie.push(acumulado);
+        });
+        return serie.length > 1 ? serie : [0, 0];
     },
 
     rotuloStatus(status = "") { return { rascunho: "Rascunho", emitido: "Emitido", enviado: "Enviado", aprovado: "Aprovado", recusado: "Recusado", expirado: "Expirado", cancelado: "Cancelado" }[String(status).toLowerCase()] || String(status || "Atualização"); },

@@ -16,7 +16,7 @@
 
   function createInstallButton(){
     const path = (location.pathname || '').toLowerCase();
-    const paginaInterna = path.includes('/login.html') || path.includes('/funcionario.html') || path.includes('/loading.html');
+    const paginaInterna = path.includes('/login.html') || path.includes('/loading.html');
     if (paginaInterna || isStandalone || document.getElementById('btnInstalarAppRK')) return;
 
     const btn = document.createElement('button');

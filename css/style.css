@@ -15105,6 +15105,14 @@ body.rk-app-interna > header .rk-nav-principal a {
     gap: 5px;
     margin-left: auto;
 }
+body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header {
+    position: relative !important;
+    z-index: 5000 !important;
+    overflow: visible !important;
+}
+body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header .rk-header-actions {
+    z-index: 5001;
+}
 .rk-header-settings,
 .rk-header-notifications {
     position: relative;
@@ -15187,9 +15195,9 @@ body.rk-app-interna > header .rk-nav-principal a {
     width: min(360px, calc(100vw - 24px));
     max-height: min(590px, calc(100dvh - 118px));
     overflow: hidden auto;
-    border: 1px solid #cbdfea;
+    border: 1px solid #ead89a;
     border-radius: 20px;
-    background: #f5f9fc;
+    background: linear-gradient(180deg, #fffdf4 0%, #fff5cf 100%);
     color: #183c56;
     box-shadow: 0 24px 60px rgba(3, 31, 52, .28);
     overscroll-behavior: contain;
@@ -15208,8 +15216,8 @@ body.rk-app-interna > header .rk-nav-principal a {
     gap: 16px;
     padding: 14px 16px !important;
     border: 0 !important;
-    border-bottom: 1px solid #dce8ef !important;
-    background: rgba(255, 255, 255, .97) !important;
+    border-bottom: 1px solid #eadca9 !important;
+    background: rgba(255, 250, 226, .97) !important;
     box-shadow: none !important;
     backdrop-filter: blur(12px);
 }
@@ -15255,9 +15263,9 @@ body.rk-app-interna > header .rk-nav-principal a {
     align-items: start;
     gap: 11px;
     padding: 12px;
-    border: 1px solid #dbe7ee;
+    border: 1px solid #eadfb9;
     border-radius: 14px;
-    background: #fff;
+    background: rgba(255, 255, 255, .88);
     transition: opacity .2s ease, background .2s ease;
 }
 .rk-header-notifications__item.is-success { --rk-alert-color: #168269; --rk-alert-soft: #e5f7f0; }
@@ -15297,8 +15305,8 @@ body.rk-app-interna > header .rk-nav-principal a {
     bottom: 0;
     z-index: 2;
     padding: 10px 12px max(10px, env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid #dce8ef;
-    background: rgba(255, 255, 255, .97);
+    border-top: 1px solid #eadca9;
+    background: rgba(255, 250, 226, .97);
     backdrop-filter: blur(12px);
 }
 .rk-header-notifications__footer button {
@@ -15324,9 +15332,9 @@ body.rk-app-interna > header .rk-nav-principal a {
     width: min(380px, calc(100vw - 24px));
     max-height: min(680px, calc(100dvh - 118px));
     overflow: hidden auto;
-    border: 1px solid #cbdfea;
+    border: 1px solid #c5d9ea;
     border-radius: 20px;
-    background: #f5f9fc;
+    background: linear-gradient(180deg, #f6faff 0%, #eaf3fb 100%);
     color: #183c56;
     box-shadow: 0 24px 60px rgba(3, 31, 52, .28);
     overscroll-behavior: contain;
@@ -15349,8 +15357,8 @@ body.rk-app-interna > header .rk-nav-principal a {
     gap: 16px;
     padding: 14px 16px !important;
     border: 0 !important;
-    border-bottom: 1px solid #dce8ef !important;
-    background: rgba(255, 255, 255, .97) !important;
+    border-bottom: 1px solid #cfdfec !important;
+    background: rgba(240, 247, 253, .97) !important;
     box-shadow: none !important;
     backdrop-filter: blur(12px);
 }
@@ -15534,8 +15542,8 @@ body.rk-app-interna > header .rk-nav-principal a {
     bottom: 0;
     z-index: 2;
     padding: 12px 14px max(12px, env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid #dce8ef;
-    background: rgba(255, 255, 255, .97);
+    border-top: 1px solid #cfdfec;
+    background: rgba(240, 247, 253, .97);
     backdrop-filter: blur(12px);
 }
 .rk-header-settings__logout {

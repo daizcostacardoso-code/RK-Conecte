@@ -1,6 +1,11 @@
 {
   "hosting": {
     "public": ".",
+    "redirects": [
+      { "source": "/paginas/funcionario.html", "destination": "/paginas/dashboard-comercial.html", "type": 301 },
+      { "source": "/paginas/novo-orcamento.html", "destination": "/paginas/orcamento-inteligente.html", "type": 301 },
+      { "source": "/paginas/valores.html", "destination": "/paginas/produtos.html", "type": 301 }
+    ],
     "predeploy": [
       "npm run prepare:deploy",
       "npm run refresh:cache",

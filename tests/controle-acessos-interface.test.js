@@ -22,7 +22,7 @@ test("controle de acessos aparece somente no cabeçalho do administrador", () =>
     const controller = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-controller.js"), "utf8");
     const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
     assert.doesNotMatch(interfaceDashboard, /acessos\.html|Controle de acessos/);
-    assert.match(navegacao, /sessao\?\.perfil === "admin"/);
+    assert.match(navegacao, /perfis: \["admin"\]/);
     assert.match(navegacao, /rotulo: "Acessos", pagina: "acessos\.html"/);
     assert.match(controller, /this\.sessao = await this\.aguardarSessao\(\)/);
     assert.match(interfaceDashboard, /dashboard-comercial-shortcuts/);
@@ -47,7 +47,7 @@ test("dashboard usa metatag atual e configuração sem persistência obsoleta", 
 });
 
 test("textos visíveis não expõem nomes da infraestrutura interna", () => {
-    const paginas = ["login.html", "funcionario.html", "projetos.html", "medicao-obra.html", "nota-servico.html", "caixa.html", "acessos.html"];
+    const paginas = ["login.html", "dashboard-comercial.html", "projetos.html", "medicao-obra.html", "nota-servico.html", "caixa.html", "acessos.html"];
     paginas.forEach(nome => {
         const html = readFileSync(resolve(raiz, "paginas", nome), "utf8")
             .replace(/<script\b[\s\S]*?<\/script>/gi, "")

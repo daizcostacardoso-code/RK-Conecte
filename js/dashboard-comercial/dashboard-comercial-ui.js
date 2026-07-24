@@ -12,7 +12,8 @@ const DashboardComercialUI = {
             this.renderizarCabecalho(estado),
             `<div class="dashboard-comercial-content">`,
             this.renderizarAtalhos(),
-            this.renderizarCards(estado.kpis || {}, estado.resumoOrcamentos || {}, estado.resumoObras || {}, estado.resumoCaixa || {}),
+            this.renderizarResumoFinanceiro(estado.resumoCaixa || {}),
+            this.renderizarCards(estado.kpis || {}, estado.resumoOrcamentos || {}, estado.resumoObras || {}, estado.resumoCaixa || {}, "desktop"),
             `<div class="dashboard-comercial-operacao-grid">`,
             this.renderizarCaixa(estado.resumoCaixa || {}),
             this.renderizarObras(estado.resumoObras || {}),
@@ -40,19 +41,30 @@ const DashboardComercialUI = {
     renderizarCabecalho(estado = {}) {
         const hora = new Date().getHours();
         const saudacao = hora < 12 ? "Bom dia" : (hora < 18 ? "Boa tarde" : "Boa noite");
+        const nomeUsuario = this.obterNomeSaudacao(estado.sessao);
         return [
             `<header class="dashboard-comercial-header">`,
             `<div class="dashboard-comercial-header-copy">`,
             `<span class="dashboard-comercial-eyebrow"><i aria-hidden="true"></i> Vis&atilde;o geral da empresa</span>`,
-            `<h1 id="dashboardComercialTitulo">${saudacao}, equipe RK.</h1>`,
+            `<h1 id="dashboardComercialTitulo">${saudacao}, ${this.escapar(nomeUsuario)}.</h1>`,
             `<p class="dashboard-comercial-subtitle">Or&ccedil;amentos, obras e financeiro em uma &uacute;nica vis&atilde;o.</p>`,
             `</div>`,
             `<div class="dashboard-comercial-header-meta">`,
-            `<span>Atualizado ${this.escapar(this.formatarDataCurta(estado.carregadoEm))}</span>`,
-            `<button type="button" class="dashboard-comercial-refresh" data-dashboard-action="atualizar" aria-label="Atualizar indicadores">${this.icone("refresh")}<span>Atualizar</span></button>`,
+            `<span class="dashboard-comercial-updated">${this.icone("clock")}<span>Atualizado ${this.escapar(this.formatarDataCurta(estado.carregadoEm))}</span></span>`,
+            `<button type="button" class="dashboard-comercial-refresh" data-dashboard-action="atualizar" aria-label="Atualizar indicadores" aria-busy="false">${this.icone("refresh")}<span>Atualizar</span></button>`,
             `</div>`,
+            this.renderizarCards(estado.kpis || {}, estado.resumoOrcamentos || {}, estado.resumoObras || {}, estado.resumoCaixa || {}, "overview"),
             `</header>`
         ].join("");
+    },
+
+    obterNomeSaudacao(sessao = {}) {
+        const nomeInformado = String(sessao?.nomeUsuario || sessao?.nome || sessao?.email || "").trim();
+        const nomeSemDominio = nomeInformado.includes("@")
+            ? nomeInformado.split("@")[0].replace(/[._-]+/g, " ")
+            : nomeInformado;
+        const primeiroNome = nomeSemDominio.split(/\s+/).find(Boolean) || "Usuário";
+        return primeiroNome.charAt(0).toLocaleUpperCase("pt-BR") + primeiroNome.slice(1);
     },
 
     renderizarAtalhos() {
@@ -76,23 +88,94 @@ const DashboardComercialUI = {
         ].join("");
     },
 
-    renderizarCards(kpis = {}, resumo = {}, obras = {}, caixa = {}) {
+    renderizarCards(kpis = {}, resumo = {}, obras = {}, caixa = {}, variante = "desktop") {
+        const moeda = variante === "overview" ? valor => this.formatarMoeda(valor) : valor => this.formatarMoedaCompacta(valor);
         const cards = [
-            { titulo: "Or&ccedil;amentos gerados", valor: this.formatarNumero(kpis.totalOrcamentos), detalhe: `${this.formatarNumero(resumo.geradosMes)} neste m&ecirc;s &middot; ${this.formatarNumero(resumo.emAberto)} em aberto`, icone: "file", tom: "blue", ajuda: "Registros únicos consolidados por número." },
-            { titulo: "Ticket m&eacute;dio", valor: this.formatarMoedaCompacta(kpis.ticketMedio), detalhe: `${this.formatarNumero(resumo.comValor)} propostas v&aacute;lidas`, icone: "trend", tom: "violet", ajuda: "Média dos orçamentos com valor, sem cancelados ou reprovados." },
-            { titulo: "Obras ativas", valor: this.formatarNumero(kpis.obrasAtivas), detalhe: `${this.formatarNumero(obras.aprovadas)} aprovadas &middot; ${this.formatarNumero(Number(obras.emProducao || 0) + Number(obras.emInstalacao || 0))} em execu&ccedil;&atilde;o`, icone: "building", tom: "amber", ajuda: "Aprovadas, em produção ou em instalação." },
-            { titulo: "Saldo em caixa", valor: this.formatarMoedaCompacta(kpis.saldoCaixa), detalhe: `${this.formatarNumero(caixa.totalConfirmados)} lan&ccedil;amentos confirmados`, icone: "wallet", tom: Number(kpis.saldoCaixa) < 0 ? "red" : "green", ajuda: "Entradas confirmadas menos saídas confirmadas, em todo o período." }
+            { titulo: "Or&ccedil;amentos gerados", valor: this.formatarNumero(kpis.totalOrcamentos), detalhes: [`${this.formatarNumero(resumo.geradosMes)} neste m&ecirc;s`, `${this.formatarNumero(resumo.emAberto)} em aberto`], icone: "file", tom: "blue", ajuda: "Registros únicos consolidados por número." },
+            { titulo: "Ticket m&eacute;dio", valor: moeda(resumo.ticketMedio), detalhes: [`${this.formatarNumero(resumo.comValor)} propostas v&aacute;lidas`], icone: "trend", tom: "violet", ajuda: "Média dos orçamentos com valor, sem cancelados ou reprovados." },
+            { titulo: "Obras ativas", valor: this.formatarNumero(kpis.obrasAtivas), detalhes: [`${this.formatarNumero(obras.aprovadas)} aprovadas`, `${this.formatarNumero(Number(obras.emProducao || 0) + Number(obras.emInstalacao || 0))} em execu&ccedil;&atilde;o`], icone: "building", tom: "amber", ajuda: "Aprovadas, em produção ou em instalação." },
+            { titulo: "Saldo em caixa", valor: moeda(kpis.saldoCaixa), detalhes: [`${this.formatarNumero(caixa.totalConfirmados)} lan&ccedil;amentos confirmados`], icone: "wallet", tom: Number(kpis.saldoCaixa) < 0 ? "red" : "green", ajuda: "Entradas confirmadas menos saídas confirmadas, em todo o período." }
         ];
+        const renderizarCard = card => [
+            `<article class="dashboard-comercial-card is-${card.tom}" title="${this.escaparAtributo(card.ajuda)}">`,
+            `<div class="dashboard-comercial-card-top"><span>${card.titulo}</span><i aria-hidden="true">${this.icone(card.icone)}</i></div>`,
+            `<strong>${this.escapar(card.valor)}</strong>`,
+            `<small>${card.detalhes.map(detalhe => `<span>${detalhe}</span>`).join("")}</small>`,
+            `</article>`
+        ].join("");
+        if (variante === "overview") {
+            const cardsPrincipais = [cards[0], cards[2]];
+            return [
+                `<section class="dashboard-comercial-kpis is-overview" aria-label="Indicadores principais">`,
+                `<div class="dashboard-comercial-kpi-group"><h2>Comercial/Opera&ccedil;&atilde;o</h2><div>`,
+                ...cardsPrincipais.map(renderizarCard),
+                `</div></div>`,
+                `</section>`
+            ].join("");
+        }
         return [
-            `<section class="dashboard-comercial-kpis" aria-label="Indicadores principais">`,
-            ...cards.map(card => [
-                `<article class="dashboard-comercial-card is-${card.tom}" title="${this.escaparAtributo(card.ajuda)}">`,
-                `<div class="dashboard-comercial-card-top"><span>${card.titulo}</span><i aria-hidden="true">${this.icone(card.icone)}</i></div>`,
-                `<strong>${this.escapar(card.valor)}</strong>`,
-                `<small>${card.detalhe}</small>`,
-                `</article>`
-            ].join("")),
+            `<section class="dashboard-comercial-kpis is-desktop" aria-label="Indicadores principais">`,
+            ...cards.map(renderizarCard),
             `</section>`
+        ].join("");
+    },
+
+    renderizarResumoFinanceiro(caixa = {}) {
+        const saldo = Number(caixa.resultadoMes || 0);
+        return [
+            `<section class="dashboard-comercial-financial-summary" aria-labelledby="resumoFinanceiroTitulo">`,
+            `<div class="dashboard-comercial-financial-heading"><h2 id="resumoFinanceiroTitulo">Resumo financeiro</h2><a href="caixa.html">Ver detalhes ${this.icone("arrow")}</a></div>`,
+            `<div class="dashboard-comercial-financial-values">`,
+            `<div class="is-entry"><span>Entradas</span><strong>${this.escapar(this.formatarMoeda(caixa.entradas))}</strong></div>`,
+            `<div class="is-exit"><span>Sa&iacute;das</span><strong>${this.escapar(this.formatarMoeda(caixa.saidas))}</strong></div>`,
+            `<div class="${saldo < 0 ? "is-negative" : "is-balance"}"><span>Saldo</span><strong>${this.escapar(this.formatarMoeda(saldo))}</strong></div>`,
+            this.renderizarGraficoMensal(caixa),
+            `</div>`,
+            `</section>`
+        ].join("");
+    },
+
+    renderizarGraficoMensal(caixa = {}) {
+        const serieRecebida = Array.isArray(caixa.serieMensal) ? caixa.serieMensal : [];
+        const serie = serieRecebida.map(Number).filter(Number.isFinite);
+        const pontos = serie.length > 1 ? serie : [0, Number(caixa.resultadoGraficoMes || caixa.resultadoMes || 0)];
+        const resultado = Number(caixa.resultadoGraficoMes ?? pontos.at(-1) ?? 0);
+        const minimo = Math.min(...pontos);
+        const maximo = Math.max(...pontos);
+        const intervalo = maximo - minimo || 1;
+        const largura = 62;
+        const altura = 34;
+        const margem = 3;
+        const coordenadas = pontos.map((valor, indice) => {
+            const x = margem + (pontos.length === 1 ? 0 : indice / (pontos.length - 1)) * (largura - margem * 2);
+            const y = altura - margem - ((valor - minimo) / intervalo) * (altura - margem * 2);
+            return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+        });
+        const caminho = coordenadas.reduce((trecho, ponto, indice) => {
+            if (!indice) return `M ${ponto.x} ${ponto.y}`;
+            const anterior = coordenadas[indice - 1];
+            const controleX = Number(((anterior.x + ponto.x) / 2).toFixed(1));
+            return `${trecho} C ${controleX} ${anterior.y}, ${controleX} ${ponto.y}, ${ponto.x} ${ponto.y}`;
+        }, "");
+        const baseY = altura - margem;
+        const area = `${caminho} L ${coordenadas.at(-1).x} ${baseY} L ${coordenadas[0].x} ${baseY} Z`;
+        const zeroCalculado = altura - margem - ((0 - minimo) / intervalo) * (altura - margem * 2);
+        const zeroY = Number(Math.max(margem, Math.min(baseY, zeroCalculado)).toFixed(1));
+        const classe = resultado < 0 ? "is-negative" : (resultado > 0 ? "is-positive" : "is-neutral");
+        const estado = resultado < 0 ? "negativo" : (resultado > 0 ? "positivo" : "zerado");
+        const ultimo = coordenadas.at(-1);
+        return [
+            `<div class="dashboard-comercial-monthly-chart ${classe}">`,
+            `<span aria-hidden="true">M&ecirc;s</span>`,
+            `<svg viewBox="0 0 ${largura} ${altura}" role="img" aria-label="Resultado mensal ${estado}: ${this.escaparAtributo(this.formatarMoeda(resultado))}">`,
+            `<defs><linearGradient id="dashboardMonthlyChartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" class="is-start"></stop><stop offset="100%" class="is-end"></stop></linearGradient></defs>`,
+            `<line class="dashboard-comercial-chart-baseline" x1="${margem}" y1="${zeroY}" x2="${largura - margem}" y2="${zeroY}"></line>`,
+            `<path class="dashboard-comercial-chart-area" d="${area}"></path>`,
+            `<path class="dashboard-comercial-chart-line" pathLength="1" d="${caminho}"></path>`,
+            `<circle class="dashboard-comercial-chart-halo" cx="${ultimo.x}" cy="${ultimo.y}" r="5"></circle>`,
+            `<circle class="dashboard-comercial-chart-point" cx="${ultimo.x}" cy="${ultimo.y}" r="2.4"></circle>`,
+            `</svg>`,
+            `</div>`
         ].join("");
     },
 
@@ -207,7 +290,8 @@ const DashboardComercialUI = {
             if (!this.controller || typeof this.controller[acao] !== "function") return;
             botao.classList.add("is-loading");
             botao.disabled = true;
-            try { await this.controller[acao](); } finally { botao.disabled = false; botao.classList.remove("is-loading"); }
+            botao.setAttribute("aria-busy", "true");
+            try { await this.controller[acao](); } finally { botao.disabled = false; botao.classList.remove("is-loading"); botao.setAttribute("aria-busy", "false"); }
         }));
     },
 
@@ -221,6 +305,7 @@ const DashboardComercialUI = {
             wallet: `<path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h16v12H5a3 3 0 0 1-3-3V6"/><path d="M16 14h2"/>`,
             trend: `<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>`,
             building: `<path d="M3 21h18M6 21V5l6-3v19M18 21V9l-6-2M9 9h.01M9 13h.01M9 17h.01M15 13h.01M15 17h.01"/>`,
+            clock: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>`,
             arrow: `<path d="M5 12h14M13 6l6 6-6 6"/>`
         };
         return `<svg viewBox="0 0 24 24" aria-hidden="true">${caminhos[nome] || caminhos.arrow}</svg>`;

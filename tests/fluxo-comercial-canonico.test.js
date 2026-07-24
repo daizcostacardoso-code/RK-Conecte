@@ -8,9 +8,8 @@ const ler = caminho => readFileSync(join(raiz, caminho), "utf8");
 
 test("rascunhos não gravam mais no documento global orcamentos/atual", () => {
     const arquivos = [
-        "js/orcamento.js",
         "js/orcamentos/orcamento-storage.js",
-        "js/funcionario.js"
+        "js/orcamentos/orcamento-inteligente-controller.js"
     ];
 
     arquivos.forEach(caminho => {
@@ -22,7 +21,6 @@ test("rascunhos não gravam mais no documento global orcamentos/atual", () => {
 
 test("telas comerciais carregam o modelo canônico antes do repositório de documentos", () => {
     const paginas = [
-        "paginas/novo-orcamento.html",
         "paginas/orcamento-inteligente.html",
         "paginas/arquivos.html",
         "paginas/compartilhar-documento.html",
@@ -38,7 +36,7 @@ test("telas comerciais carregam o modelo canônico antes do repositório de docu
         assert.ok(repositorio > modelo, `${caminho} carrega o repositório antes do modelo`);
     });
 
-    const novo = ler("paginas/novo-orcamento.html");
+    const novo = ler("paginas/orcamento-inteligente.html");
     const ordem = [
         "orcamento-aprovacao-model.js",
         "orcamento-aprovacao-validator.js",

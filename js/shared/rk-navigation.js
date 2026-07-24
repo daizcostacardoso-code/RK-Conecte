@@ -1,15 +1,22 @@
 const RKNavigation = {
-    links: [
-        { rotulo: "Dashboard", pagina: "dashboard-comercial.html" },
-        { rotulo: "Clientes", pagina: "clientes.html" },
-        { rotulo: "Projetos", pagina: "projetos.html" },
-        { rotulo: "Produtos", pagina: "produtos.html" },
-        { rotulo: "Orcamento", pagina: "orcamento-inteligente.html" },
-        { rotulo: "Medições", pagina: "medicao-obra.html" },
-        { rotulo: "Notas", pagina: "nota-servico.html" },
-        { rotulo: "Arquivos", pagina: "arquivos.html" },
-        { rotulo: "Caixa", pagina: "caixa.html" }
+    // Metadados únicos usados pelo desktop e pelos dois estados mobile.
+    navigationConfig: [
+        { id: "visao-geral", rotulo: "Visão geral", items: [{ rotulo: "Dashboard", pagina: "dashboard-comercial.html", atalho: true, ordemAtalho: 1, icone: "inicio" }] },
+        { id: "comercial", rotulo: "Comercial", items: [{ rotulo: "Clientes", pagina: "clientes.html", atalho: true, ordemAtalho: 2, icone: "clientes" }, { rotulo: "Projetos", pagina: "projetos.html", icone: "obras" }, { rotulo: "Produtos", pagina: "produtos.html" }, { rotulo: "Orçamento", pagina: "orcamento-inteligente.html", atalho: true, ordemAtalho: 4, destaque: true, icone: "orcamentos" }] },
+        { id: "operacao", rotulo: "Operação", items: [{ rotulo: "Medições", rotuloAtalho: "Medir obra", pagina: "medicao-obra.html", atalho: true, ordemAtalho: 3, icone: "medicao" }, { rotulo: "Notas", pagina: "nota-servico.html" }, { rotulo: "Arquivos", pagina: "arquivos.html" }, { rotulo: "Caixa", pagina: "caixa.html" }] },
+        { id: "conta", rotulo: "Conta", items: [{ rotulo: "Acessos", pagina: "acessos.html", perfis: ["admin"] }] }
     ],
+    // Conjunto Lucide incorporado localmente para preservar consistência e uso offline.
+    iconsMobile: {
+        inicio: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>',
+        clientes: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle>',
+        obras: '<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path><path d="M8 10v4"></path><path d="M12 10v2"></path><path d="M16 10v6"></path>',
+        medicao: '<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path>',
+        orcamentos: '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path>',
+        mais: '<circle cx="4" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="20" cy="12" r="1.6"></circle>',
+        fechar: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>',
+        padrao: '<path d="M12 5v14"></path><path d="M5 12h14"></path>'
+    },
     atalhosSistema: [
         {
             chave: "medicao",
@@ -66,21 +73,40 @@ const RKNavigation = {
         "dashboard-comercial.html",
         "orcamento.html",
         "orcamento-inteligente.html",
-        "novo-orcamento.html",
         "nota-servico.html",
-        "funcionario.html",
         "login.html",
         "loading.html"
     ],
+    monitorConexaoPreparado: false,
+    controladorPainelConfiguracoes: null,
+    controladorPainelNotificacoes: null,
+    chavePreferenciasInterface: "rk_preferencias_interface",
+    shellInicialPreparado: false,
+    iconesConfiguracoes: {
+        engrenagem: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
+        notificacoes: '<path d="M10.3 21a2 2 0 0 0 3.4 0"></path><path d="M4 17h16"></path><path d="M18 17v-6a6 6 0 1 0-12 0v6"></path>',
+        funcionamento: '<path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle>',
+        empresa: '<path d="M3 21h18"></path><path d="M6 21V5l6-3 6 3v16"></path><path d="M9 9h.01"></path><path d="M15 9h.01"></path><path d="M9 13h.01"></path><path d="M15 13h.01"></path><path d="M9 17h.01"></path><path d="M15 17h.01"></path>',
+        usuario: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+        sair: '<path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>',
+        fechar: '<path d="m18 6-12 12"></path><path d="m6 6 12 12"></path>',
+        chevron: '<path d="m9 18 6-6-6-6"></path>'
+    },
 
     iniciar() {
+        const paginaPublica = this.paginaPublica();
+        if (!paginaPublica) {
+            this.aplicarPreferenciasInterface();
+            this.configurarIndicadorConexao();
+            this.renderizarCabecalhoInterno();
+        }
         const lista = document.querySelector("header nav ul");
 
         if (!lista) {
             return false;
         }
 
-        if (this.paginaPublica()) {
+        if (paginaPublica) {
             lista.classList.add("rk-nav-principal");
             this.protegerLinksInternos(lista);
             return true;
@@ -95,7 +121,7 @@ const RKNavigation = {
 
         lista.innerHTML = this.obterLinksVisiveis().map(link => this.renderizarLink(link)).join("");
         lista.classList.add("rk-nav-principal");
-        this.garantirBotaoFecharDrawer(lista);
+        if (window.matchMedia("(min-width: 701px)").matches) this.garantirBotaoFecharDrawer(lista);
         this.renderizarPerfilHeader();
         document.documentElement.classList.remove("rk-app-interna-preload");
         this.removerAtalhosSistema();
@@ -105,13 +131,56 @@ const RKNavigation = {
         return true;
     },
 
-    obterLinksVisiveis() {
-        const links = [...this.links];
-        const sessao = window.RKAuth?.obterSessao?.();
-        if (sessao?.perfil === "admin") {
-            links.push({ rotulo: "Acessos", pagina: "acessos.html" });
+    prepararShellInicial() {
+        if (this.shellInicialPreparado || this.paginaPublica() || !document.body) return false;
+        document.body.classList.add("rk-app-interna");
+        this.aplicarPreferenciasInterface();
+        this.configurarIndicadorConexao();
+        const header = this.renderizarCabecalhoInterno();
+        const lista = header.querySelector("nav ul");
+        lista.innerHTML = this.obterLinksVisiveis().map(link => this.renderizarLink(link)).join("");
+        lista.classList.add("rk-nav-principal");
+        this.prepararTelaInterna(lista);
+        this.renderizarMenuInferior();
+        this.protegerLinksInternos(lista);
+        this.shellInicialPreparado = true;
+        document.documentElement.classList.remove("rk-app-interna-preload");
+        window.dispatchEvent(new CustomEvent("rk:shell-ready"));
+        window.RKLoading?.marcarShellPronto?.();
+        return true;
+    },
+
+    configurarIndicadorConexao() {
+        const atualizar = () => document.documentElement.classList.toggle("rk-offline", navigator.onLine === false);
+        atualizar();
+        if (this.monitorConexaoPreparado) return;
+        this.monitorConexaoPreparado = true;
+        window.addEventListener("online", atualizar);
+        window.addEventListener("offline", atualizar);
+    },
+
+    renderizarCabecalhoInterno() {
+        let header = document.querySelector("body > header");
+        if (!header) {
+            header = document.createElement("header");
+            document.body.prepend(header);
         }
-        return links;
+        header.className = "rk-internal-header";
+        header.dataset.rkInternalHeader = "true";
+        if (!header.querySelector(":scope > .container")) {
+            header.innerHTML = `<span class="rk-internal-header__crossover" aria-hidden="true"></span><div class="container"><a class="marca-header marca-header-compacta rk-internal-header__brand" href="${this.escaparAtributo(this.criarHref("dashboard-comercial.html"))}" aria-label="RK Vidraçaria — abrir dashboard"><img src="/imagens/logo.jpeg" alt="Logo RK Vidraçaria"><span><strong>RK Vidraçaria</strong><small>Sistema interno</small></span></a><nav aria-label="Navegação principal"><ul></ul></nav></div>`;
+        }
+        return header;
+    },
+
+    obterLinksVisiveis() { return this.obterItensNavegacao(); },
+    obterItensNavegacao() {
+        const perfil = window.RKAuth?.obterSessao?.()?.perfil;
+        return this.navigationConfig.flatMap(grupo => grupo.items.filter(item => !item.perfis || item.perfis.includes(perfil)));
+    },
+    obterGruposNavegacao() {
+        const itens = this.obterItensNavegacao();
+        return this.navigationConfig.map(grupo => ({ ...grupo, items: grupo.items.filter(item => itens.includes(item)) })).filter(grupo => grupo.items.length);
     },
 
     removerAtalhosSistema() {
@@ -119,133 +188,138 @@ const RKNavigation = {
         return true;
     },
 
-    renderizarMenuInferior() {
-        document.querySelectorAll(".rk-menu-inferior, .rk-mobile-nav-handle, .rk-mobile-more").forEach(elemento => elemento.remove());
-        const itens = [
-            { area: "inicio", rotulo: "Início", pagina: "dashboard-comercial.html", icone: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><path d="M9 21v-7h6v7"></path>' },
-            { area: "orcamentos", rotulo: "Orçamentos", pagina: "orcamento-inteligente.html", icone: '<path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4M9 12h6M9 16h6"></path>' },
-            { area: "obras", rotulo: "Obras", pagina: "projetos.html", icone: '<path d="M4 20h16M6 20V10l6-5 6 5v10M9 20v-5h6v5"></path>' },
-            { area: "clientes", rotulo: "Clientes", pagina: "clientes.html", icone: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6M22 11h-6"></path>' }
-        ];
-        const areaAtiva = this.obterAreaMobileAtual();
-        const menu = document.createElement("nav");
-        menu.className = "rk-menu-inferior";
-        menu.id = "rkMenuInferior";
-        menu.setAttribute("aria-label", "Navegação principal");
-        menu.innerHTML = itens.map(item => `<a href="${this.escaparAtributo(this.criarHref(item.pagina))}"${areaAtiva === item.area ? ' aria-current="page"' : ""}><svg viewBox="0 0 24 24" aria-hidden="true">${item.icone}</svg><span>${this.escapar(item.rotulo)}</span></a>`).join("");
-        const mais = document.createElement("button");
-        mais.type = "button";
-        mais.className = "rk-menu-inferior__mais";
-        mais.setAttribute("aria-expanded", "false");
-        mais.setAttribute("aria-controls", "rkMobileMore");
-        if (areaAtiva === "mais") mais.setAttribute("aria-current", "page");
-        mais.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle></svg><span>Mais</span>';
-        menu.appendChild(mais);
+    renderizarNavegacaoAdaptativa() {
+        let backdrop = document.querySelector(".rk-adaptive-mobile-navigation__backdrop");
+        let nav = document.querySelector(".rk-adaptive-mobile-navigation");
+        const atalhos = this.obterItensNavegacao()
+            .filter(item => item.atalho)
+            .sort((itemA, itemB) => itemA.ordemAtalho - itemB.ordemAtalho)
+            .slice(0, 4);
+        const paginaAtualEmAtalho = atalhos.some(item => this.paginaAtual(item.pagina));
+        const grupos = this.obterGruposNavegacao().map(grupo => ({ ...grupo, items: grupo.items.filter(item => !item.atalho) })).filter(grupo => grupo.items.length);
+        const grupoAtivo = grupos.find(grupo => grupo.items.some(item => this.paginaAtual(item.pagina)))?.id || grupos[0]?.id;
+        const sessao = window.RKAuth?.obterSessao?.() || {};
+        const nomePerfil = String(sessao.nomeUsuario || sessao.email || "Conta").trim();
+        const cargoPerfil = sessao.perfil === "admin" ? "Administrador" : (sessao.logado ? "Funcionário" : "Acesso em validação");
+        const iniciaisPerfil = nomePerfil.split(/\s+/).filter(Boolean).slice(0, 2).map(parte => parte[0]).join("").toUpperCase() || "U";
+        const fotoPerfil = String(sessao.fotoUsuario || "").trim();
+        const perfilMobile = `<section class="rk-adaptive-mobile-navigation__profile"><div class="rk-adaptive-mobile-navigation__cover" aria-hidden="true"></div><div class="rk-adaptive-mobile-navigation__profile-body"><span class="rk-adaptive-mobile-navigation__avatar" aria-hidden="true"><span>${this.escapar(iniciaisPerfil)}</span>${fotoPerfil ? `<img src="${this.escaparAtributo(fotoPerfil)}" alt="">` : ""}</span><div class="rk-adaptive-mobile-navigation__profile-copy"><strong>${this.escapar(nomePerfil)}</strong><small>${this.escapar(cargoPerfil)}</small></div><span class="rk-adaptive-mobile-navigation__profile-label">Perfil</span></div></section>`;
+        if (!backdrop) backdrop = document.createElement("button");
+        backdrop.type = "button";
+        backdrop.className = "rk-adaptive-mobile-navigation__backdrop";
+        backdrop.dataset.state = "collapsed";
+        backdrop.setAttribute("aria-label", "Recolher navegação");
+        if (!nav) nav = document.createElement("nav");
+        nav.className = "rk-adaptive-mobile-navigation";
+        nav.id = "rkAdaptiveMobileNavigation";
+        nav.dataset.state = "collapsed";
+        nav.dataset.currentPage = paginaAtualEmAtalho ? "shortcut" : "more";
+        nav.dataset.scrollVisibility = "shown";
+        nav.setAttribute("aria-label", "Navegação principal");
+        nav.innerHTML = `<div class="rk-adaptive-mobile-navigation__header">${perfilMobile}</div><div class="rk-adaptive-mobile-navigation__content">${grupos.map(grupo => `<section class="rk-adaptive-mobile-navigation__group" data-group="${this.escaparAtributo(grupo.id)}"><button type="button" aria-expanded="${grupo.id === grupoAtivo}" aria-controls="rkGroup${this.escaparAtributo(grupo.id)}"><span>${this.escapar(grupo.rotulo)}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"></path></svg></button><div id="rkGroup${this.escaparAtributo(grupo.id)}">${grupo.items.map(item => this.renderizarLinkMobile(item)).join("")}</div></section>`).join("")}</div><div class="rk-adaptive-mobile-navigation__shortcuts">${this.renderizarAtalhosMobile(atalhos)}<button type="button" class="rk-adaptive-mobile-navigation__toggle" aria-label="Abrir navegação" aria-expanded="false" aria-controls="rkAdaptiveMobileNavigation"><svg viewBox="0 0 24 24" aria-hidden="true"><g data-icon-more>${this.iconsMobile.mais}</g><g data-icon-close>${this.iconsMobile.fechar}</g></svg><span>Mais</span></button></div>`;
+        if (!backdrop.isConnected) document.body.appendChild(backdrop);
+        if (!nav.isConnected) document.body.appendChild(nav);
+        this.configurarNavegacaoAdaptativa(nav, backdrop);
+        nav.querySelector(".rk-adaptive-mobile-navigation__avatar img")?.addEventListener("error", evento => evento.currentTarget.remove());
+        this.protegerLinksInternos(nav);
+    },
 
-        const painel = this.criarPainelMaisMobile();
-        const alca = document.createElement("button");
-        alca.type = "button";
-        alca.className = "rk-mobile-nav-handle";
-        alca.setAttribute("aria-label", "Mostrar navegação principal");
-        alca.setAttribute("aria-controls", "rkMenuInferior");
-        alca.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg><span>Menu</span>';
+    renderizarLinkMobile(item) {
+        const ativo = this.paginaAtual(item.pagina);
+        return `<a href="${this.escaparAtributo(this.criarHref(item.pagina))}"${ativo ? ' aria-current="page"' : ""}>${this.escapar(item.rotulo)}</a>`;
+    },
 
-        const definirVisibilidade = oculto => {
-            const inicio = areaAtiva === "inicio";
-            menu.classList.toggle("rk-menu-inferior--oculto", oculto && !inicio);
-            alca.classList.toggle("rk-mobile-nav-handle--visivel", oculto && !inicio);
+    renderizarAtalhosMobile(itens) {
+        return itens.map(item => `<a href="${this.escaparAtributo(this.criarHref(item.pagina))}"${this.paginaAtual(item.pagina) ? ' aria-current="page"' : ""}${item.destaque ? ' class="rk-adaptive-mobile-navigation__action"' : ""}><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconsMobile[item.icone] || this.iconsMobile.padrao}</svg><span>${this.escapar(item.rotuloAtalho || item.rotulo)}</span></a>`).join("");
+    },
+
+    configurarNavegacaoAdaptativa(nav, backdrop) {
+        const toggle = nav.querySelector(".rk-adaptive-mobile-navigation__toggle"), labelToggle = toggle.querySelector("span");
+        let opener = null, previousOverflow = "", fechamentoPendente = null;
+        let ultimaRolagem = Math.max(0, window.scrollY), rolagemAgendada = false;
+        const mostrarBarra = () => { nav.dataset.scrollVisibility = "shown"; };
+        const atualizarBarraPelaRolagem = () => {
+            rolagemAgendada = false;
+            const rolagemAtual = Math.max(0, window.scrollY);
+            if (nav.dataset.state !== "collapsed") {
+                ultimaRolagem = rolagemAtual;
+                mostrarBarra();
+                return;
+            }
+            const deslocamento = rolagemAtual - ultimaRolagem;
+            if (Math.abs(deslocamento) < 8) return;
+            nav.dataset.scrollVisibility = deslocamento > 0 ? "hidden" : "shown";
+            ultimaRolagem = rolagemAtual;
         };
-        this.configurarOcultacaoMenuMobile(definirVisibilidade, areaAtiva === "inicio");
-        alca.addEventListener("click", () => definirVisibilidade(false));
-        this.configurarPainelMaisMobile({ mais, painel, menu, definirVisibilidade });
-
-        document.body.appendChild(menu);
-        document.body.appendChild(alca);
-        document.body.appendChild(painel);
-        this.protegerLinksInternos(menu);
-    },
-
-    obterAreaMobileAtual() {
-        const pagina = this.obterPaginaAtual();
-        if (["dashboard-comercial.html", "index.html"].includes(pagina)) return "inicio";
-        if (["orcamento.html", "orcamento-inteligente.html", "novo-orcamento.html", "arquivos.html", "compartilhar-documento.html"].includes(pagina)) return "orcamentos";
-        if (["projetos.html", "medicao-obra.html", "nota-servico.html"].includes(pagina)) return "obras";
-        if (pagina === "clientes.html") return "clientes";
-        return "mais";
-    },
-
-    criarPainelMaisMobile() {
-        const links = [
-            { rotulo: "Arquivos", pagina: "arquivos.html" }, { rotulo: "Medições", pagina: "medicao-obra.html" },
-            { rotulo: "Notas de serviço", pagina: "nota-servico.html" }, { rotulo: "Caixa", pagina: "caixa.html" },
-            { rotulo: "Produtos", pagina: "produtos.html" }, { rotulo: "Valores", pagina: "valores.html" },
-            { rotulo: "Funcionários", pagina: "funcionario.html" }
-        ];
-        if (window.RKAuth?.obterSessao?.()?.perfil === "admin") links.push({ rotulo: "Acessos", pagina: "acessos.html" });
-        const painel = document.createElement("div");
-        painel.className = "rk-mobile-more";
-        painel.id = "rkMobileMore";
-        painel.hidden = true;
-        painel.innerHTML = `<div class="rk-mobile-more__backdrop" data-rk-more-close></div><section class="rk-mobile-more__sheet" role="dialog" aria-modal="true" aria-labelledby="rkMobileMoreTitle"><div class="rk-mobile-more__topo"><h2 id="rkMobileMoreTitle">Mais opções</h2><button type="button" data-rk-more-close aria-label="Fechar mais opções">×</button></div><nav aria-label="Opções secundárias">${links.map(link => `<a href="${this.escaparAtributo(this.criarHref(link.pagina))}">${this.escapar(link.rotulo)}</a>`).join("")}</nav></section>`;
-        return painel;
-    },
-
-    configurarPainelMaisMobile({ mais, painel, menu, definirVisibilidade }) {
-        let focoAnterior = null;
+        const aoRolar = () => {
+            if (rolagemAgendada) return;
+            rolagemAgendada = true;
+            window.requestAnimationFrame(atualizarBarraPelaRolagem);
+        };
+        if (this.aoRolarNavegacaoAdaptativa) window.removeEventListener("scroll", this.aoRolarNavegacaoAdaptativa);
+        this.aoRolarNavegacaoAdaptativa = aoRolar;
+        window.addEventListener("scroll", aoRolar, { passive: true });
+        const resetar = () => {
+            window.clearTimeout(fechamentoPendente);
+            fechamentoPendente = null;
+            mostrarBarra();
+            nav.dataset.state = "collapsed";
+            backdrop.dataset.state = "collapsed";
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.setAttribute("aria-label", "Abrir navegação");
+            labelToggle.textContent = "Mais";
+            document.body.style.overflow = previousOverflow;
+            opener = null;
+        };
         const fechar = () => {
-            if (painel.hidden) return;
-            painel.classList.remove("rk-mobile-more--aberto");
-            document.body.classList.remove("rk-mobile-more-aberto");
-            mais.setAttribute("aria-expanded", "false");
-            window.setTimeout(() => { painel.hidden = true; focoAnterior?.focus(); }, 180);
+            if (nav.dataset.state !== "expanded") return;
+            nav.dataset.state = "closing";
+            backdrop.dataset.state = "collapsed";
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.setAttribute("aria-label", "Abrir navegação");
+            labelToggle.textContent = "Mais";
+            fechamentoPendente = window.setTimeout(() => {
+                nav.dataset.state = "collapsed";
+                document.body.style.overflow = previousOverflow;
+                opener?.focus({ preventScroll: true });
+                opener = null;
+                fechamentoPendente = null;
+            }, 320);
         };
-        const abrir = () => {
-            focoAnterior = document.activeElement;
-            painel.hidden = false;
-            requestAnimationFrame(() => painel.classList.add("rk-mobile-more--aberto"));
-            document.body.classList.add("rk-mobile-more-aberto");
-            mais.setAttribute("aria-expanded", "true");
-            definirVisibilidade(false);
-            painel.querySelector("[data-rk-more-close]")?.focus();
-        };
-        mais.addEventListener("click", abrir);
-        painel.addEventListener("click", evento => { if (evento.target.matches("[data-rk-more-close]")) fechar(); });
-        painel.addEventListener("keydown", evento => {
-            if (evento.key === "Escape") fechar();
-            if (evento.key === "Tab") {
-                const foco = [...painel.querySelectorAll("button, a")].filter(elemento => !elemento.disabled);
-                    const primeiro = foco[0], ultimo = foco[foco.length - 1];
-                if (evento.shiftKey && document.activeElement === primeiro) { evento.preventDefault(); ultimo.focus(); }
-                if (!evento.shiftKey && document.activeElement === ultimo) { evento.preventDefault(); primeiro.focus(); }
+        const abrir = () => { window.clearTimeout(fechamentoPendente); fechamentoPendente = null; mostrarBarra(); opener = document.activeElement; previousOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; nav.dataset.state = "expanded"; backdrop.dataset.state = "expanded"; toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", "Fechar navegação"); labelToggle.textContent = "Fechar"; nav.querySelector(".rk-adaptive-mobile-navigation__group > button")?.focus({ preventScroll: true }); };
+        toggle.addEventListener("click", () => nav.dataset.state === "collapsed" ? abrir() : fechar());
+        backdrop.addEventListener("click", fechar);
+        nav.addEventListener("click", event => { if (event.target.closest("a")) fechar(); const group = event.target.closest(".rk-adaptive-mobile-navigation__group > button"); if (group) nav.querySelectorAll(".rk-adaptive-mobile-navigation__group > button").forEach(button => button.setAttribute("aria-expanded", String(button === group && button.getAttribute("aria-expanded") !== "true"))); });
+        nav.addEventListener("keydown", event => {
+            if (event.key === "Escape") fechar();
+            if (event.key === "Tab" && nav.dataset.state === "expanded") {
+                const focaveis = [...nav.querySelectorAll("a, button")].filter(elemento => !elemento.disabled);
+                const primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
+                if (event.shiftKey && document.activeElement === primeiro) { event.preventDefault(); ultimo?.focus(); }
+                if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primeiro?.focus(); }
             }
         });
-        menu.addEventListener("click", evento => { if (evento.target.closest("a")) definirVisibilidade(false); });
+        const desktopMedia = window.matchMedia("(min-width: 701px)");
+        const fecharAoMudarParaDesktop = event => { if (event.matches) { mostrarBarra(); fechar(); } };
+        if (typeof desktopMedia.addEventListener === "function") desktopMedia.addEventListener("change", fecharAoMudarParaDesktop);
+        else desktopMedia.addListener?.(fecharAoMudarParaDesktop);
+        window.addEventListener("rk:loading-start", resetar);
+        window.addEventListener("rk:loading-end", resetar);
     },
 
-    configurarOcultacaoMenuMobile(definirVisibilidade, manterVisivel) {
-        if (manterVisivel) return;
-        let ultimaPosicao = window.scrollY;
-        let pendente = false;
-        const tolerancia = 12;
-        window.addEventListener("scroll", () => {
-            if (pendente) return;
-            pendente = true;
-            requestAnimationFrame(() => {
-                const atual = window.scrollY;
-                const diferenca = atual - ultimaPosicao;
-                if (Math.abs(diferenca) >= tolerancia) {
-                    if (diferenca > 0 && atual > 48) definirVisibilidade(true);
-                    if (diferenca < 0) definirVisibilidade(false);
-                    ultimaPosicao = atual;
-                }
-                pendente = false;
-            });
-        }, { passive: true });
+    renderizarMenuInferior() {
+        this.renderizarNavegacaoAdaptativa();
     },
 
     prepararTelaInterna(lista) {
         document.body.classList.add("rk-app-interna");
-        this.prepararMenuMobile(lista);
+        const desktopMedia = window.matchMedia("(min-width: 701px)");
+        if (desktopMedia.matches) this.prepararMenuMobile(lista);
+        else {
+            const aoMudarParaDesktop = event => { if (event.matches) this.prepararMenuMobile(lista); };
+            if (typeof desktopMedia.addEventListener === "function") desktopMedia.addEventListener("change", aoMudarParaDesktop, { once: true });
+            else desktopMedia.addListener?.(aoMudarParaDesktop);
+        }
         this.atualizarCacheAplicacao();
         this.carregarVersao(() => this.renderizarAssinaturaVersao());
     },
@@ -606,47 +680,271 @@ const RKNavigation = {
     },
 
     renderizarPerfilHeader() {
-        document.querySelectorAll(".rk-header-profile").forEach(elemento => elemento.remove());
+        document.body.classList.remove("rk-header-panel-aberto");
+        document.querySelectorAll(".rk-header-profile, .rk-header-actions, .rk-header-settings, .rk-header-notifications").forEach(elemento => elemento.remove());
         const container = document.querySelector("body > header > .container");
         const sessao = window.RKAuth?.obterSessao?.();
         if (!container || !sessao) return false;
 
         const nome = String(sessao.nomeUsuario || sessao.email || "Usuário").trim();
         const cargo = sessao.perfil === "admin" ? "Administrador" : "Funcionário";
-        const iniciais = nome.split(/\s+/).filter(Boolean).slice(0, 2).map(parte => parte[0]).join("").toUpperCase() || "U";
-        const foto = String(sessao.fotoUsuario || "").trim();
-        const perfil = document.createElement("section");
-        perfil.className = "rk-header-profile";
-        perfil.innerHTML = [
-            `<button type="button" class="rk-header-profile__trigger" aria-label="Abrir menu do perfil de ${this.escaparAtributo(nome)}" aria-expanded="false" aria-controls="rkHeaderProfileMenu">`,
-            `<span class="rk-header-profile__avatar" aria-hidden="true"><span>${this.escapar(iniciais)}</span>${foto ? `<img src="${this.escaparAtributo(foto)}" alt="">` : ""}</span>`,
-            `<span class="rk-header-profile__copy"><strong title="${this.escaparAtributo(nome)}">${this.escapar(nome)}</strong><small>${cargo}</small></span>`,
-            `<span class="rk-header-profile__chevron" aria-hidden="true">⌄</span>`,
+        const email = String(sessao.email || "").trim();
+        const empresaConfigurada = typeof Config !== "undefined" ? Config?.empresa?.nome : window.Config?.empresa?.nome;
+        const empresa = String(empresaConfigurada || "RK Vidraçaria").trim();
+        const densidade = this.obterPreferenciasInterface().densidade;
+        const acoes = document.createElement("section");
+        const notificacoes = document.createElement("section");
+        const configuracoes = document.createElement("section");
+        acoes.className = "rk-header-actions";
+        acoes.setAttribute("aria-label", "Ações do sistema");
+        notificacoes.className = "rk-header-notifications";
+        configuracoes.className = "rk-header-settings";
+        notificacoes.innerHTML = [
+            `<button type="button" class="rk-header-action-button rk-header-notifications__trigger" aria-label="Abrir notificações — 3 alertas" aria-haspopup="dialog" aria-expanded="false" aria-controls="rkHeaderNotificationsPanel" title="Notificações">`,
+            `<svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.notificacoes}</svg>`,
+            `<span class="rk-header-notifications__badge" aria-hidden="true">3</span>`,
             `</button>`,
-            `<div class="rk-header-profile__menu" id="rkHeaderProfileMenu" role="menu" hidden>`,
-            `<a role="menuitem" href="${this.escaparAtributo(this.criarHref("funcionario.html"))}">Meu perfil</a>`,
-            `<button type="button" role="menuitem" data-rk-profile-logout>Sair</button>`,
+            `<div class="rk-header-notifications__panel" id="rkHeaderNotificationsPanel" role="dialog" aria-modal="false" aria-labelledby="rkHeaderNotificationsTitle" hidden>`,
+            `<header class="rk-header-notifications__header">`,
+            `<div><small>Central de alertas</small><strong id="rkHeaderNotificationsTitle">Notificações</strong></div>`,
+            `<button type="button" class="rk-header-notifications__close" aria-label="Fechar notificações"><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.fechar}</svg></button>`,
+            `</header>`,
+            `<div class="rk-header-notifications__list">`,
+            this.renderizarAlertaSistema("conexao", navigator.onLine === false ? "Conexão indisponível" : "Sistema conectado", navigator.onLine === false ? "Alguns recursos podem ficar limitados até a internet voltar." : "A sincronização e os serviços online estão disponíveis.", navigator.onLine === false ? "critical" : "success"),
+            this.renderizarAlertaSistema("atualizacao", "Sistema atualizado", `${this.obterVersao()} em uso, com verificação automática de novas versões.`, "info"),
+            this.renderizarAlertaSistema("visual", "Preferência visual", `O modo ${densidade === "compact" ? "compacto" : "normal"} está ativo nesta tela.`, "neutral"),
+            `</div>`,
+            `<footer class="rk-header-notifications__footer">`,
+            `<button type="button" data-rk-notifications-read>Marcar alertas como lidos</button>`,
+            `</footer>`,
             `</div>`
         ].join("");
-        container.appendChild(perfil);
+        configuracoes.innerHTML = [
+            `<button type="button" class="rk-header-action-button rk-header-settings__trigger" aria-label="Abrir configurações" aria-haspopup="dialog" aria-expanded="false" aria-controls="rkHeaderSettingsPanel" title="Configurações">`,
+            `<svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.engrenagem}</svg>`,
+            `</button>`,
+            `<div class="rk-header-settings__panel" id="rkHeaderSettingsPanel" role="dialog" aria-modal="false" aria-labelledby="rkHeaderSettingsTitle" hidden>`,
+            `<header class="rk-header-settings__panel-header">`,
+            `<div><small>Central do sistema</small><strong id="rkHeaderSettingsTitle">Configurações</strong></div>`,
+            `<button type="button" class="rk-header-settings__close" aria-label="Fechar configurações"><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.fechar}</svg></button>`,
+            `</header>`,
+            `<div class="rk-header-settings__panel-body">`,
+            `<section class="rk-header-settings__appearance" aria-labelledby="rkSettingsAppearanceTitle">`,
+            `<div><strong id="rkSettingsAppearanceTitle">Visual da interface</strong><small>Escolha a densidade das informações.</small></div>`,
+            `<div class="rk-header-settings__density" role="group" aria-label="Densidade da interface">`,
+            `<button type="button" data-rk-density="normal" aria-pressed="${densidade === "normal"}">Normal</button>`,
+            `<button type="button" data-rk-density="compact" aria-pressed="${densidade === "compact"}">Compacto</button>`,
+            `</div>`,
+            `</section>`,
+            `<div class="rk-header-settings__sections" aria-label="Áreas de configuração">`,
+            this.renderizarSecaoConfiguracoes("funcionamento", "Funcionamento", "Regras e preferências do sistema", [
+                `<span><b>Conectividade</b><small data-rk-settings-connection>${navigator.onLine === false ? "Sem conexão" : "Sistema conectado"}</small></span>`,
+                `<span><b>Atualizações</b><small>Atualização automática ativa</small></span>`
+            ].join("")),
+            this.renderizarSecaoConfiguracoes("empresa", "Empresa", "Identidade e dados corporativos", [
+                `<span><b>Empresa atual</b><small>${this.escapar(empresa)}</small></span>`,
+                `<span class="rk-header-settings__future"><b>Novas opções</b><small>Área preparada para dados fiscais e preferências</small></span>`
+            ].join("")),
+            this.renderizarSecaoConfiguracoes("usuario", "Configuração do usuário", "Conta, perfil e permissões", [
+                `<span><b>${this.escapar(nome)}</b><small>${this.escapar(email || cargo)}</small></span>`,
+                `<span><b>Perfil</b><small>${this.escapar(cargo)}</small></span>`,
+                sessao.perfil === "admin" ? `<a href="${this.escaparAtributo(this.criarHref("acessos.html"))}">Gerenciar usuários e acessos<svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.chevron}</svg></a>` : ""
+            ].join("")),
+            `</div>`,
+            `<p class="rk-header-settings__status" data-rk-settings-status role="status" aria-live="polite"></p>`,
+            `</div>`,
+            `<footer class="rk-header-settings__footer">`,
+            `<button type="button" class="rk-header-settings__logout" data-rk-settings-logout><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.sair}</svg><span>Sair do sistema</span></button>`,
+            `</footer>`,
+            `</div>`
+        ].join("");
+        acoes.append(notificacoes, configuracoes);
+        container.appendChild(acoes);
 
-        const trigger = perfil.querySelector(".rk-header-profile__trigger");
-        const menu = perfil.querySelector(".rk-header-profile__menu");
-        const fechar = () => {
-            menu.hidden = true;
-            trigger.setAttribute("aria-expanded", "false");
+        this.configurarPainelNotificacoes(notificacoes);
+        this.configurarPainelConfiguracoes(configuracoes);
+        return true;
+    },
+
+    renderizarAlertaSistema(tipo, titulo, descricao, estado = "neutral") {
+        const icone = tipo === "conexao" ? this.iconesConfiguracoes.funcionamento : tipo === "visual" ? this.iconesConfiguracoes.engrenagem : this.iconesConfiguracoes.notificacoes;
+        return [
+            `<article class="rk-header-notifications__item is-${this.escaparAtributo(estado)}" data-rk-system-alert="${this.escaparAtributo(tipo)}">`,
+            `<span class="rk-header-notifications__item-icon"><svg viewBox="0 0 24 24" aria-hidden="true">${icone}</svg></span>`,
+            `<div><strong>${this.escapar(titulo)}</strong><p>${this.escapar(descricao)}</p><small>Agora</small></div>`,
+            `</article>`
+        ].join("");
+    },
+
+    renderizarSecaoConfiguracoes(id, titulo, descricao, conteudo) {
+        const identificador = `rkSettingsSection${id[0].toUpperCase()}${id.slice(1)}`;
+        return [
+            `<section class="rk-header-settings__section" data-rk-settings-section="${this.escaparAtributo(id)}">`,
+            `<button type="button" class="rk-header-settings__section-trigger" aria-expanded="false" aria-controls="${identificador}">`,
+            `<span class="rk-header-settings__section-icon"><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes[id]}</svg></span>`,
+            `<span><strong>${this.escapar(titulo)}</strong><small>${this.escapar(descricao)}</small></span>`,
+            `<svg class="rk-header-settings__section-chevron" viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.chevron}</svg>`,
+            `</button>`,
+            `<div class="rk-header-settings__section-content" id="${identificador}" hidden>${conteudo}</div>`,
+            `</section>`
+        ].join("");
+    },
+
+    configurarPainelNotificacoes(notificacoes) {
+        this.controladorPainelNotificacoes?.abort();
+        this.controladorPainelNotificacoes = new AbortController();
+        const signal = this.controladorPainelNotificacoes.signal;
+        const gatilho = notificacoes.querySelector(".rk-header-notifications__trigger");
+        const painel = notificacoes.querySelector(".rk-header-notifications__panel");
+        const fecharBotao = notificacoes.querySelector(".rk-header-notifications__close");
+        const badge = notificacoes.querySelector(".rk-header-notifications__badge");
+        const atualizarCamada = () => {
+            const existePainelAberto = Boolean(document.querySelector(".rk-header-settings.is-open, .rk-header-notifications.is-open"));
+            document.body.classList.toggle("rk-header-panel-aberto", existePainelAberto);
+        };
+        const fechar = ({ devolverFoco = false } = {}) => {
+            painel.hidden = true;
+            gatilho.setAttribute("aria-expanded", "false");
+            notificacoes.classList.remove("is-open");
+            atualizarCamada();
+            if (devolverFoco) gatilho.focus({ preventScroll: true });
         };
         const abrir = () => {
-            menu.hidden = false;
-            trigger.setAttribute("aria-expanded", "true");
-            menu.querySelector("a, button")?.focus();
+            painel.hidden = false;
+            gatilho.setAttribute("aria-expanded", "true");
+            notificacoes.classList.add("is-open");
+            atualizarCamada();
+            fecharBotao.focus({ preventScroll: true });
         };
-        trigger.addEventListener("click", () => menu.hidden ? abrir() : fechar());
-        perfil.querySelector("[data-rk-profile-logout]").addEventListener("click", evento => window.RKAuth?.sair(evento));
-        perfil.querySelector("img")?.addEventListener("error", evento => evento.currentTarget.remove());
-        document.addEventListener("click", evento => { if (!perfil.contains(evento.target)) fechar(); });
-        document.addEventListener("keydown", evento => { if (evento.key === "Escape") { fechar(); trigger.focus(); } });
-        return true;
+        const atualizarConexao = () => {
+            const alerta = notificacoes.querySelector('[data-rk-system-alert="conexao"]');
+            if (!alerta) return;
+            const online = navigator.onLine !== false;
+            alerta.classList.toggle("is-critical", !online);
+            alerta.classList.toggle("is-success", online);
+            alerta.querySelector("strong").textContent = online ? "Sistema conectado" : "Conexão indisponível";
+            alerta.querySelector("p").textContent = online
+                ? "A sincronização e os serviços online estão disponíveis."
+                : "Alguns recursos podem ficar limitados até a internet voltar.";
+        };
+
+        gatilho.addEventListener("click", () => painel.hidden ? abrir() : fechar({ devolverFoco: true }), { signal });
+        fecharBotao.addEventListener("click", () => {
+            fechar();
+            fecharBotao.blur();
+        }, { signal });
+        notificacoes.querySelector("[data-rk-notifications-read]").addEventListener("click", evento => {
+            badge.hidden = true;
+            gatilho.setAttribute("aria-label", "Abrir notificações — alertas lidos");
+            evento.currentTarget.textContent = "Alertas lidos";
+            evento.currentTarget.disabled = true;
+            notificacoes.querySelectorAll(".rk-header-notifications__item").forEach(item => item.classList.add("is-read"));
+        }, { signal });
+        document.addEventListener("pointerdown", evento => {
+            if (!painel.hidden && !notificacoes.contains(evento.target)) fechar();
+        }, { signal });
+        document.addEventListener("keydown", evento => {
+            if (evento.key === "Escape" && !painel.hidden) fechar({ devolverFoco: true });
+        }, { signal });
+        window.addEventListener("online", atualizarConexao, { signal });
+        window.addEventListener("offline", atualizarConexao, { signal });
+    },
+
+    configurarPainelConfiguracoes(configuracoes) {
+        this.controladorPainelConfiguracoes?.abort();
+        this.controladorPainelConfiguracoes = new AbortController();
+        const signal = this.controladorPainelConfiguracoes.signal;
+        const gatilho = configuracoes.querySelector(".rk-header-settings__trigger");
+        const painel = configuracoes.querySelector(".rk-header-settings__panel");
+        const fecharBotao = configuracoes.querySelector(".rk-header-settings__close");
+        const status = configuracoes.querySelector("[data-rk-settings-status]");
+        const atualizarCamada = () => {
+            const existePainelAberto = Boolean(document.querySelector(".rk-header-settings.is-open, .rk-header-notifications.is-open"));
+            document.body.classList.toggle("rk-header-panel-aberto", existePainelAberto);
+        };
+        const atualizarSelecaoDensidade = densidade => {
+            configuracoes.querySelectorAll("[data-rk-density]").forEach(botao => {
+                botao.setAttribute("aria-pressed", String(botao.dataset.rkDensity === densidade));
+            });
+        };
+        const fechar = ({ devolverFoco = false } = {}) => {
+            painel.hidden = true;
+            gatilho.setAttribute("aria-expanded", "false");
+            configuracoes.classList.remove("is-open");
+            atualizarCamada();
+            if (devolverFoco) gatilho.focus({ preventScroll: true });
+        };
+        const abrir = () => {
+            painel.hidden = false;
+            gatilho.setAttribute("aria-expanded", "true");
+            configuracoes.classList.add("is-open");
+            atualizarCamada();
+            fecharBotao.focus({ preventScroll: true });
+        };
+
+        gatilho.addEventListener("click", () => painel.hidden ? abrir() : fechar({ devolverFoco: true }), { signal });
+        fecharBotao.addEventListener("click", () => fechar({ devolverFoco: true }), { signal });
+        configuracoes.querySelector("[data-rk-settings-logout]").addEventListener("click", evento => window.RKAuth?.sair(evento), { signal });
+        configuracoes.querySelectorAll("[data-rk-density]").forEach(botao => botao.addEventListener("click", () => {
+            const densidade = this.definirDensidadeInterface(botao.dataset.rkDensity);
+            atualizarSelecaoDensidade(densidade);
+            status.textContent = densidade === "compact" ? "Visual compacto ativado." : "Visual normal ativado.";
+            const alertaVisual = configuracoes.closest(".rk-header-actions")?.querySelector('[data-rk-system-alert="visual"] p');
+            if (alertaVisual) alertaVisual.textContent = `O modo ${densidade === "compact" ? "compacto" : "normal"} está ativo nesta tela.`;
+        }, { signal }));
+        configuracoes.querySelectorAll(".rk-header-settings__section-trigger").forEach(botao => botao.addEventListener("click", () => {
+            const conteudo = configuracoes.querySelector(`#${botao.getAttribute("aria-controls")}`);
+            const expandir = botao.getAttribute("aria-expanded") !== "true";
+            botao.setAttribute("aria-expanded", String(expandir));
+            conteudo.hidden = !expandir;
+            const secao = botao.closest("[data-rk-settings-section]")?.dataset.rkSettingsSection || "";
+            window.dispatchEvent(new CustomEvent("rk:settings-section", { detail: { secao, expandida: expandir } }));
+        }, { signal }));
+        configuracoes.querySelectorAll("a").forEach(link => link.addEventListener("click", () => fechar(), { signal }));
+        document.addEventListener("pointerdown", evento => {
+            if (!painel.hidden && !configuracoes.contains(evento.target)) fechar();
+        }, { signal });
+        document.addEventListener("keydown", evento => {
+            if (evento.key === "Escape" && !painel.hidden) fechar({ devolverFoco: true });
+        }, { signal });
+        const atualizarConexao = () => {
+            const indicador = configuracoes.querySelector("[data-rk-settings-connection]");
+            if (indicador) indicador.textContent = navigator.onLine === false ? "Sem conexão" : "Sistema conectado";
+        };
+        window.addEventListener("online", atualizarConexao, { signal });
+        window.addEventListener("offline", atualizarConexao, { signal });
+    },
+
+    obterPreferenciasInterface() {
+        let preferencias = {};
+        try {
+            preferencias = JSON.parse(localStorage.getItem(this.chavePreferenciasInterface) || "{}") || {};
+        } catch (erro) {
+            preferencias = {};
+        }
+        return {
+            ...preferencias,
+            densidade: preferencias.densidade === "compact" ? "compact" : "normal"
+        };
+    },
+
+    aplicarPreferenciasInterface() {
+        const preferencias = this.obterPreferenciasInterface();
+        document.documentElement.dataset.rkDensity = preferencias.densidade;
+        document.body?.classList.toggle("rk-density-compact", preferencias.densidade === "compact");
+        return preferencias;
+    },
+
+    definirDensidadeInterface(densidade) {
+        const valor = densidade === "compact" ? "compact" : "normal";
+        const preferencias = { ...this.obterPreferenciasInterface(), densidade: valor };
+        try {
+            localStorage.setItem(this.chavePreferenciasInterface, JSON.stringify(preferencias));
+        } catch (erro) {}
+        document.documentElement.dataset.rkDensity = valor;
+        document.body?.classList.toggle("rk-density-compact", valor === "compact");
+        window.dispatchEvent(new CustomEvent("rk:interface-density-changed", { detail: { densidade: valor } }));
+        return valor;
     },
 
     usuarioAutenticado() {
@@ -710,9 +1008,6 @@ const RKNavigation = {
             
             
             
-            "funcionario.html",
-            "novo-orcamento.html",
-            "valores.html",
             "produtos.html",
             "arquivos.html",
             "medicao-obra.html",
@@ -769,7 +1064,10 @@ const RKNavigation = {
     }
 };
 
+if (!RKNavigation.prepararShellInicial()) window.RKLoading?.marcarShellPronto?.();
+
 document.addEventListener("DOMContentLoaded", async () => {
+    if (!RKNavigation.prepararShellInicial()) window.RKLoading?.marcarShellPronto?.();
     if (window.RKAuth?.paginaAtualProtegida()) {
         const sessao = await RKAuth.aguardarAutenticacao();
         if (!sessao) return;

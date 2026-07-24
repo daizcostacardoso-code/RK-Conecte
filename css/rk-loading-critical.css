@@ -1,1 +1,285 @@
-html.rk-app-iniciando,html.rk-app-iniciando body{margin:0;min-height:100%;overflow:hidden;background:#071c2b}html.rk-app-iniciando body>:not(#rk-global-loading){visibility:hidden!important}#rk-global-loading[hidden]{display:none!important}#rk-global-loading{position:fixed;z-index:2147483647;inset:0;box-sizing:border-box;display:grid;place-items:center;overflow:hidden;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:radial-gradient(circle at 80% 15%,rgba(55,196,220,.18),transparent 30%),linear-gradient(145deg,#061724,#0a3853);color:#eefaff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.rk-loading-card{box-sizing:border-box;width:min(100%,430px);display:grid;justify-items:center;gap:13px;padding:clamp(24px,6vw,38px);border:1px solid rgba(255,255,255,.18);border-radius:24px;background:rgba(5,28,44,.88);box-shadow:0 24px 70px rgba(0,0,0,.35);text-align:center}.rk-loading-logo{width:68px;height:68px;object-fit:cover;border:3px solid #fff;border-radius:18px}.rk-loading-kicker{margin:0;color:#71dce9;font-size:.7rem;font-weight:800;letter-spacing:.14em}.rk-loading-card h1{margin:0;font-size:clamp(1.5rem,6vw,2rem)}#rk-loading-message{min-height:1.5em;margin:0;color:#c9dce8;line-height:1.5}.rk-loading-line{width:100%;height:5px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.12)}.rk-loading-line span{display:block;width:42%;height:100%;border-radius:inherit;background:#40c9dc;animation:rk-loading 1.2s ease-in-out infinite}.rk-loading-card button{min-height:44px;border:1px solid #75dce8;border-radius:10px;background:transparent;color:#fff;padding:9px 16px;font:inherit;font-weight:700}.rk-loading-card footer{display:grid;justify-items:center;gap:4px;margin-top:10px}.rk-loading-card footer span{color:#8daaba;font-size:.63rem;text-transform:uppercase}.rk-loading-card footer img{width:132px;height:48px;object-fit:contain}.rk-loading-error .rk-loading-line span{width:100%;animation:none;background:#e7a04b}@keyframes rk-loading{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}@media(max-height:520px){.rk-loading-card{grid-template-columns:auto 1fr;padding:18px;text-align:left}.rk-loading-card footer,.rk-loading-line{grid-column:1/-1}}@media(prefers-reduced-motion:reduce){.rk-loading-line span{animation:none;width:65%}}
+html.rk-app-iniciando {
+    background: #eef2f6;
+}
+
+html.rk-app-iniciando body {
+    overflow: hidden !important;
+}
+
+#rk-global-loading[hidden] {
+    display: none !important;
+}
+
+#rk-global-loading {
+    position: fixed;
+    z-index: 2147483600;
+    inset: 0;
+    display: grid;
+    width: 100%;
+    max-width: 100vw;
+    min-width: 280px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    place-items: center;
+    overflow: hidden auto;
+    box-sizing: border-box;
+    padding:
+        max(18px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
+    background: linear-gradient(180deg, #f8fafc 0, #eef2f6 100%);
+    color: #26314d;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .18s ease, visibility .18s ease;
+}
+
+#rk-global-loading.rk-loading-leaving {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.rk-loading-card {
+    width: min(100%, 420px);
+    display: grid;
+    gap: 18px;
+    box-sizing: border-box;
+    border: 1px solid #d7dee8;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(16, 24, 40, .12);
+    padding: 24px;
+}
+
+.rk-loading-brand {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e9ef;
+    text-align: left;
+}
+
+.rk-loading-logo {
+    display: block;
+    width: 62px;
+    height: 42px;
+    flex: 0 0 62px;
+    border-radius: 5px;
+    object-fit: contain;
+    background: #fff;
+}
+
+.rk-loading-brand-copy {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.rk-loading-brand-copy strong {
+    overflow: hidden;
+    color: #172b62;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rk-loading-brand-copy span {
+    overflow: hidden;
+    color: #667085;
+    font-size: .72rem;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rk-loading-content {
+    display: grid;
+    gap: 8px;
+    text-align: left;
+}
+
+.rk-loading-content h1 {
+    margin: 0;
+    color: #172033;
+    font-size: clamp(1.18rem, 5vw, 1.45rem);
+    line-height: 1.2;
+    letter-spacing: -.02em;
+}
+
+#rk-loading-message {
+    min-height: 1.4em;
+    margin: 0;
+    color: #667085;
+    font-size: .86rem;
+    line-height: 1.45;
+}
+
+.rk-loading-progress-wrap {
+    display: grid;
+    gap: 8px;
+}
+
+.rk-loading-progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #475467;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.rk-loading-line {
+    position: relative;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e7edf3;
+}
+
+.rk-loading-line > span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0756d9, #42d5b8);
+    transform: scaleX(.08);
+    transform-origin: left;
+    transition: transform .28s ease;
+}
+
+.rk-loading-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #e5e9ef;
+    border-radius: 7px;
+    background: #f8fafc;
+    padding: 9px 10px;
+    color: #475467;
+    font-size: .72rem;
+}
+
+.rk-loading-network {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+}
+
+.rk-loading-network::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    flex: 0 0 8px;
+    border-radius: 50%;
+    background: #16835a;
+    box-shadow: 0 0 0 3px rgba(22, 131, 90, .12);
+}
+
+.rk-loading-offline .rk-loading-network::before {
+    background: #b76a08;
+    box-shadow: 0 0 0 3px rgba(183, 106, 8, .12);
+}
+
+.rk-loading-reload {
+    min-height: 38px;
+    border: 1px solid #c63845;
+    border-radius: 6px;
+    background: #fff;
+    color: #a12828;
+    font: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.rk-loading-powered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding-top: 2px;
+    color: #7b8798;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.rk-loading-powered img {
+    display: block;
+    width: auto;
+    height: 26px;
+    max-width: 116px;
+    border-radius: 5px;
+    background: #101828;
+    object-fit: contain;
+    padding: 3px 8px;
+}
+
+.rk-loading-error .rk-loading-line > span {
+    background: linear-gradient(90deg, #a62f3b, #dc5963);
+}
+
+@media (max-width: 700px) {
+    body.rk-app-interna #rk-global-loading {
+        z-index: 1199;
+        top: 82px;
+        right: 0;
+        bottom: calc(var(--rk-mobile-navigation-height, 76px) + env(safe-area-inset-bottom, 0px));
+        left: 0;
+        width: auto;
+        min-height: 0;
+        height: auto;
+        padding: 14px 12px;
+    }
+
+    body.rk-app-interna.orcamento-inteligente-page #rk-global-loading {
+        top: 0;
+    }
+
+    body.rk-app-interna > .rk-internal-header,
+    body.rk-app-interna > .rk-adaptive-mobile-navigation {
+        z-index: 1200;
+    }
+}
+
+@media (max-width: 520px) {
+    #rk-global-loading {
+        place-items: center;
+        padding-inline: 12px;
+    }
+
+    .rk-loading-card {
+        gap: 16px;
+        border-radius: 10px;
+        padding: 20px 17px;
+    }
+
+    .rk-loading-logo {
+        width: 56px;
+        height: 38px;
+        flex-basis: 56px;
+    }
+
+    .rk-loading-status {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #rk-global-loading,
+    .rk-loading-line > span {
+        transition-duration: .01ms !important;
+    }
+}

@@ -11,17 +11,14 @@ const paginasComAuth = [
     "paginas/clientes.html",
     "paginas/compartilhar-documento.html",
     "paginas/dashboard-comercial.html",
-    "paginas/funcionario.html",
     "paginas/loading.html",
     "paginas/login.html",
     "paginas/medicao-obra.html",
     "paginas/nota-servico.html",
-    "paginas/novo-orcamento.html",
     "paginas/orcamento-inteligente.html",
     "paginas/orcamento.html",
     "paginas/produtos.html",
-    "paginas/projetos.html",
-    "paginas/valores.html"
+    "paginas/projetos.html"
 ];
 
 function contar(texto, trecho) {
@@ -66,14 +63,32 @@ test("navegacao inferior e compartilhada na area interna", () => {
     const arquivos = readFileSync(resolve(raiz, "paginas/arquivos.html"), "utf8");
 
     assert.match(navegacao, /renderizarMenuInferior\(\)/);
-    assert.match(navegacao, /rk-mobile-nav-handle/);
-    assert.match(navegacao, /rk-menu-inferior--oculto/);
-    assert.match(navegacao, /rk-mobile-more/);
-    assert.match(navegacao, /requestAnimationFrame/);
+    assert.match(navegacao, /navigationConfig/);
+    assert.match(navegacao, /rk-adaptive-mobile-navigation/);
+    assert.match(navegacao, /configurarNavegacaoAdaptativa/);
+    assert.match(navegacao, /createElement\("nav"\)/);
+    assert.match(navegacao, /dataset\.state = "collapsed"/);
+    assert.match(navegacao, /Conjunto Lucide incorporado localmente/);
+    assert.match(navegacao, /data-icon-more/);
+    assert.match(navegacao, /data-icon-close/);
+    assert.match(navegacao, /dataset\.currentPage = paginaAtualEmAtalho \? "shortcut" : "more"/);
+    assert.match(navegacao, /dataset\.scrollVisibility = deslocamento > 0 \? "hidden" : "shown"/);
+    assert.match(navegacao, /addEventListener\("scroll", aoRolar, \{ passive: true \}\)/);
+    assert.match(navegacao, /rotuloAtalho: "Medir obra"/);
+    assert.match(navegacao, /pagina: "medicao-obra\.html", atalho: true, ordemAtalho: 3, icone: "medicao"/);
+    assert.doesNotMatch(navegacao, /rotulo: "Projetos"[^}]*atalho: true/);
+    assert.doesNotMatch(navegacao, /criarPainelMaisMobile|configurarPainelMaisMobile|rk-mobile-more/);
+    assert.equal((navegacao.match(/renderizarAtalhosMobile\(atalhos\)/g) || []).length, 1);
+    assert.match(css, /height \.32s cubic-bezier/);
+    assert.match(css, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\) 52px/);
+    assert.match(css, /width: 46px !important/);
+    assert.match(css, /data-current-page="more"/);
+    assert.match(css, /data-scroll-visibility="hidden"/);
+    assert.match(css, /border: 0; background: #edf4f8/);
     for (const pagina of ["dashboard-comercial.html", "orcamento-inteligente.html", "projetos.html", "clientes.html", "caixa.html"]) {
         assert.match(navegacao, new RegExp(pagina), pagina);
     }
-    assert.match(css, /\.rk-menu-inferior/);
+    assert.match(css, /\.rk-adaptive-mobile-navigation/);
     assert.match(css, /overflow-wrap: anywhere/);
     assert.doesNotMatch(arquivos, /Arquivos de orçamentos/);
 });

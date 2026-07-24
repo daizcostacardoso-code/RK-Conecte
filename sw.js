@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v1.0.0-20260724101343706';
+const RK_CACHE = 'rk-conecte-v1.0.0-20260724223512576';
 const OFFLINE_FALLBACK = '/404.html';
 const APP_SHELL = [
   '/', '/index.html', OFFLINE_FALLBACK, '/paginas/login.html', '/paginas/loading.html',

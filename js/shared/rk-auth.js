@@ -26,9 +26,6 @@ const RKAuth = {
         "caixa.html",
         "loading.html",
         "projetos.html",
-        "funcionario.html",
-        "novo-orcamento.html",
-        "valores.html",
         "produtos.html",
         "acessos.html"
     ],
@@ -320,14 +317,21 @@ const RKAuth = {
         if (document.getElementById("rkAuthPendingStyle")) return;
         const estilo = document.createElement("style");
         estilo.id = "rkAuthPendingStyle";
-        estilo.textContent = "html.rk-auth-pending body>:not(#rk-global-loading){visibility:hidden!important}html.rk-auth-pending{background:#071c2b}";
+        estilo.textContent = [
+            "html.rk-auth-pending body>:not(#rk-global-loading):not(.rk-internal-header):not(.rk-adaptive-mobile-navigation):not(.rk-adaptive-mobile-navigation__backdrop){visibility:hidden!important}",
+            "html.rk-auth-pending body>.rk-internal-header,html.rk-auth-pending body>.rk-adaptive-mobile-navigation{visibility:visible!important}",
+            "html.rk-auth-pending{background:#071c2b}"
+        ].join("");
         document.head.appendChild(estilo);
     },
 
     liberarInterface() {
         if (typeof document === "undefined") return;
-        document.documentElement.classList.remove("rk-auth-pending");
-        window.RKLoading?.concluirInicializacao?.();
+        if (window.RKLoading?.marcarAutenticacaoPronta) {
+            window.RKLoading.marcarAutenticacaoPronta();
+        } else {
+            document.documentElement.classList.remove("rk-auth-pending");
+        }
     },
 
     notificarEstado(sessao) {

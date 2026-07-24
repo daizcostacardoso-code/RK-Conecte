@@ -31,30 +31,4 @@ assert.deepEqual(
     ["Total sem desconto=1125", "Desconto à vista=100", "Valor à vista=1025"]
 );
 
-const textos = [];
-const pdfLegado = carregarObjeto("js/pdf.js", "PDF", {
-    window: {},
-    Util: {
-        numero: valor => Number(valor) || 0,
-        moeda: valor => `R$ ${Number(valor).toFixed(2)}`
-    }
-});
-const doc = {
-    line() {},
-    setFont() {},
-    setFontSize() {},
-    addPage() {},
-    splitTextToSize: texto => [texto],
-    text(texto) { textos.push(texto); }
-};
-pdfLegado.desenharTotais(doc, {
-    subtotal: 1000,
-    totalAdicionais: 125,
-    adicionais: [{ valor: 50 }, { valor: 75 }],
-    desconto: 0,
-    totalFinal: 1125
-}, 20);
-
-assert.equal(textos.filter(texto => texto === "Ferragens/Acessórios:").length, 1);
-assert.equal(textos.filter(texto => texto === "R$ 125.00").length, 1);
 console.log("PDF com ferragens/acessorios consolidados: OK");
