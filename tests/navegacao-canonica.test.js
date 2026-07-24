@@ -125,3 +125,12 @@ test("sino e engrenagem fazem parte do shell anterior à autenticação", () => 
     assert.match(navegacao, /Validando acesso\.\.\./);
     assert.doesNotMatch(navegacao, /querySelectorAll\("\.rk-header-profile, \.rk-header-actions/);
 });
+
+test("ações do header são atualizadas sem recriar botões e ícones", () => {
+    const navegacao = ler("js/shared/rk-navigation.js");
+    assert.match(navegacao, /if \(acoes\.isConnected\) \{\s*this\.atualizarAcoesHeaderAutenticado\(acoes, sessao\)/);
+    assert.match(navegacao, /data-rk-settings-user-name/);
+    assert.match(navegacao, /data-rk-settings-user-profile/);
+    assert.match(navegacao, /data-rk-settings-admin-link/);
+    assert.match(navegacao, /sair\.disabled = !autenticado/);
+});

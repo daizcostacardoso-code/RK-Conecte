@@ -694,6 +694,10 @@ const RKNavigation = {
         const empresa = String(empresaConfigurada || "RK Vidraçaria").trim();
         const densidade = this.obterPreferenciasInterface().densidade;
         const acoes = container.querySelector(":scope > .rk-header-actions") || document.createElement("section");
+        if (acoes.isConnected) {
+            this.atualizarAcoesHeaderAutenticado(acoes, sessao);
+            return true;
+        }
         const notificacoes = acoes.querySelector(":scope > .rk-header-notifications") || document.createElement("section");
         const configuracoes = acoes.querySelector(":scope > .rk-header-settings") || document.createElement("section");
         acoes.className = "rk-header-actions";
@@ -747,9 +751,9 @@ const RKNavigation = {
                 `<span class="rk-header-settings__future"><b>Novas opções</b><small>Área preparada para dados fiscais e preferências</small></span>`
             ].join("")),
             this.renderizarSecaoConfiguracoes("usuario", "Configuração do usuário", "Conta, perfil e permissões", [
-                `<span><b>${this.escapar(nome)}</b><small>${this.escapar(email || cargo)}</small></span>`,
-                `<span><b>Perfil</b><small>${this.escapar(cargo)}</small></span>`,
-                sessao.perfil === "admin" ? `<a href="${this.escaparAtributo(this.criarHref("acessos.html"))}">Gerenciar usuários e acessos<svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.chevron}</svg></a>` : ""
+                `<span><b data-rk-settings-user-name>${this.escapar(nome)}</b><small data-rk-settings-user-detail>${this.escapar(email || cargo)}</small></span>`,
+                `<span><b>Perfil</b><small data-rk-settings-user-profile>${this.escapar(cargo)}</small></span>`,
+                `<a data-rk-settings-admin-link href="${this.escaparAtributo(this.criarHref("acessos.html"))}"${sessao.perfil === "admin" ? "" : " hidden"}>Gerenciar usuários e acessos<svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.chevron}</svg></a>`
             ].join("")),
             `</div>`,
             `<p class="rk-header-settings__status" data-rk-settings-status role="status" aria-live="polite"></p>`,
@@ -764,6 +768,31 @@ const RKNavigation = {
 
         this.configurarPainelNotificacoes(notificacoes);
         this.configurarPainelConfiguracoes(configuracoes);
+        return true;
+    },
+
+    atualizarAcoesHeaderAutenticado(acoes, sessao = {}) {
+        const autenticado = Boolean(sessao.logado);
+        const nome = String(sessao.nomeUsuario || sessao.email || "Conta em validação").trim();
+        const cargo = sessao.perfil === "admin" ? "Administrador" : (autenticado ? "Funcionário" : "Aguardando autenticação");
+        const email = String(sessao.email || "").trim();
+        const definirTexto = (seletor, valor) => {
+            const elemento = acoes.querySelector(seletor);
+            if (elemento) elemento.textContent = valor;
+        };
+
+        definirTexto("[data-rk-settings-user-name]", nome);
+        definirTexto("[data-rk-settings-user-detail]", email || cargo);
+        definirTexto("[data-rk-settings-user-profile]", cargo);
+
+        const areaAdmin = acoes.querySelector("[data-rk-settings-admin-link]");
+        if (areaAdmin) areaAdmin.hidden = sessao.perfil !== "admin";
+
+        const sair = acoes.querySelector("[data-rk-settings-logout]");
+        if (sair) {
+            sair.disabled = !autenticado;
+            definirTexto("[data-rk-settings-logout] span", autenticado ? "Sair do sistema" : "Validando acesso...");
+        }
         return true;
     },
 
