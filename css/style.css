@@ -15110,6 +15110,12 @@ body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header {
     z-index: 5000 !important;
     overflow: visible !important;
 }
+body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header::after {
+    top: 0 !important;
+    bottom: 0 !important;
+    height: auto !important;
+    transform: none !important;
+}
 body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header .rk-header-actions {
     z-index: 5001;
 }

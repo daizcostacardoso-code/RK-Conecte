@@ -134,3 +134,8 @@ test("ações do header são atualizadas sem recriar botões e ícones", () => {
     assert.match(navegacao, /data-rk-settings-admin-link/);
     assert.match(navegacao, /sair\.disabled = !autenticado/);
 });
+
+test("decoração desktop permanece contida ao abrir painéis do header", () => {
+    const estilos = ler("css/style.css");
+    assert.match(estilos, /body\.rk-app-interna\.rk-header-panel-aberto > header\.rk-internal-header::after\s*\{[\s\S]*?top:\s*0 !important;[\s\S]*?bottom:\s*0 !important;[\s\S]*?height:\s*auto !important;[\s\S]*?transform:\s*none !important;/);
+});
