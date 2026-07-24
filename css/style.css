@@ -14974,8 +14974,10 @@ body.rk-app-interna > header.rk-internal-header::before {
 body.rk-app-interna > header.rk-internal-header::after {
     left: 0;
     width: 25%;
+    height: auto;
     background: linear-gradient(115deg, #e3fbff, #91dcef);
     clip-path: polygon(0 0, 72% 0, 54% 100%, 0 100%);
+    transform: none;
 }
 body.rk-app-interna > header.rk-internal-header .rk-internal-header__crossover {
     position: absolute;
@@ -15109,12 +15111,6 @@ body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header {
     position: relative !important;
     z-index: 5000 !important;
     overflow: visible !important;
-}
-body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header::after {
-    top: 0 !important;
-    bottom: 0 !important;
-    height: auto !important;
-    transform: none !important;
 }
 body.rk-app-interna.rk-header-panel-aberto > header.rk-internal-header .rk-header-actions {
     z-index: 5001;

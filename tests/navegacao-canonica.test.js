@@ -137,5 +137,6 @@ test("ações do header são atualizadas sem recriar botões e ícones", () => {
 
 test("decoração desktop permanece contida ao abrir painéis do header", () => {
     const estilos = ler("css/style.css");
-    assert.match(estilos, /body\.rk-app-interna\.rk-header-panel-aberto > header\.rk-internal-header::after\s*\{[\s\S]*?top:\s*0 !important;[\s\S]*?bottom:\s*0 !important;[\s\S]*?height:\s*auto !important;[\s\S]*?transform:\s*none !important;/);
+    assert.match(estilos, /body\.rk-app-interna > header\.rk-internal-header::after\s*\{[\s\S]*?height:\s*auto;[\s\S]*?transform:\s*none;/);
+    assert.doesNotMatch(estilos, /rk-header-panel-aberto > header\.rk-internal-header::after/);
 });
