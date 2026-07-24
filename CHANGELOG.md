@@ -1,16 +1,5 @@
 # Histórico de alterações
 
-## v1.0.1 — lançamento seguro e acabamento da experiência
-
-- Alterado o Firebase Hosting para publicar somente um pacote `dist/` gerado por lista permitida.
-- Adicionadas verificações contra publicação de Git, backups, testes, logs, patches e referências quebradas.
-- Direcionada a abertura da PWA diretamente ao dashboard, eliminando a segunda tela de carregamento.
-- Mantida `loading.html` apenas como redirecionamento imediato para instalações antigas.
-- Redirecionados usuários autenticados da página inicial para a área interna sem exibir o site público.
-- Removidos rodapés institucionais das páginas internas e preservados os rodapés das páginas públicas.
-- Consolidada a barra Conecte em um único componente, com encaixe móvel, área segura e prevenção de duplicidade.
-- Atualizados cache, manifesto, versão central e testes de prontidão para `v1.0.1`.
-
 ## v1.0.0 — estabilização para lançamento
 
 - Adicionado carregador global acessível, responsivo e orientado a tarefas reais.

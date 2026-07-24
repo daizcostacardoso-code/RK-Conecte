@@ -8,12 +8,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script src="../js/firebase-auth-bootstrap.js?v=1.0.0"></script>
-    <script src="../js/shared/rk-auth.js?v=1.0.1" data-rk-auth="protected"></script>
+    <script src="../js/shared/rk-auth.js?v=1.0.0" data-rk-auth="protected"></script>
     <title>Arquivos - RK Vidraçaria</title>
     <link rel="stylesheet" href="../css/style.css?v=1.0.0">
     <script defer src="../js/shared/rk-internal-accessibility.js?v=1.0.0"></script>
     <meta name="theme-color" content="#083d67">
-    <link rel="manifest" href="../manifest.webmanifest?v=1.0.1">
+    <link rel="manifest" href="../manifest.webmanifest">
     <link rel="apple-touch-icon" href="../imagens/icons/icon-192.png">
     <style>
         .arquivos-page .arquivos-main { padding: 26px 0 38px; }
@@ -23,10 +23,18 @@
         .arquivos-label { display: block; color: #00727a; font-weight: 800; text-transform: uppercase; font-size: .82rem; margin-bottom: 4px; }
         .arquivos-topo h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.15rem); color: #061b34; }
         .arquivos-topo p { margin: 6px 0 0; color: #53657a; }
-        .arquivos-filtros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-        .arquivos-filtros label { display: grid; gap: 6px; color: #17324d; font-weight: 700; }
-        .arquivos-filtros input, .arquivos-filtros select { width: 100%; border: 1px solid #c9d9e8; border-radius: 10px; padding: 12px; font: inherit; background: #f8fbff; }
-        .arquivos-acoes { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .arquivos-filtros-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .arquivos-filtros-cabecalho h2 { margin: 0; color: #061b34; font-size: 1rem; }
+        .arquivos-filtros-cabecalho p { margin: 3px 0 0; color: #647487; font-size: .84rem; }
+        .arquivos-filtros-cabecalho .botao { display: none; }
+        .arquivos-filtros { display: grid; grid-template-columns: 1.35fr 1fr 1fr .8fr; gap: 9px; }
+        .arquivos-filtros label { display: grid; gap: 4px; color: #17324d; font-size: .78rem; font-weight: 800; }
+        .arquivos-filtros input, .arquivos-filtros select { width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid #c9d9e8; border-radius: 9px; padding: 8px 10px; font: inherit; background: #f8fbff; }
+        .arquivos-filtros-avancados { display: contents; }
+        .arquivos-filtros-avancados-cabecalho { display: none; }
+        .arquivos-filtros-fechar { display: none; }
+        .arquivos-acoes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+        .arquivos-acoes .botao { min-height: 38px; padding: 8px 12px; }
         .arquivos-lista { overflow-x: auto; }
         .arquivos-tabela { width: 100%; border-collapse: collapse; min-width: 760px; }
         .arquivos-tabela th, .arquivos-tabela td { text-align: left; padding: 13px 12px; border-bottom: 1px solid #e5edf5; }
@@ -52,16 +60,42 @@
         .arquivos-detalhes-resumo p { display: flex; gap: 10px; justify-content: space-between; align-items: center; margin: 0; color: #061b34; font-size: 1.1rem; }.arquivos-detalhes-resumo dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0 0; }.arquivos-detalhes-resumo dl div { background: #f5f9fd; border-radius: 9px; padding: 10px; }.arquivos-detalhes-resumo dt { font-size: .76rem; color: #53657a; font-weight: 800; text-transform: uppercase; }.arquivos-detalhes-resumo dd { margin: 4px 0 0; color: #17324d; font-weight: 700; }
         .arquivos-detalhes-secao { border-top: 1px solid #e5edf5; margin-top: 18px; padding-top: 16px; }.arquivos-detalhes-secao h3 { margin: 0 0 8px; color: #083d67; }.arquivos-detalhes-secao p { color: #435a70; }.arquivos-detalhes-secao ul { margin: 0; padding-left: 20px; color: #435a70; }.arquivos-historico { display: grid; gap: 10px; margin: 0; padding-left: 22px; }.arquivos-historico li { color: #17324d; }.arquivos-historico span, .arquivos-historico small { display: block; color: #53657a; margin-top: 2px; }.arquivos-historico p { margin: 4px 0 0; }
         .arquivos-detalhes-form { display: grid; gap: 12px; }.arquivos-detalhes-form label { display: grid; gap: 6px; color: #17324d; font-weight: 700; }.arquivos-detalhes-form textarea { width: 100%; min-height: 86px; box-sizing: border-box; border: 1px solid #c9d9e8; border-radius: 9px; padding: 10px; font: inherit; }.arquivos-confirmacao { display: flex !important; grid-template-columns: auto 1fr; align-items: center; }
-        @media (max-width: 900px) { .arquivos-filtros { grid-template-columns: 1fr; } .arquivos-detalhes-resumo dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        .arquivos-menu-inferior { display: none; }
+        @media (max-width: 900px) { .arquivos-filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); } .arquivos-detalhes-resumo dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 600px) { .arquivos-item-acoes button { min-height: 44px; padding: 9px 12px; } .arquivos-detalhes-resumo dl { grid-template-columns: 1fr; } .arquivos-modal-conteudo { padding: 16px; } }
 
 
         /* Mobile: transforma cada orçamento em um cartão compacto e mantém as ações visíveis. */
         @media (max-width: 700px) {
-            .arquivos-page .arquivos-main { padding: 12px 0 26px; }
+            .arquivos-page .arquivos-main { padding: 12px 0 92px; }
             .arquivos-shell { gap: 10px; }
             .arquivos-card { padding: 12px; border-radius: 12px; }
+            .arquivos-topo p { font-size: .88rem; }
+            .arquivos-filtros-cabecalho { margin-bottom: 10px; }
+            .arquivos-filtros-cabecalho p { display: none; }
+            .arquivos-filtros-cabecalho .botao { display: inline-flex; min-height: 38px; padding: 7px 10px; }
+            .arquivos-filtros { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .arquivos-filtros label:first-child { grid-column: 1 / -1; }
+            .arquivos-filtros label { font-size: .72rem; }
+            .arquivos-filtros input, .arquivos-filtros select { min-height: 38px; padding: 7px 9px; font-size: .86rem; }
+            .arquivos-filtros-avancados { display: none; }
+            .arquivos-filtros-avancados.is-visible { position: fixed; z-index: 60; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); border-radius: 20px 20px 0 0; background: #fff; box-shadow: 0 -12px 40px rgba(6,27,52,.25); }
+            .arquivos-filtros-avancados.is-visible::before { content: ""; position: absolute; top: 8px; left: calc(50% - 22px); width: 44px; height: 4px; border-radius: 999px; background: #8b9aaa; }
+            .arquivos-filtros-avancados.is-visible .arquivos-filtros-avancados-cabecalho { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; padding-top: 5px; }
+            .arquivos-filtros-avancados-cabecalho h3 { margin: 0; color: #061b34; font-size: 1.2rem; }
+            .arquivos-filtros-fechar { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #eef4f9; color: #083d67; font: inherit; font-size: 1.35rem; cursor: pointer; }
+            .arquivos-filtros-avancados.is-visible label:first-of-type { grid-column: 1 / -1; }
+            .arquivos-filtros-avancados.is-visible .arquivos-acoes { grid-column: 1 / -1; margin-top: 2px; }
+            body.arquivos-filtros-abertos { overflow: hidden; }
+            .arquivos-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 10px; }
+            .arquivos-acoes .botao { min-height: 38px; padding: 7px 8px; font-size: .8rem; }
+            .arquivos-acoes #btnExcluirArquivosSelecionados { grid-column: 1 / -1; }
             .arquivos-lista { overflow: visible; padding: 8px; }
+
+            .arquivos-menu-inferior { position: fixed; z-index: 50; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); left: 10px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 6px; border: 1px solid rgba(8,61,103,.14); border-radius: 16px; background: rgba(255,255,255,.96); box-shadow: 0 10px 28px rgba(6,27,52,.18); backdrop-filter: blur(14px); }
+            .arquivos-menu-inferior a { display: grid; place-items: center; gap: 3px; min-height: 50px; border-radius: 11px; color: #526b81; font-size: .62rem; font-weight: 800; line-height: 1; text-align: center; text-decoration: none; }
+            .arquivos-menu-inferior a svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+            .arquivos-menu-inferior a[aria-current="page"] { background: #e7f2ff; color: #083d67; }
 
             .arquivos-tabela {
                 width: 100%;
@@ -252,26 +286,25 @@
 </header>
 <main class="arquivos-main">
     <div class="container arquivos-shell">
-        <section class="arquivos-card arquivos-topo">
-            <div>
-                <span class="arquivos-label">Arquivos</span>
-                <h1>Arquivos de orçamentos</h1>
-                <p>Localize orçamentos salvos no banco e gere novamente o PDF para visualizar ou baixar.</p>
-            </div>
-        </section>
         <p id="arquivosMensagem" class="arquivos-mensagem" role="status" aria-live="polite"></p>
         <section class="arquivos-card" aria-label="Filtros de arquivos">
+            <div class="arquivos-filtros-cabecalho">
+                <button class="botao botao-claro" id="btnAbrirFiltrosArquivos" type="button" aria-expanded="false" aria-controls="arquivosFiltrosAvancados">Filtros</button>
+            </div>
             <div class="arquivos-filtros">
-                <label><span>Cliente</span><input type="search" id="filtroArquivoCliente" placeholder="Nome do cliente"></label>
-                <label><span>CPF/CNPJ</span><input type="search" id="filtroArquivoDocumento" placeholder="Documento do cliente"></label>
                 <label><span>Número do orçamento</span><input type="search" id="filtroArquivoNumero" placeholder="Ex.: ORC-0001"></label>
                 <label><span>Status</span><select id="filtroArquivoStatus"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="emitido">Emitido</option><option value="enviado">Enviado</option><option value="aprovado">Aprovado</option><option value="recusado">Recusado</option><option value="expirado">Expirado</option><option value="cancelado">Cancelado</option></select></label>
-                <label><span>Data inicial</span><input type="date" id="filtroArquivoDataInicial"></label>
-                <label><span>Data final</span><input type="date" id="filtroArquivoDataFinal"></label>
-                <label><span>Valor mínimo</span><input type="number" id="filtroArquivoValorMinimo" placeholder="R$ 0,00" min="0" step="0.01"></label>
-                <label><span>Valor máximo</span><input type="number" id="filtroArquivoValorMaximo" placeholder="R$ 0,00" min="0" step="0.01"></label>
+                <div class="arquivos-filtros-avancados" id="arquivosFiltrosAvancados">
+                    <div class="arquivos-filtros-avancados-cabecalho"><h3>Filtros</h3><button class="arquivos-filtros-fechar" id="btnFecharFiltrosArquivos" type="button" aria-label="Fechar filtros">×</button></div>
+                    <label><span>Cliente</span><input type="search" id="filtroArquivoCliente" placeholder="Nome do cliente"></label>
+                    <label><span>CPF/CNPJ</span><input type="search" id="filtroArquivoDocumento" placeholder="Documento do cliente"></label>
+                    <label><span>Data inicial</span><input type="date" id="filtroArquivoDataInicial"></label>
+                    <label><span>Data final</span><input type="date" id="filtroArquivoDataFinal"></label>
+                    <label><span>Valor mínimo</span><input type="number" id="filtroArquivoValorMinimo" placeholder="R$ 0,00" min="0" step="0.01"></label>
+                    <label><span>Valor máximo</span><input type="number" id="filtroArquivoValorMaximo" placeholder="R$ 0,00" min="0" step="0.01"></label>
+                </div>
             </div>
-            <div class="arquivos-acoes" style="margin-top:14px;">
+            <div class="arquivos-acoes">
                 <button class="botao cadastro-btn-principal" id="btnBuscarArquivos" type="button">Buscar</button>
                 <button class="botao botao-claro" id="btnLimparArquivos" type="button">Limpar filtros</button>
                 <button class="botao btn-tabela-excluir" id="btnExcluirArquivosSelecionados" type="button" disabled>Cancelar selecionados</button>
@@ -302,6 +335,7 @@
         </dialog>
     </div>
 </main>
+<footer><p>© 2026 RK Vidraçaria - Todos os direitos reservados.</p><p>(73) 9981-9768 | Rua Guimarães, 336 - Nilo Fraga, Porto Seguro</p></footer>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="../js/firebase-config.js?v=1.0.0"></script>
 <script src="../js/config.js?v=1.0.0"></script>
@@ -329,8 +363,32 @@
 <script src="../js/export/export-service.js?v=1.0.0"></script>
 <script src="../js/documentos/document-pdf-repository.js?v=1.0.0"></script>
 <script src="../js/documentos/document-archive-controller.js?v=1.0.0"></script>
-<script src="../js/shared/rk-navigation.js?v=1.0.1"></script>
-<script src="../js/app-install.js?v=1.0.1"></script>
-  <script src="../js/conecte-signature.js?v=1.0.1"></script>
+<script src="../js/shared/rk-navigation.js?v=1.0.0"></script>
+<script src="../js/app-install.js?v=1.0.0"></script>
+<script>
+    (() => {
+        const painel = document.getElementById("arquivosFiltrosAvancados");
+        const abrir = document.getElementById("btnAbrirFiltrosArquivos");
+        const fechar = document.getElementById("btnFecharFiltrosArquivos");
+        const acoes = document.querySelector(".arquivos-acoes");
+        if (!painel || !abrir || !fechar || !acoes) return;
+        const marcador = document.createComment("acoes dos filtros");
+        acoes.parentNode.insertBefore(marcador, acoes);
+
+        const alternar = aberto => {
+            if (aberto) painel.appendChild(acoes);
+            else marcador.parentNode.insertBefore(acoes, marcador.nextSibling);
+            painel.classList.toggle("is-visible", aberto);
+            abrir.setAttribute("aria-expanded", String(aberto));
+            document.body.classList.toggle("arquivos-filtros-abertos", aberto);
+        };
+        abrir.addEventListener("click", () => alternar(true));
+        fechar.addEventListener("click", () => alternar(false));
+        document.getElementById("btnBuscarArquivos")?.addEventListener("click", () => alternar(false));
+        document.getElementById("btnLimparArquivos")?.addEventListener("click", () => alternar(false));
+        window.addEventListener("keydown", evento => { if (evento.key === "Escape") alternar(false); });
+    })();
+</script>
+  <script src="../js/conecte-signature.js?v=20260722c"></script>
 </body>
 </html>

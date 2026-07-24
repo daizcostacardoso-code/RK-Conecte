@@ -1,5 +1,7 @@
 (function (global) {
   "use strict";
+  // Esta é a única camada global da tela de carregamento. As páginas apenas
+  // registram tarefas com RKLoading.addTask/finishTask, mantendo o fluxo simples.
   if (!global.document || global.RKLoading) return;
 
   const doc = global.document;

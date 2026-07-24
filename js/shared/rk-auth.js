@@ -24,6 +24,7 @@ const RKAuth = {
         "medicao-obra.html",
         "nota-servico.html",
         "caixa.html",
+        "loading.html",
         "projetos.html",
         "funcionario.html",
         "novo-orcamento.html",
@@ -143,13 +144,7 @@ const RKAuth = {
             return sessao;
         }
 
-        if (this.modoAtual === "home") {
-            if (sessao) this.redirecionarDashboard();
-            else this.liberarInterface();
-            return sessao;
-        }
-
-        if (this.modoAtual === "public") {
+        if (["home", "public"].includes(this.modoAtual)) {
             this.liberarInterface();
             return sessao;
         }
@@ -194,7 +189,7 @@ const RKAuth = {
             uid: String(this.usuarioAtual.uid || ""),
             usuario: email,
             email,
-            nomeUsuario: this.usuarioAtual.displayName || preferencias.nomeUsuario || nomeEmail || "Funcionário RK",
+            nomeUsuario: this.usuarioAtual.displayName || this.perfilAtual?.nome || preferencias.nomeUsuario || nomeEmail || "Funcionário RK",
             fotoUsuario: this.usuarioAtual.photoURL || preferencias.fotoUsuario || "",
             entradaEm: this.usuarioAtual.metadata?.lastSignInTime || new Date().toISOString(),
             perfil: this.perfilAtual?.perfil || "",

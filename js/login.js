@@ -18,11 +18,16 @@ const Login = {
         this.mostrarMensagem("");
 
         try {
-            await autenticacao.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            const ambienteLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+            const persistencia = ambienteLocal
+                ? firebase.auth.Auth.Persistence.SESSION
+                : firebase.auth.Auth.Persistence.LOCAL;
+            await autenticacao.setPersistence(persistencia);
             const credencial = await autenticacao.signInWithEmailAndPassword(email, senha);
             if (window.RKAuth) await RKAuth.processarEstado(credencial.user);
             else window.location.replace("dashboard-comercial.html");
         } catch (erro) {
+            console.error("Falha no login Firebase:", erro?.code || "sem código", erro?.message || erro);
             this.mostrarMensagem(this.mensagemErro(erro));
             this.alterarProcessamento(false);
         }
@@ -69,7 +74,7 @@ const Login = {
             "auth/wrong-password": "E-mail ou senha incorretos.",
             "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
             "auth/network-request-failed": "Falha de conexão. Verifique a internet e tente novamente.",
-            "auth/unauthorized-domain": "Este endereço ainda não está liberado para acesso."
+            "auth/unauthorized-domain": "Este endereço ainda não está liberado para acesso. Adicione 127.0.0.1 aos domínios autorizados do Firebase Authentication."
         };
         return mensagens[codigo] || "Não foi possível entrar. Tente novamente.";
     }

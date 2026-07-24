@@ -1,4 +1,4 @@
-const RK_CACHE = 'rk-conecte-v1.0.1';
+const RK_CACHE = 'rk-conecte-v1.0.0-20260724001643423';
 const OFFLINE_FALLBACK = '/404.html';
 const APP_SHELL = [
   '/', '/index.html', OFFLINE_FALLBACK, '/paginas/login.html', '/paginas/loading.html',
@@ -8,13 +8,11 @@ const APP_SHELL = [
   '/paginas/compartilhar-documento.html', '/paginas/medicao-obra.html', '/paginas/nota-servico.html',
   '/paginas/caixa.html', '/paginas/acessos.html', '/css/style.css', '/css/rk-loading-critical.css',
   '/css/medicao-obra.css', '/css/nota-servico.css', '/css/caixa-basico.css', '/css/acessos.css',
-  '/js/app-install.js', '/js/firebase-auth-bootstrap.js', '/js/shared/rk-auth.js',
-  '/js/shared/rk-loading.js', '/js/shared/rk-navigation.js', '/js/shared/rk-version.js',
-  '/js/conecte-signature.js', '/js/public-site.js',
-  '/imagens/logo.jpeg', '/assets/conecte-logo.png', '/imagens/icons/icon-192.png',
-  '/imagens/icons/icon-512.png', '/imagens/icons/maskable-192-v1.0.1.png',
-  '/imagens/icons/maskable-512-v1.0.1.png', '/assets/pwa/launch-1170x2532.png',
-  '/assets/pwa/launch-1290x2796.png', '/assets/pwa/launch-2048x2732.png', '/manifest.webmanifest'
+  '/js/app-install.js', '/js/shared/rk-loading.js', '/js/shared/rk-version.js',
+  '/imagens/logo.jpeg', '/assets/conecte-logo.png', '/imagens/icons/icon-192.png?v=1.0.2',
+  '/imagens/icons/icon-512.png?v=1.0.2', '/imagens/icons/maskable-192-v1.0.1.png?v=1.0.2',
+  '/imagens/icons/maskable-512-v1.0.1.png?v=1.0.2', '/assets/pwa/launch-background.png?v=1.0.2',
+  '/manifest.webmanifest?v=1.0.2'
 ];
 
 self.addEventListener('install', event => {
@@ -38,11 +36,13 @@ async function navigation(request) {
 }
 
 async function staticAsset(request) {
-  const cached = await caches.match(request, { ignoreSearch: true });
-  if (cached) return cached;
-  const response = await fetch(request);
-  if (cacheable(response)) (await caches.open(RK_CACHE)).put(request, response.clone());
-  return response;
+  try {
+    const response = await fetch(request, { cache: 'no-cache' });
+    if (cacheable(response)) (await caches.open(RK_CACHE)).put(request, response.clone());
+    return response;
+  } catch (_) {
+    return (await caches.match(request, { ignoreSearch: true })) || Response.error();
+  }
 }
 
 self.addEventListener('fetch', event => {

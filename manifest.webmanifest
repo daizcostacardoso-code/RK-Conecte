@@ -1,11 +1,11 @@
 {
   "id": "/",
-  "name": "RK Vidraçaria",
-  "short_name": "RK Vidraçaria",
-  "description": "Vidraçaria em Porto Seguro com orçamento público, catálogo de produtos, serviços e atendimento por WhatsApp.",
+  "name": "RK Vidra\u00e7aria",
+  "short_name": "RK Vidra\u00e7aria",
+  "description": "Vidra\u00e7aria em Porto Seguro com or\u00e7amento p\u00fablico, cat\u00e1logo de produtos, servi\u00e7os e atendimento por WhatsApp.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "/paginas/dashboard-comercial.html?app=1&origem=pwa",
+  "start_url": "/index.html?app=1",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -17,53 +17,61 @@
   ],
   "icons": [
     {
-      "src": "/imagens/icons/icon-72.png",
+      "src": "/imagens/icons/icon-72.png?v=1.0.2",
       "sizes": "72x72",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-96.png",
+      "src": "/imagens/icons/icon-96.png?v=1.0.2",
       "sizes": "96x96",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-128.png",
+      "src": "/imagens/icons/icon-128.png?v=1.0.2",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-144.png",
+      "src": "/imagens/icons/icon-144.png?v=1.0.2",
       "sizes": "144x144",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-152.png",
+      "src": "/imagens/icons/icon-152.png?v=1.0.2",
       "sizes": "152x152",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-192.png",
+      "src": "/imagens/icons/icon-192.png?v=1.0.2",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-384.png",
+      "src": "/imagens/icons/icon-384.png?v=1.0.2",
       "sizes": "384x384",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/icon-512.png",
+      "src": "/imagens/icons/icon-512.png?v=1.0.2",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/imagens/icons/maskable-192-v1.0.1.png",
+      "src": "/imagens/icons/maskable-192-v1.0.1.png?v=1.0.2",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/imagens/icons/maskable-512-v1.0.1.png",
+      "src": "/imagens/icons/maskable-512-v1.0.1.png?v=1.0.2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -71,10 +79,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Solicitar orçamento",
-      "short_name": "Orçamento",
+      "name": "Solicitar or\u00e7amento",
+      "short_name": "Or\u00e7amento",
       "url": "/paginas/orcamento.html?app=1",
-      "description": "Enviar pedido de orçamento para a RK Vidraçaria.",
+      "description": "Enviar pedido de or\u00e7amento para a RK Vidra\u00e7aria.",
       "icons": [
         {
           "src": "/imagens/icons/icon-192.png",
@@ -84,10 +92,10 @@
       ]
     },
     {
-      "name": "Serviços",
-      "short_name": "Serviços",
+      "name": "Servi\u00e7os",
+      "short_name": "Servi\u00e7os",
       "url": "/paginas/servicos-publico.html?app=1",
-      "description": "Conhecer serviços de box, espelhos, fachadas e fechamentos.",
+      "description": "Conhecer servi\u00e7os de box, espelhos, fachadas e fechamentos.",
       "icons": [
         {
           "src": "/imagens/icons/icon-192.png",
@@ -100,7 +108,7 @@
       "name": "WhatsApp",
       "short_name": "WhatsApp",
       "url": "/paginas/contato.html?app=1",
-      "description": "Abrir os canais de contato da RK Vidraçaria.",
+      "description": "Abrir os canais de contato da RK Vidra\u00e7aria.",
       "icons": [
         {
           "src": "/imagens/icons/icon-192.png",
@@ -109,8 +117,5 @@
         }
       ]
     }
-  ],
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  }
+  ]
 }

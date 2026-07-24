@@ -373,6 +373,7 @@ body.dashboard-comercial-page .dashboard-comercial-activities { max-height: none
 }
 
 @media (max-width: 680px) {
+    body.dashboard-comercial-page .dashboard-comercial-shortcuts { display: none !important; }
     body.dashboard-comercial-page .dashboard-comercial-main > .container { width: min(100% - 20px, 1320px); }
     body.dashboard-comercial-page .dashboard-comercial-main { padding: 10px 0 28px; }
     body.dashboard-comercial-page .dashboard-comercial-header { min-height: 185px !important; align-items: flex-start; flex-direction: column; justify-content: center; gap: 18px; border-radius: 17px; padding: 25px 21px !important; }

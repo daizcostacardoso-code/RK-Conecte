@@ -1,3 +1,6 @@
+// Ponto único para dados que aparecem em várias telas. Altere nome, contato,
+// logo ou chaves de armazenamento aqui, sem procurar valores duplicados.
+// Não coloque segredos neste arquivo: ele é carregado publicamente pelo site.
 const Config = {
     sistema: {
         nome: "Orçamento RK Vidraçaria",

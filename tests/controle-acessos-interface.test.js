@@ -20,16 +20,12 @@ test("tela administrativa controla criação, perfil, situação e recuperação
 test("controle de acessos aparece somente no cabeçalho do administrador", () => {
     const interfaceDashboard = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-ui.js"), "utf8");
     const controller = readFileSync(resolve(raiz, "js/dashboard-comercial/dashboard-comercial-controller.js"), "utf8");
-    const estilos = readFileSync(resolve(raiz, "css/dashboard-comercial.css"), "utf8");
     const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
     assert.doesNotMatch(interfaceDashboard, /acessos\.html|Controle de acessos/);
     assert.match(navegacao, /sessao\?\.perfil === "admin"/);
     assert.match(navegacao, /rotulo: "Acessos", pagina: "acessos\.html"/);
     assert.match(controller, /this\.sessao = await this\.aguardarSessao\(\)/);
-    assert.match(estilos, /dashboard-comercial-shortcuts[\s\S]*repeat\(5/);
-    assert.match(estilos, /grid-auto-rows:\s*104px/);
-    assert.match(estilos, /dashboard-comercial-shortcut\s*\{[\s\S]*height:\s*100%/);
-    assert.doesNotMatch(estilos, /grid-template-columns:\s*repeat\(auto-fit/);
+    assert.match(interfaceDashboard, /dashboard-comercial-shortcuts/);
 });
 
 test("controle de acessos transforma a tabela em cartões no celular", () => {

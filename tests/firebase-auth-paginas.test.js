@@ -5,7 +5,6 @@ const { resolve } = require("node:path");
 
 const raiz = resolve(__dirname, "..");
 const paginasComAuth = [
-    "index.html",
     "paginas/acessos.html",
     "paginas/arquivos.html",
     "paginas/caixa.html",
@@ -13,6 +12,7 @@ const paginasComAuth = [
     "paginas/compartilhar-documento.html",
     "paginas/dashboard-comercial.html",
     "paginas/funcionario.html",
+    "paginas/loading.html",
     "paginas/login.html",
     "paginas/medicao-obra.html",
     "paginas/nota-servico.html",
@@ -51,4 +51,38 @@ test("Login não mantém usuário ou senha padrão no formulário", () => {
     assert.match(html, /type="email" id="email"/);
     assert.doesNotMatch(html, /placeholder="1234"/);
     assert.doesNotMatch(html, /id="usuario"/);
+});
+
+test("Login local informa a liberação necessária do endereço 127.0.0.1", () => {
+    const login = readFileSync(resolve(raiz, "js/login.js"), "utf8");
+    assert.match(login, /Adicione 127\.0\.0\.1 aos domínios autorizados/);
+    assert.match(login, /Persistence\.SESSION/);
+    assert.match(login, /"127\.0\.0\.1"/);
+});
+
+test("navegacao inferior e compartilhada na area interna", () => {
+    const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
+    const css = readFileSync(resolve(raiz, "css/style.css"), "utf8");
+    const arquivos = readFileSync(resolve(raiz, "paginas/arquivos.html"), "utf8");
+
+    assert.match(navegacao, /renderizarMenuInferior\(\)/);
+    assert.match(navegacao, /rk-mobile-nav-handle/);
+    assert.match(navegacao, /rk-menu-inferior--oculto/);
+    assert.match(navegacao, /rk-mobile-more/);
+    assert.match(navegacao, /requestAnimationFrame/);
+    for (const pagina of ["dashboard-comercial.html", "orcamento-inteligente.html", "projetos.html", "clientes.html", "caixa.html"]) {
+        assert.match(navegacao, new RegExp(pagina), pagina);
+    }
+    assert.match(css, /\.rk-menu-inferior/);
+    assert.match(css, /overflow-wrap: anywhere/);
+    assert.doesNotMatch(arquivos, /Arquivos de orçamentos/);
+});
+
+test("área interna verifica atualizações do service worker a cada carregamento", () => {
+    const navegacao = readFileSync(resolve(raiz, "js/shared/rk-navigation.js"), "utf8");
+    const serviceWorker = readFileSync(resolve(raiz, "sw.js"), "utf8");
+    assert.match(navegacao, /atualizarCacheAplicacao/);
+    assert.match(navegacao, /registro\?\.update\(\)/);
+    assert.match(navegacao, /controllerchange/);
+    assert.match(serviceWorker, /cache: 'no-cache'/);
 });

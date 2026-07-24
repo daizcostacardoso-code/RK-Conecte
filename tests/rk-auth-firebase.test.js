@@ -105,6 +105,7 @@ test("Telas comerciais sensíveis permanecem classificadas como protegidas", () 
         "medicao-obra.html",
         "nota-servico.html",
         "caixa.html",
+        "loading.html",
         "produtos.html",
         "acessos.html"
     ].forEach(pagina => assert.equal(RKAuth.paginaProtegida(pagina), true, pagina));

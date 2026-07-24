@@ -2,26 +2,14 @@
   'use strict';
 
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  const internalStartUrl = '/paginas/dashboard-comercial.html?app=1&origem=pwa-legado';
   let deferredPrompt = null;
-
-  function redirectLegacyPwaLaunch(){
-    if (!isStandalone) return false;
-    const path = (window.location.pathname || '/').toLowerCase();
-    const legacyEntry = path === '/' || path.endsWith('/index.html') || path.endsWith('/paginas/loading.html');
-    if (!legacyEntry) return false;
-    window.location.replace(internalStartUrl);
-    return true;
-  }
-
-  if (redirectLegacyPwaLaunch()) return;
 
   function registerSW(){
     if (!('serviceWorker' in navigator)) return;
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
+      navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {
         const prefix = location.pathname.includes('/paginas/') ? '../' : './';
-        navigator.serviceWorker.register(prefix + 'sw.js').catch(() => null);
+        navigator.serviceWorker.register(prefix + 'sw.js', { updateViaCache: 'none' }).catch(() => null);
       });
     });
   }

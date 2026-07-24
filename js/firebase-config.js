@@ -1,3 +1,5 @@
+// Configuração pública do projeto Firebase. Chaves privadas e credenciais de
+// serviço nunca devem ser adicionadas aqui; use o ambiente seguro do backend.
 var firebaseConfig = window.RK_FIREBASE_CONFIG || {
     apiKey: "AIzaSyBYZYbcYwU2U-mUXAEKsQzZddsUEHNynPI",
     authDomain: "rk-vidracaria.firebaseapp.com",

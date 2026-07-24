@@ -54,24 +54,25 @@ test("páginas protegidas carregam o shell crítico antes do Firebase", () => {
   }
 });
 
-test("service worker mantém shell offline seguro da v1.0.1", () => {
+test("service worker mantém shell offline seguro da v1.0.0", () => {
   const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-  assert.match(sw, /rk-conecte-v1\.0\.1/);
+  assert.match(sw, /rk-conecte-v1\.0\.0/);
   for (const asset of ["rk-loading.js", "rk-loading-critical.css", "imagens/logo.jpeg", "assets/conecte-logo.png", "404.html"]) assert.ok(sw.includes(asset), asset);
   assert.match(sw, /request\.mode === 'navigate'/);
   assert.match(sw, /request\.method !== 'GET'/);
-  assert.match(sw, /maskable-512-v1\.0\.1\.png/);
-  assert.match(sw, /launch-1170x2532\.png/);
+  assert.match(sw, /maskable-512-v1\.0\.1\.png\?v=1\.0\.2/);
+  assert.match(sw, /launch-background\.png\?v=1\.0\.2/);
 });
 
-test("entrada da PWA abre diretamente o dashboard com o mesmo shell visual", () => {
+test("entrada da PWA usa o mesmo shell e startup visual do carregador", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const manifest = fs.readFileSync(path.join(root, "manifest.webmanifest"), "utf8");
   assert.match(html, /class="rk-app-iniciando"/);
   assert.ok(html.indexOf("rk-loading-critical.css") < html.indexOf("rk-auth.js"));
   assert.ok(html.indexOf("rk-loading.js") < html.indexOf("rk-auth.js"));
   assert.match(html, /apple-touch-startup-image/);
-  assert.match(manifest, /"start_url": "\/paginas\/dashboard-comercial\.html\?app=1&origem=pwa"/);
+  assert.match(html, /launch-background\.png\?v=1\.0\.2/);
+  assert.doesNotMatch(html, /launch-1170x2532\.png/);
   assert.match(manifest, /"background_color": "#071c2b"/);
-  assert.match(manifest, /maskable-512-v1\.0\.1\.png/);
+  assert.match(manifest, /maskable-512-v1\.0\.1\.png\?v=1\.0\.2/);
 });
