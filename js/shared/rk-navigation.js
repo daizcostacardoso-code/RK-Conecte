@@ -141,6 +141,7 @@ const RKNavigation = {
         lista.innerHTML = this.obterLinksVisiveis().map(link => this.renderizarLink(link)).join("");
         lista.classList.add("rk-nav-principal");
         this.prepararTelaInterna(lista);
+        this.renderizarPerfilHeader();
         this.renderizarMenuInferior();
         this.protegerLinksInternos(lista);
         this.shellInicialPreparado = true;
@@ -681,20 +682,20 @@ const RKNavigation = {
 
     renderizarPerfilHeader() {
         document.body.classList.remove("rk-header-panel-aberto");
-        document.querySelectorAll(".rk-header-profile, .rk-header-actions, .rk-header-settings, .rk-header-notifications").forEach(elemento => elemento.remove());
         const container = document.querySelector("body > header > .container");
-        const sessao = window.RKAuth?.obterSessao?.();
-        if (!container || !sessao) return false;
+        const sessao = window.RKAuth?.obterSessao?.() || {};
+        if (!container) return false;
 
-        const nome = String(sessao.nomeUsuario || sessao.email || "Usuário").trim();
-        const cargo = sessao.perfil === "admin" ? "Administrador" : "Funcionário";
+        const autenticado = Boolean(sessao.logado);
+        const nome = String(sessao.nomeUsuario || sessao.email || "Conta em validação").trim();
+        const cargo = sessao.perfil === "admin" ? "Administrador" : (autenticado ? "Funcionário" : "Aguardando autenticação");
         const email = String(sessao.email || "").trim();
         const empresaConfigurada = typeof Config !== "undefined" ? Config?.empresa?.nome : window.Config?.empresa?.nome;
         const empresa = String(empresaConfigurada || "RK Vidraçaria").trim();
         const densidade = this.obterPreferenciasInterface().densidade;
-        const acoes = document.createElement("section");
-        const notificacoes = document.createElement("section");
-        const configuracoes = document.createElement("section");
+        const acoes = container.querySelector(":scope > .rk-header-actions") || document.createElement("section");
+        const notificacoes = acoes.querySelector(":scope > .rk-header-notifications") || document.createElement("section");
+        const configuracoes = acoes.querySelector(":scope > .rk-header-settings") || document.createElement("section");
         acoes.className = "rk-header-actions";
         acoes.setAttribute("aria-label", "Ações do sistema");
         notificacoes.className = "rk-header-notifications";
@@ -754,12 +755,12 @@ const RKNavigation = {
             `<p class="rk-header-settings__status" data-rk-settings-status role="status" aria-live="polite"></p>`,
             `</div>`,
             `<footer class="rk-header-settings__footer">`,
-            `<button type="button" class="rk-header-settings__logout" data-rk-settings-logout><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.sair}</svg><span>Sair do sistema</span></button>`,
+            `<button type="button" class="rk-header-settings__logout" data-rk-settings-logout${autenticado ? "" : " disabled"}><svg viewBox="0 0 24 24" aria-hidden="true">${this.iconesConfiguracoes.sair}</svg><span>${autenticado ? "Sair do sistema" : "Validando acesso..."}</span></button>`,
             `</footer>`,
             `</div>`
         ].join("");
         acoes.append(notificacoes, configuracoes);
-        container.appendChild(acoes);
+        if (!acoes.isConnected) container.appendChild(acoes);
 
         this.configurarPainelNotificacoes(notificacoes);
         this.configurarPainelConfiguracoes(configuracoes);

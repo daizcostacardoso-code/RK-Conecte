@@ -113,3 +113,15 @@ test("shell oferece configuracoes no cabecalho e opcoes opacas no menu expandido
     assert.match(estilos, /\.rk-adaptive-mobile-navigation\[data-state="expanded"\] \.rk-adaptive-mobile-navigation__group a\s*\{[\s\S]*?background:\s*#fff !important;/);
     assert.match(estilos, /\.rk-adaptive-mobile-navigation\[data-state="expanded"\] \.rk-adaptive-mobile-navigation__group a\s*\{[\s\S]*?opacity:\s*1 !important;/);
 });
+
+test("sino e engrenagem fazem parte do shell anterior à autenticação", () => {
+    const navegacao = ler("js/shared/rk-navigation.js");
+    const inicioShell = navegacao.indexOf("prepararShellInicial()");
+    const fimShell = navegacao.indexOf('window.dispatchEvent(new CustomEvent("rk:shell-ready")', inicioShell);
+    const acoes = navegacao.indexOf("this.renderizarPerfilHeader();", inicioShell);
+
+    assert.ok(acoes > inicioShell && acoes < fimShell);
+    assert.match(navegacao, /Conta em validação/);
+    assert.match(navegacao, /Validando acesso\.\.\./);
+    assert.doesNotMatch(navegacao, /querySelectorAll\("\.rk-header-profile, \.rk-header-actions/);
+});
