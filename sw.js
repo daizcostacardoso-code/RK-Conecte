@@ -1,10 +1,10 @@
-const RK_CACHE = 'rk-conecte-v1.0.0-20260724001643423';
+const RK_CACHE = 'rk-conecte-v1.0.0-20260724101343706';
 const OFFLINE_FALLBACK = '/404.html';
 const APP_SHELL = [
   '/', '/index.html', OFFLINE_FALLBACK, '/paginas/login.html', '/paginas/loading.html',
-  '/paginas/dashboard-comercial.html', '/paginas/clientes.html', '/paginas/funcionario.html',
-  '/paginas/orcamento-inteligente.html', '/paginas/novo-orcamento.html', '/paginas/orcamento.html',
-  '/paginas/projetos.html', '/paginas/produtos.html', '/paginas/valores.html', '/paginas/arquivos.html',
+  '/paginas/dashboard-comercial.html', '/paginas/clientes.html',
+  '/paginas/orcamento-inteligente.html', '/paginas/orcamento.html',
+  '/paginas/projetos.html', '/paginas/produtos.html', '/paginas/arquivos.html',
   '/paginas/compartilhar-documento.html', '/paginas/medicao-obra.html', '/paginas/nota-servico.html',
   '/paginas/caixa.html', '/paginas/acessos.html', '/css/style.css', '/css/rk-loading-critical.css',
   '/css/medicao-obra.css', '/css/nota-servico.css', '/css/caixa-basico.css', '/css/acessos.css',

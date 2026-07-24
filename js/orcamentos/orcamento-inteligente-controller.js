@@ -218,6 +218,12 @@ const OrcamentoInteligenteController = {
             return;
         }
 
+        if (acao === "limpar-item") {
+            evento.preventDefault();
+            this.limparItemAtual(botao);
+            return;
+        }
+
         if (acao === "remover-produto") {
             await this.removerProduto(Number(botao.dataset.indice));
             return;
@@ -294,6 +300,32 @@ const OrcamentoInteligenteController = {
         }
 
         await this.adicionarItemProjeto(dadosItem);
+    },
+
+    limparItemAtual(botao) {
+        const form = botao?.closest?.("[data-orcamento-form='produto']");
+        if (!form) {
+            this.mostrarAviso("Formulario de item nao encontrado.", "erro");
+            return false;
+        }
+
+        form.reset();
+        this.formularioNovoItemPendente = null;
+
+        const descricao = form.querySelector("[name='descricao']");
+        if (descricao) {
+            descricao.dataset.autogerada = "false";
+            delete descricao.dataset.itemPronto;
+        }
+
+        this.atualizarFormularioItem(form);
+        this.atualizarObrigatoriedadeAdicional(form);
+        this.agendarPersistenciaRascunho();
+
+        const primeiroCampo = form.querySelector("[name='itemProntoId']");
+        primeiroCampo?.focus?.({ preventScroll: true });
+        this.mostrarAviso("Campos do item limpos.", "info");
+        return true;
     },
 
     validarDadosItemParaAdicionar(dadosItem = {}) {
@@ -438,18 +470,18 @@ const OrcamentoInteligenteController = {
 
         if (this.mesmaEntidade(this.contexto?.cliente, cliente)) {
             this.mostrarAviso("Cliente ja estava selecionado.", "info");
-            this.renderizarEtapaAtual();
+            this.irParaEtapa("produtos");
             this.atualizarResumo();
             return;
         }
 
         const resultado = await OrcamentoOrchestrator.selecionarCliente(this.contexto, cliente);
         if (!resultado.sucesso) {
-            this.aplicarResultado(resultado, "projeto");
+            this.aplicarResultado(resultado, "produtos", { avancarNoMobile: true });
             return;
         }
 
-        this.aplicarResultado(resultado, "projeto");
+        this.aplicarResultado(resultado, "produtos", { avancarNoMobile: true });
     },
 
     async criarClienteRapido(dadosCliente = {}) {
@@ -998,13 +1030,14 @@ const OrcamentoInteligenteController = {
         this.renderizarEtapaAtual();
     },
 
-    aplicarResultado(resultado, proximaEtapa) {
+    aplicarResultado(resultado, proximaEtapa, opcoes = {}) {
         this.contexto = resultado.contexto;
         if (resultado.sucesso) {
             this.garantirServicoPadrao();
         }
 
-        if (resultado.sucesso && proximaEtapa && !this.estaEmMobile()) {
+        const podeAvancar = !this.estaEmMobile() || opcoes.avancarNoMobile === true;
+        if (resultado.sucesso && proximaEtapa && podeAvancar) {
             this.etapaAtual = proximaEtapa;
         }
 

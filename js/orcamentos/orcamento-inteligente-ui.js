@@ -749,16 +749,21 @@ const OrcamentoInteligenteUI = {
         `;
     },
 
+    renderizarControleComUnidade(controle, unidade) {
+        return `
+            <div class="orcamento-inteligente-controle-unidade">
+                ${controle}
+                <span class="orcamento-inteligente-unidade" aria-hidden="true">${this.escapar(unidade)}</span>
+            </div>
+        `;
+    },
+
     renderizarGrupoItem(servico = {}, catalogo = {}) {
         const grupoServico = servico.id || "outros";
         const itensProntos = Array.isArray(catalogo.itens) ? catalogo.itens : [];
 
         return `
             <section class="orcamento-inteligente-grupo-item">
-                <div class="orcamento-inteligente-grupo-topo">
-                    <h3><span class="orcamento-inteligente-grupo-icone" aria-hidden="true">${this.escapar(this.iconeServico(servico))}</span>${this.escapar((servico.plural || servico.nome || "Itens").toUpperCase())}</h3>
-                    <span>Adicionar item</span>
-                </div>
                 <form class="orcamento-inteligente-form orcamento-inteligente-form-item" data-orcamento-form="produto" data-orcamento-novo-item data-grupo-servico="${this.escapar(grupoServico)}" novalidate>
                     <input type="hidden" name="grupoServico" value="${this.escapar(grupoServico)}">
                     <input type="hidden" name="grupoServicoNome" value="Itens">
@@ -766,14 +771,13 @@ const OrcamentoInteligenteUI = {
                     <input type="hidden" name="tipoItemNome" value="">
                     <input type="hidden" name="subtipoItem" value="">
                     <input type="hidden" name="unidade" value="m2">
-                    <div class="orcamento-inteligente-campo">
+                    <div class="orcamento-inteligente-campo orcamento-inteligente-campo-item-selecao">
                         <label>Item</label>
                         <select name="itemProntoId">
                             <option value="">Preencher manualmente</option>
                             ${this.renderizarOptionsItensProntos(itensProntos)}
                         </select>
                     </div>
-                    ${this.renderizarDescricaoTamanhoItemPronto("", "", false)}
                     ${this.renderizarCamposDimensao({
                         grupoServico,
                         tipoDimensao: "engenharia",
@@ -783,36 +787,64 @@ const OrcamentoInteligenteUI = {
                         larguraCm: "",
                         alturaCm: ""
                     })}
+                    ${this.renderizarDescricaoTamanhoItemPronto("", "", false)}
                     <div class="orcamento-inteligente-campo">
                         <label>Quantidade</label>
-                        <input type="number" name="quantidade" min="0.01" step="0.01" inputmode="decimal" placeholder="1.00" value="1.00" required>
+                        ${this.renderizarControleComUnidade(
+                            `<input type="number" name="quantidade" min="0.01" step="0.01" inputmode="decimal" placeholder="1.00" value="1.00" required>`,
+                            "un"
+                        )}
                     </div>
                     <div class="orcamento-inteligente-campo">
-                        <label>Valor unitario <small>R$</small></label>
-                        <input type="number" name="valorUnitario" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(this.obterValorUnitarioPadrao(grupoServico), 0)}" required>
+                        <label>Valor unit&aacute;rio</label>
+                        ${this.renderizarControleComUnidade(
+                            `<input type="number" name="valorUnitario" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(this.obterValorUnitarioPadrao(grupoServico), 0)}" required>`,
+                            "R$"
+                        )}
                     </div>
                     <div class="orcamento-inteligente-campo orcamento-inteligente-campo-valor-item">
-                        <label>Ferragens/Acessórios <small>R$</small></label>
-                        <input type="number" name="valorAdicional" min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+                        <label>Ferragens/Acess&oacute;rios</label>
+                        ${this.renderizarControleComUnidade(
+                            `<input type="number" name="valorAdicional" min="0" step="0.01" inputmode="decimal" placeholder="0.00">`,
+                            "R$"
+                        )}
                     </div>
                     <div class="orcamento-inteligente-campo orcamento-inteligente-campo-valor-item">
-                        <label>Valor do aluminio <small>R$/m</small></label>
-                        <input type="number" name="valorAluminio" min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+                        <label>Valor do alum&iacute;nio</label>
+                        ${this.renderizarControleComUnidade(
+                            `<input type="number" name="valorAluminio" min="0" step="0.01" inputmode="decimal" placeholder="0.00">`,
+                            "R$/m"
+                        )}
                     </div>
                     <div class="orcamento-inteligente-campo orcamento-inteligente-campo-valor-item">
-                        <label>Adicional do jato <small>R$</small></label>
-                        <input type="number" name="valorJato" min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+                        <label>Adicional do jato</label>
+                        ${this.renderizarControleComUnidade(
+                            `<input type="number" name="valorJato" min="0" step="0.01" inputmode="decimal" placeholder="0.00">`,
+                            "R$"
+                        )}
                     </div>
                     <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
-                        <label>Descricao</label>
-                        <input type="text" name="descricao" data-autogerada="false" placeholder="Informe a descricao" required>
+                        <label>Descri&ccedil;&atilde;o</label>
+                        <textarea name="descricao" data-autogerada="false" rows="2" maxlength="200" placeholder="Informe a descri&ccedil;&atilde;o do item" required></textarea>
                     </div>
                     ${this.renderizarDependencias(grupoServico, "", [])}
                     <div class="orcamento-inteligente-campo orcamento-inteligente-campo-cheio">
-                        <label>Observacao do item</label>
-                        <textarea name="observacoes" rows="2"></textarea>
+                        <label>Observa&ccedil;&atilde;o do item</label>
+                        <textarea name="observacoes" rows="2" maxlength="300" placeholder="Adicione observa&ccedil;&otilde;es relevantes sobre este item"></textarea>
                     </div>
-                    <button type="button" class="botao orcamento-inteligente-btn-form" data-orcamento-action="adicionar-item"><span class="orcamento-inteligente-btn-icone" aria-hidden="true">+</span>Adicionar item</button>
+                    <div class="orcamento-inteligente-item-acoes">
+                        <button type="button" class="orcamento-inteligente-btn-limpar" data-orcamento-action="limpar-item">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="m7 15 7.8-7.8a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8L11 19H7l-3-3 3-3"></path>
+                                <path d="m13 9 4 4M9 19h10"></path>
+                            </svg>
+                            Limpar
+                        </button>
+                        <button type="button" class="botao orcamento-inteligente-btn-form" data-orcamento-action="adicionar-item">
+                            <span class="orcamento-inteligente-btn-icone" aria-hidden="true">+</span>
+                            Adicionar item
+                        </button>
+                    </div>
                 </form>
             </section>
         `;
@@ -845,13 +877,19 @@ const OrcamentoInteligenteUI = {
                 <input type="hidden" name="tipoDimensao" value="engenharia">
                 ${item.omitirTamanhoPadraoSelecionado ? "" : `<input type="hidden" name="tamanhoPadraoSelecionado" value="${this.escapar(item.tamanhoPadraoSelecionado || "")}">`}
             `}
-            <div class="orcamento-inteligente-campo">
-                <label>Altura <small>cm</small></label>
-                <input type="number" name="alturaCm" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.alturaCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>
+            <div class="orcamento-inteligente-campo orcamento-inteligente-campo-dimensao">
+                <label>Altura</label>
+                ${this.renderizarControleComUnidade(
+                    `<input type="number" name="alturaCm" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.alturaCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>`,
+                    "cm"
+                )}
             </div>
-            <div class="orcamento-inteligente-campo">
-                <label>Largura <small>cm</small></label>
-                <input type="number" name="larguraCm" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.larguraCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>
+            <div class="orcamento-inteligente-campo orcamento-inteligente-campo-dimensao">
+                <label>Largura</label>
+                ${this.renderizarControleComUnidade(
+                    `<input type="number" name="larguraCm" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="${this.valorCalculo(item.larguraCm, 0)}" ${tipoDimensao === "padrao" ? "readonly" : ""} required>`,
+                    "cm"
+                )}
             </div>
         `;
     },
@@ -892,10 +930,23 @@ const OrcamentoInteligenteUI = {
             : this.obterDependenciasItem(grupoServico, tipoItem);
 
         return `
-            <div class="orcamento-inteligente-dependencias orcamento-inteligente-campo-cheio">
-                <span>Dependencias</span>
-                <strong data-item-dependencias>${this.escapar(dependencias.length ? dependencias.join(", ") : "Dependencias a definir")}</strong>
-            </div>
+            <details class="orcamento-inteligente-dependencias orcamento-inteligente-campo-cheio">
+                <summary>
+                    <span class="orcamento-inteligente-dependencias-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                            <path d="m8.5 15.5 7-7M6.4 18.6l-1-1a3.5 3.5 0 0 1 0-5l3-3a3.5 3.5 0 0 1 5 0M17.6 5.4l1 1a3.5 3.5 0 0 1 0 5l-3 3a3.5 3.5 0 0 1-5 0"></path>
+                        </svg>
+                    </span>
+                    <span class="orcamento-inteligente-dependencias-texto">
+                        <b>Depend&ecirc;ncias</b>
+                        <strong data-item-dependencias>${this.escapar(dependencias.length ? dependencias.join(", ") : "Dependencias a definir")}</strong>
+                    </span>
+                    <span class="orcamento-inteligente-dependencias-seta" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false"><path d="m9 6 6 6-6 6"></path></svg>
+                    </span>
+                </summary>
+                <p>As depend&ecirc;ncias s&atilde;o atualizadas conforme o item selecionado.</p>
+            </details>
         `;
     },
 

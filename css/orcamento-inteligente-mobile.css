@@ -213,6 +213,143 @@
     }
 }
 
+/* No mobile a timeline horizontal permanece visivel durante toda a jornada. */
+@media (max-width: 820px) {
+    body.orcamento-inteligente-page {
+        --orcamento-mobile-timeline-altura: 56px;
+        --orcamento-mobile-timeline-topo: 0px;
+        scroll-padding-top: var(--orcamento-mobile-timeline-altura);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-modulo > .container {
+        padding-top: var(--orcamento-mobile-timeline-altura);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-principal > .orcamento-inteligente-painel,
+    body.orcamento-inteligente-page .orcamento-inteligente-resumo-painel {
+        padding-right: 14px !important;
+    }
+
+    body.orcamento-inteligente-page
+        .orcamento-inteligente-principal > .orcamento-inteligente-painel
+        > .orcamento-inteligente-painel-topo h2,
+    body.orcamento-inteligente-page
+        .orcamento-inteligente-resumo-painel
+        > .orcamento-inteligente-painel-topo h2 {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page
+        .orcamento-inteligente-principal > .orcamento-inteligente-painel
+        > .orcamento-inteligente-painel-topo .orcamento-inteligente-label,
+    body.orcamento-inteligente-page
+        .orcamento-inteligente-resumo-painel
+        > .orcamento-inteligente-painel-topo .orcamento-inteligente-label {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page
+        .orcamento-inteligente-principal > .orcamento-inteligente-painel
+        > .orcamento-inteligente-painel-topo {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page
+        .orcamento-inteligente-resumo-painel
+        > .orcamento-inteligente-painel-topo {
+        justify-content: flex-end;
+        margin-bottom: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-estado {
+        display: none !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel {
+        position: fixed;
+        top: var(--orcamento-mobile-timeline-topo);
+        right: 0;
+        bottom: auto;
+        left: 0;
+        z-index: 95;
+        width: 100%;
+        height: var(--orcamento-mobile-timeline-altura);
+        padding: 3px 8px 4px !important;
+        border: 0 !important;
+        border-bottom: 1px solid rgba(5, 42, 82, .07) !important;
+        border-radius: 0;
+        background: rgba(255, 255, 255, .95) !important;
+        box-shadow: 0 2px 7px rgba(5, 42, 82, .07) !important;
+        backdrop-filter: blur(9px);
+        -webkit-backdrop-filter: blur(9px);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas-painel .orcamento-inteligente-painel-topo {
+        display: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapas {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-rows: none;
+        gap: 0;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa {
+        min-height: 48px;
+        gap: 1px;
+        border-radius: 7px;
+        padding-block: 1px !important;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
+        width: 29px;
+        height: 29px;
+        font-size: 11px;
+        box-shadow: 0 1px 3px rgba(5, 42, 82, .11), 0 0 0 1px #ffffff;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
+        color: #607080;
+        font-size: 7px;
+        opacity: .86;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.ativa {
+        background: rgba(234, 243, 255, .38);
+        box-shadow: inset 0 0 0 1px rgba(18, 107, 255, .07);
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa.concluida .orcamento-inteligente-etapa-bola {
+        box-shadow: 0 1px 3px rgba(47, 158, 68, .11), 0 0 0 1px #ffffff;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-etapa::before {
+        top: 17px;
+        right: calc(50% + 17px);
+        bottom: auto;
+        left: auto;
+        width: calc(100% - 31px);
+        height: 1px;
+        transform: none;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-aviso-flutuante {
+        top: calc(var(--orcamento-mobile-timeline-altura) + 10px);
+        right: 11px;
+    }
+
+    body.orcamento-inteligente-page .orcamento-inteligente-contexto-fixo:not([hidden]) {
+        top: calc(var(--orcamento-mobile-timeline-altura) + 7px);
+        right: 10px;
+    }
+}
+
+@media (min-width: 701px) and (max-width: 820px) {
+    body.orcamento-inteligente-page {
+        --orcamento-mobile-timeline-topo: var(--orcamento-mobile-header-altura, 58px);
+    }
+}
+
 @media (max-width: 360px) {
     body.orcamento-inteligente-page {
         --orcamento-mobile-timeline-largura: 44px;
@@ -220,13 +357,13 @@
 
     body.orcamento-inteligente-page .orcamento-inteligente-etapa strong {
         max-width: none;
-        font-size: 7px;
+        font-size: 6px;
     }
 
     body.orcamento-inteligente-page .orcamento-inteligente-etapa-bola {
-        width: 34px;
-        height: 34px;
-        font-size: 14px;
+        width: 27px;
+        height: 27px;
+        font-size: 10px;
     }
 
     body.orcamento-inteligente-page .orcamento-inteligente-contexto-fixo:not([hidden]) {
@@ -238,5 +375,153 @@
     body.orcamento-inteligente-page .orcamento-inteligente-contexto-itens {
         min-width: 42px;
         padding-inline: 5px;
+    }
+}
+
+/* Etapa Itens - acabamento compacto no mobile */
+@media (max-width: 820px) {
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-grupos-itens {
+        padding: 0 2px 4px 0;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-grupo-item {
+        overflow: visible;
+        border-radius: 10px;
+        box-shadow: 0 4px 14px rgba(5, 42, 82, .06);
+        padding: 10px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-form-item {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px 8px;
+        border: 0;
+        background: transparent;
+        padding: 0;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-campo {
+        gap: 3px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-campo-dimensao {
+        border-radius: 8px;
+        padding: 6px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-campo label {
+        min-height: 0;
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos
+        .orcamento-inteligente-campo-dimensao > label {
+        font-size: 11px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos
+        .orcamento-inteligente-form-item :is(input, select, textarea) {
+        min-height: 36px;
+        border-radius: 7px;
+        font-size: 12px;
+        padding: 7px 8px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos
+        .orcamento-inteligente-form-item [name="itemProntoId"] {
+        font-size: 10px !important;
+        padding-inline: 7px 24px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-form-item textarea {
+        min-height: 48px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-controle-unidade {
+        min-height: 36px;
+        border-radius: 7px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos
+        .orcamento-inteligente-controle-unidade > input {
+        min-height: 34px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-unidade {
+        min-width: 36px;
+        font-size: 10px;
+        padding: 0 7px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias {
+        border-radius: 8px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias summary {
+        min-height: 48px;
+        grid-template-columns: 28px minmax(0, 1fr) 18px;
+        gap: 7px;
+        padding: 6px 8px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias-icone svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias-texto b {
+        font-size: 10px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias-texto strong,
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias > p {
+        font-size: 9px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-dependencias > p {
+        padding: 7px 9px 8px 43px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-item-acoes {
+        grid-template-columns: minmax(90px, .7fr) minmax(150px, 1.3fr);
+        gap: 8px;
+        border: 1px solid rgba(203, 217, 231, .86);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .96);
+        box-shadow: 0 7px 20px rgba(5, 42, 82, .1);
+        padding: 7px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos
+        .orcamento-inteligente-item-acoes > button {
+        min-height: 38px;
+        border-radius: 7px !important;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 760px) {
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-form-item {
+        padding-bottom: 68px;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-item-acoes {
+        position: fixed;
+        right: 10px;
+        bottom: calc(var(--rk-mobile-navigation-height, 76px) + 7px + env(safe-area-inset-bottom, 0px));
+        left: 10px;
+        z-index: 94;
+    }
+}
+
+@media (max-width: 340px) {
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos .orcamento-inteligente-form-item {
+        grid-template-columns: 1fr;
+    }
+
+    body.orcamento-inteligente-page #orcamentoInteligenteProdutos
+        :is(.orcamento-inteligente-campo-item-selecao, .orcamento-inteligente-campo-cheio, [data-tamanho-item-pronto-campo], .orcamento-inteligente-item-acoes) {
+        grid-column: 1;
     }
 }
